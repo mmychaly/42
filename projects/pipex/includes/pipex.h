@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 22:44:20 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/08/04 22:45:01 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/08/06 17:43:38 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,9 @@ void	ft_launch_child_2(char **argv, char *envp[], int pipefd[2]);
 void	ft_redirection_in(char *argv, int pipefd, char **strs_argv, char *cmd);
 void	ft_redirection_out(char *argv, int pipefd, char **strs_argv, char *cmd);
 
-void	ft_create_empty_file(char *filename);
+void	ft_create_empty_file(char *filename, int nb);
 void	ft_execution(char **argv, char *envp[]);
 void	ft_free_strs(char **strs);
 void	ft_free_all(char **strs, char *cmd, int fd);
+void	ft_error_exit(int nb);
 #endif
