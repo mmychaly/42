@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 02:22:54 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/08/06 01:49:14 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/08/06 17:58:49 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,8 +94,6 @@ char	*ft_envp_cherch(char *cmd, char **envp)
 	i = 0;
 	while (ft_strnstr(envp[i], "PATH", 4) == 0)
 		i++;
-	if (!envp[i])
-		return (NULL);
 	strs = ft_split(envp[i] + 5, ':');
 	if (strs == NULL)
 	{

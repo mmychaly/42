@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 02:32:53 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/08/06 01:55:24 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/08/06 17:57:28 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,7 @@ void	ft_launch_child_2(char **argv, char *envp[], int pipefd[2])
 
 	strs_argv = ft_split(argv[3], ' ');
 	if (strs_argv == NULL)
-	{
-		perror("Error in split for strs_argv_2");
-		exit(EXIT_FAILURE);
-	}
+		ft_error_exit(1);
 	if (access(strs_argv[0], F_OK | X_OK) == 0)
 		cmd = strs_argv[0];
 	else
@@ -62,7 +59,6 @@ void	ft_launch_child_2(char **argv, char *envp[], int pipefd[2])
 	}
 	close(pipefd[1]);
 	ft_redirection_out(argv[4], pipefd[0], strs_argv, cmd);
-
 	if (execve(cmd, strs_argv, envp) == -1)
 	{
 		perror("execve_2");
