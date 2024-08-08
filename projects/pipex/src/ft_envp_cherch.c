@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 02:22:54 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/08/06 17:58:49 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/08/08 03:10:40 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ char	*ft_creat_path(char **strs, char *cmd)
 	int		len;
 
 	i = 0;
-	len = strlen(cmd);
+	len = ft_strlen(cmd);
 	while (strs[i] != NULL)
 	{
 		if (access(strs[i], F_OK | X_OK) == 0)

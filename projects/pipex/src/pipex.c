@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 22:27:49 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/08/06 17:44:40 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/08/08 00:29:32 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,18 +44,7 @@ void	ft_execution(char **argv, char *envp[])
 int	main(int argc, char **argv, char *envp[])
 {
 	if (argc == 5)
-	{
-		if (access(argv[1], F_OK) == -1)
-		{
-			if (access(argv[4], F_OK) == -1)
-				ft_create_empty_file(argv[4], 0);
-			perror("Error");
-			exit(0);
-		}
-		if ((access(argv[4], F_OK) == -1))
-			ft_create_empty_file(argv[4], 1);
 		ft_execution(argv, envp);
-	}
 	else
 	{
 		write(2, "Error: Incorrect number of arguments\n", 37);
