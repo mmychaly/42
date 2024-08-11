@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 02:32:53 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/08/08 06:13:20 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/08/11 14:41:22 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	ft_redirection_out(char *argv, int pipefd)
 	fd_out = open(argv, O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	if (fd_out == -1)
 	{
-		perror("open infile");
+		perror("open outfile");
 		close(pipefd);
 		exit (1);
 	}
