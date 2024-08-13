@@ -6,7 +6,11 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 02:32:53 by mmychaly          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2024/08/13 22:02:30 by mmychaly         ###   ########.fr       */
+=======
+/*   Updated: 2024/08/11 14:41:22 by mmychaly         ###   ########.fr       */
+>>>>>>> 665a4d9dc5929277a71b4f7d34fc89c572f5370b
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +23,13 @@ void	ft_redirection_out(char *argv, int pipefd)
 	fd_out = open(argv, O_WRONLY | O_TRUNC | O_CREAT, 0644); //Открываем файлы в который выведем конечный результат, если он не создан то создаем
 	if (fd_out == -1)
 	{
+<<<<<<< HEAD
 		perror("open infile");
 		close(pipefd); //Если не получилось открыть то закрываем второй пайп
+=======
+		perror("open outfile");
+		close(pipefd);
+>>>>>>> 665a4d9dc5929277a71b4f7d34fc89c572f5370b
 		exit (1);
 	}
 	if (dup2(fd_out, STDOUT_FILENO) == -1) //Перенаправлем канал выхода на наш файл выхода,теперь результат работы команы выведется не в терминал а в файл
