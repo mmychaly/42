@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 22:27:49 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/08/08 00:29:32 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/08/13 21:34:53 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,36 +14,36 @@
 
 void	ft_execution(char **argv, char *envp[])
 {
-	int	pid_1;
-	int	pid_2;
-	int	pipefd[2];
-	int	status;
+	int	pid_1; //Для первого дочернего процесса
+	int	pid_2; //Для второго дочернего процесса
+	int	pipefd[2]; //Массив инт для пайпа, 2 канала // 0 для чтения из пайпа 1 для записи в пайп
+	int	status; //Для ослеживания как завершился процесс
 
-	if (pipe(pipefd) == -1)
+	if (pipe(pipefd) == -1) //Создаем пайп
 		ft_error_exit(1);
-	pid_1 = fork();
+	pid_1 = fork(); //Создаем первый дочерний процесс
 	if (pid_1 == -1)
 		ft_error_exit(1);
-	if (pid_1 == 0)
-		ft_launch_child_1(argv, envp, pipefd);
-	pid_2 = fork();
+	if (pid_1 == 0) //Для дочернего процесса pid_1 == 0 для родительского pid_1 == pid дочернего процесса, только дочерний процесс сможет пройти в иф по этому условию 
+		ft_launch_child_1(argv, envp, pipefd); //Запускаем основную функцию для дочернего процесса
+	pid_2 = fork(); //Создаем второй дочерний процесс
 	if (pid_2 == -1)
 		ft_error_exit(1);
-	if (pid_2 == 0)
+	if (pid_2 == 0) //Все тоже самое что и для первого 
 		ft_launch_child_2(argv, envp, pipefd);
-	close(pipefd[0]);
-	close(pipefd[1]);
-	waitpid(pid_1, &status, 0);
-	waitpid(pid_2, &status, 0);
-	if (WIFEXITED(status))
-		exit(WEXITSTATUS(status));
+	close(pipefd[0]); //Закрываем каналы пайпа в родительском процессе так как мы их здесь не используем 
+	close(pipefd[1]); //Закрываем второй
+	waitpid(pid_1, &status, 0); //Родтельский процесс будет продолжит исполнять инструкции только после завершения первого дочеренго процесса
+	waitpid(pid_2, &status, 0); //Так же ждем пока не завершиться второй дочерний процесс
+	if (WIFEXITED(status)) //Принимаем статус , если возвращает 0 то завершили процесс корректно через exit //Обращаем внимание на статус последнего процесса
+		exit(WEXITSTATUS(status)); //Выводим значение с которым закрыли процесс
 	else
-		ft_error_exit(1);
+		ft_error_exit(1); //Вышли из процесса не корректно 
 }
 
 int	main(int argc, char **argv, char *envp[])
 {
-	if (argc == 5)
+	if (argc == 5) //Проверяем количество аргументов , все что больше/меньше 5 не корректно //ВОзможно стоило проверить envp на NULL и выйти по ошибке 
 		ft_execution(argv, envp);
 	else
 	{
