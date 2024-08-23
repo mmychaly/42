@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 20:39:09 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/08/20 04:18:24 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/08/23 17:46:37 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,12 +163,12 @@ void ft_sort_b(t_stack **stack_b, t_stack *min, t_stack *max)
 	{
 		if (max->above_mid == 1)
 		{
-			write(1, "ra\n", 3);
+			write(1, "rb\n", 3);
 			ft_rotate(stack_b);
 		}
 		else
 		{
-			write(1, "rra\n", 4);
+			write(1, "rrb\n", 4);
 			ft_rev_rotate(stack_b);
 		}
 	}

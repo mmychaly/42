@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 02:32:09 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/08/20 06:08:37 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/08/23 17:47:15 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,8 +131,10 @@ void	ft_stack_check(t_stack **stack_a, int len_a, t_stack **stack_b, int	len_b)
 {
 	t_stack *max;
 	t_stack *min;
-	t_stack *actuel;
-	
+//	t_stack *actual;
+
+	max = NULL;
+	min = NULL;
 	if (ft_check_sort(*stack_a, len_a) == 1)
 		return ;
 	if (len_a == 1)
@@ -182,7 +184,12 @@ void	ft_stack_check(t_stack **stack_a, int len_a, t_stack **stack_b, int	len_b)
 			check_min_max(*stack_a, &min, &max);
 			if (ft_check_sort(*stack_a, len_a) == 0)
 				ft_sort_a(stack_a, min, max);
-
+/*			actual = *stack_a;
+			while (actual != NULL)
+			{
+				printf("in ft_rotate index == %i // nomber == %i\n", actual->index, actual->nbr);
+				actual = actual->next;
+			}*/
 		}
 	}
 }

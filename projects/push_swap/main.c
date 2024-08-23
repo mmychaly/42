@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 23:22:04 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/08/19 02:11:34 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/08/23 17:28:21 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
 		ft_lstclear_mod(&stack_a);
 	}
 	return (0);
+
 }
 
 
