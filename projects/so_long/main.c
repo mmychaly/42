@@ -1,30 +1,48 @@
 #include "minilibx-linux/mlx.h"
 #include <stdlib.h>
 
-int	main(void)
+typedef struct s_data
 {
 	void *mlx_ptr;
 	void *win_ptr;
+}				t_data;
 
-	mlx_ptr = mlx_init();
-	if (!mlx_ptr)
+int	close_window(t_data *data)
+{
+	mlx_destroy_window(data->mlx_ptr, data->win_ptr);
+	free(data->win_ptr);
+	mlx_destroy_display(data->mlx_ptr);
+	free(data->mlx_ptr);
+	exit(EXIT_FAILURE);
+}
+
+
+int	main(void)
+{
+	t_data data;
+
+	data.mlx_ptr = mlx_init();
+	if (data.mlx_ptr)
 	{
 		perror("ERROR");
 		exit(EXIT_FAILURE);
 	}
 
-	win_ptr = mlx_new_window(mlx_ptr, 800, 600, "Hello!");
-	if (!win_ptr)
+	data.win_ptr = mlx_new_window(data.mlx_ptr, 800, 600, "Hello!");
+	if (!data.win_ptr)
 	{
 		perror("ERROR");
-		mlx_destroy_display(mlx_ptr);
-		free(mlx_ptr);
+		mlx_destroy_display(data.mlx_ptr);
+		free(data.mlx_ptr);
 		exit(EXIT_FAILURE);
 	}
-	mlx_hook(win_ptr, )
-	mlx_loop(mlx_ptr);
-	mlx_destroy_window(win_ptr);
-	mlx_destroy_display(mlx_ptr);
-	free(mlx_ptr);
+
+	mlx_hook(data.win_ptr, 17, 0, close_window, &data);
+	mlx_hook(data.win_ptr, 2, 0, key_press, &data);
+
+	mlx_loop(data.mlx_ptr);
+	mlx_destroy_window(data.win_ptr);
+	mlx_destroy_display(data.mlx_ptr);
+	free(data.mlx_ptr);
 	return (0);
 }
