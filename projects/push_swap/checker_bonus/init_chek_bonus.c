@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 03:48:11 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/08/25 04:21:59 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/08/31 15:01:00 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,11 @@ void	ft_check_digit(char **strs)
 		i_2 = 0;
 		if (strs[i][0] == '-' || strs[i][0] == '+')
 			i_2++;
+		if (ft_isdigit(strs[i][i_2]) == 0)
+		{
+			ft_free_strs(strs);
+			ft_error_exit(1);
+		}
 		while (strs[i][i_2] != '\0')
 		{
 			if (ft_isdigit(strs[i][i_2]) == 0)

@@ -21,7 +21,8 @@ int	main(void)
 		free(mlx_ptr);
 		exit(EXIT_FAILURE);
 	}
-
+	mlx_hook(win_ptr, )
+	mlx_loop(mlx_ptr);
 	mlx_destroy_window(win_ptr);
 	mlx_destroy_display(mlx_ptr);
 	free(mlx_ptr);

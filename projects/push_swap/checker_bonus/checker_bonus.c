@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 03:44:04 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/08/26 04:32:08 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/08/29 11:35:50 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,7 @@ void	ft_check_operation(t_stack **stack_a, char *str, int len)
 	{
 		temp = str;
 		str = ft_launch_operations(str, stack_a, &stack_b);
-		if (str != NULL)
-			free(temp);
-		else
-			break ;
+		free(temp);
 	}
 	if (stack_b != NULL || ft_check_sort(*stack_a, len) == 0)
 		write(1, "KO\n", 3);
@@ -68,14 +65,19 @@ int	main(int argc, char *argv[])
 		len = ft_init_bonus(&stack_a, argc, argv);
 		str = get_next_line(0);
 		if (str == NULL && ft_check_sort(stack_a, len) == 0)
+		{
 			write(1, "KO\n", 3);
+			free(str);
+			ft_lstclear_mod(&stack_a);
+		}
 		else if (str == NULL && ft_check_sort(stack_a, len) == 1)
+		{
 			write(1, "OK\n", 3);
+			free(str);
+			ft_lstclear_mod(&stack_a);
+		}
 		else
 			ft_check_operation(&stack_a, str, len);
-		str = get_next_line(0);
-		if (str != NULL)
-			free(str);
 		ft_lstclear_mod(&stack_a);
 	}
 	return (0);
