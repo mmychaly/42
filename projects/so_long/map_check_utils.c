@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 22:00:23 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/09/07 05:45:34 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/09/11 20:45:49 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,11 @@ void	check_symb_utils(t_data *data, int i)
 		if (data->map[i][i_2] == 'C')
 			data->coin_counter += 1;
 		else if (data->map[i][i_2] == 'E')
+		{
 			data->exit_counter += 1;
+			data->exit_y = i;
+			data->exit_x = i_2;
+		}
 		else if (data->map[i][i_2] == 'P')
 		{
 			data->departure_counter += 1;
