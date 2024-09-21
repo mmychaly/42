@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 05:22:58 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/09/12 15:08:09 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/09/16 14:11:06 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,4 +57,13 @@ void	free_all(t_data *data)
 		mlx_destroy_display(data->mlx_ptr);
 	free(data->mlx_ptr);
 	free_strs(data);
+}
+
+void	window_error(t_data *data)
+{
+	perror("Error\n");
+	mlx_destroy_display(data->mlx_ptr);
+	free(data->mlx_ptr);
+	free_strs(data);
+	exit(EXIT_FAILURE);
 }
