@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/09 03:27:36 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/07/20 18:20:22 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/09/10 22:41:37 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,3 +16,4 @@ void	ft_put_symb(char symb, int *len)
 {
 	write(1, &symb, 1);
 	(*len)++;
+}
