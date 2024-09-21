@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/13 17:02:05 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/09/21 04:43:23 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/09/21 04:41:32 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 size_t	ft_strlcpy(char *dest, const char *src, size_t size)
 {
@@ -76,15 +76,16 @@ char	*ft_read_fd_utils(char *buffer, char **temp)
 	return (*temp);
 }
 
-char	*ft_read_fd(int fd, char *line_buffer, char *buffer)
+char	*ft_read_fd(int fd,
+	char line_buffer[500][BUFFER_SIZE + 1], char *buffer)
 {
 	char	*temp;
 	int		res_read;
 
 	temp = NULL;
-	if (line_buffer[0] != '\0')
+	if (line_buffer[fd][0] != '\0')
 	{
-		temp = ft_strdup(line_buffer);
+		temp = ft_strdup(line_buffer[fd]);
 		if (!temp)
 			return (NULL);
 	}
@@ -107,14 +108,15 @@ char	*ft_read_fd(int fd, char *line_buffer, char *buffer)
 
 char	*get_next_line(int fd)
 {
-	static char	line_buffer[BUFFER_SIZE + 1];
+	static char	line_buffer[500][BUFFER_SIZE + 1];
 	char		*line_printable;
 	char		*temp;
 	char		*buffer;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+	if (fd < 0 || fd >= 500 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
 	{
-		line_buffer[0] = '\0';
+		if (fd >= 0 && fd < 500)
+			line_buffer[fd][0] = '\0';
 		return (NULL);
 	}
 	buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1));
@@ -126,7 +128,7 @@ char	*get_next_line(int fd)
 		return (NULL);
 	line_printable = ft_separator_line(&temp);
 	if (line_printable != NULL)
-		ft_strlcpy(line_buffer, temp, (ft_strlen(temp) + 1));
+		ft_strlcpy(line_buffer[fd], temp, (ft_strlen(temp) + 1));
 	free(temp);
 	return (line_printable);
 }
