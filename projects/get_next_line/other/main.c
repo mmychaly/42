@@ -5,6 +5,7 @@ int main(void)
 {
 	int fd;
 	char *line = NULL;;
+    int i = 0;
 
 	fd = open("test.txt", O_RDONLY);
     if (fd == -1)
@@ -15,9 +16,17 @@ int main(void)
 
     while ((line = get_next_line(fd)) != NULL)
     {
-        printf("in wh %s\n", line);
+        printf("%s\n", line);
         free(line);
+        i++;
+        if (i == 6)
+        {
+            printf("quit leak line\n");
+            break ;
+        }
     }
+    printf("after wh %s\n", line);
+    free(line);
     close(fd);
     printf("after close\n");
     printf("File descriptor closed\n\tNext Call = (%s)\n", get_next_line(fd));
