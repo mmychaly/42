@@ -1,11 +1,13 @@
 #include <stdio.h>
-#include "get_next_line.h"
+#include "../temp/get_next_line.h"
 
 int main(void)
 {
 	int fd;
 	char *line = NULL;
-	
+	int i;
+
+    i = 0;
     fd = open("test.txt", O_RDONLY);
     if (fd == -1)
     {
@@ -17,6 +19,12 @@ int main(void)
     {
         printf("%s\n", line);
         free(line);
+                i++;
+        if (i == 3)
+        {
+            printf("quit leak line\n");
+            break ;
+        }
     }
     close(fd);
     printf("after close\n");
