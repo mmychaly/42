@@ -1,0 +1,6 @@
+
+
+after wh (null)
+after close
+File descriptor closed
+	Next Call = ((null))
