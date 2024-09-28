@@ -59,7 +59,6 @@ int main(int argc, char *argv[])
         i++;
     }
     free(fds);
-    printf("after close\n");
 	return (0);
 }
 

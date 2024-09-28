@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/13 17:02:08 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/09/25 01:27:15 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/09/25 15:32:26 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ char	*ft_strjoin(char *s1, char *s2)
 	str[i] = '\0';
 	return (str);
 }
-
 
 char	*ft_strdup(const char *s)
 {

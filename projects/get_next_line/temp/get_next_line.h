@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/13 17:00:02 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/09/25 01:27:35 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/09/25 15:33:37 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,9 @@
 char	*get_next_line(int fd);
 char	*ft_separator_line(char **buffer);
 char	*ft_read_fd(int fd, char **line_buffer, char *buffer);
+char	*ft_read_utils(char **line_buffer, char *buffer);
+char	*ft_next_string(char **buffer);
 char	*ft_strjoin(char *s1, char *s2);
-size_t	ft_strlcpy(char *dest, const char *src, size_t size);
 size_t	ft_strlen(const char *s);
 char	*ft_strdup(const char *s);
 char	*ft_strchr(const char *s, int c);

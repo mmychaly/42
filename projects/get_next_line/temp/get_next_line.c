@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/13 17:02:05 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/09/25 01:38:07 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/09/25 18:24:18 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ char	*ft_next_string(char **buffer)
 		i++;
 	if ((*buffer)[i] == '\n')
 		i++;
-	else 
+	else
 	{
 		new_buffer = NULL;
 		return (free_error(buffer));
@@ -47,13 +47,28 @@ char	*ft_next_string(char **buffer)
 	new_buffer = ft_strdup(*buffer + i);
 	free(*buffer);
 	if (!new_buffer)
-		return(NULL);
+		return (NULL);
 	return (new_buffer);
+}
+
+char	*ft_read_utils(char **line_buffer, char *buffer)
+{
+	char	*temp;
+
+	temp = ft_strjoin(*line_buffer, buffer);
+	if (!temp)
+	{
+		free(buffer);
+		return (free_error(line_buffer));
+	}
+	free(*line_buffer);
+	*line_buffer = temp;
+	temp = NULL;
+	return (*line_buffer);
 }
 
 char	*ft_read_fd(int fd, char **line_buffer, char *buffer)
 {
-	char	*temp;
 	int		res_read;
 
 	while (1)
@@ -65,20 +80,12 @@ char	*ft_read_fd(int fd, char **line_buffer, char *buffer)
 		if (*line_buffer == NULL)
 		{
 			*line_buffer = ft_strdup(buffer);
-			if (line_buffer == NULL)
+			if (*line_buffer == NULL)
 				return (free_error(&buffer));
 		}
 		else
-		{
-			temp = ft_strjoin(*line_buffer, buffer);
-			if (!temp)
-			{
-				free(buffer);
-				return (free_error(line_buffer));
-			}
-			free(*line_buffer);
-			*line_buffer = temp;
-		}
+			if (ft_read_utils(line_buffer, buffer) == NULL)
+				return (NULL);
 		if (ft_strchr(*line_buffer, '\n'))
 			break ;
 	}
@@ -95,11 +102,11 @@ char	*get_next_line(int fd)
 	char		*buffer;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (free_error(&line_buffer)); 
+		return (free_error(&line_buffer));
 	buffer = malloc (sizeof(char) * (BUFFER_SIZE + 1));
 	if (buffer == NULL)
 		return (free_error(&line_buffer));
-	buffer[0] = '\0'; 
+	buffer[0] = '\0';
 	line_buffer = ft_read_fd(fd, &line_buffer, buffer);
 	if (line_buffer == NULL)
 		return (NULL);
