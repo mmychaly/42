@@ -6,11 +6,11 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 02:32:53 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/08/13 22:10:57 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/02 05:10:14 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include "pipex_bonus.h"
 
 void	ft_redirection_out(char *argv, int pipefd)
 {
@@ -40,14 +40,14 @@ void	ft_redirection_out(char *argv, int pipefd)
 	close(pipefd); //Закрываем канал так как все уже пренаправили
 }
 
-void	ft_launch_child_2(char **argv, char *envp[], int pipefd[2]) // Функция для чтения из пайпа , передачи данных во вторую команды и вывода результата второй команды в файл выхода.
+void	ft_launch_child_2(int i, char **argv, char *envp[], int prev_pipe) // Функция для чтения из пайпа , передачи данных во вторую команды и вывода результата второй команды в файл выхода.
 {
 	char	**strs_argv;
 	char	*cmd;
 
-	close(pipefd[1]);//Закрываем канал записи так как мы его не используем
-	ft_redirection_out(argv[4], pipefd[0]);//Пернаправлем файловые дескрипторы
-	strs_argv = ft_split(argv[3], ' ');//Все тоже самое чтои в прошлой функции
+	printf("in ft_launch_child_2 // i = %i // i - 1 == %i\n", i, i + 1);
+	ft_redirection_out(argv[i + 1], prev_pipe);//Пернаправлем файловые дескрипторы
+	strs_argv = ft_split(argv[i], ' ');//Все тоже самое чтои в прошлой функции
 	if (strs_argv == NULL)
 		ft_error_exit(1);
 	if (access(strs_argv[0], F_OK | X_OK) == 0)

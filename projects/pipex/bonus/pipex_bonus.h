@@ -1,17 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   pipex_bonus.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 22:44:20 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/09/28 19:08:49 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/02 06:38:13 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
+#ifndef PIPEX_BONUS_H
+# define PIPEX_BONUS_H
+
 # include <unistd.h>
 # include <stdio.h>
 # include <errno.h>
@@ -20,6 +21,7 @@
 # include <sys/wait.h>
 # include <sys/types.h>
 # include <stdlib.h>
+# include "libft/libft.h"
 
 char	*ft_strjoin(char const *s1, char const *s2);
 char	**ft_split(char const *s, char c);
@@ -35,9 +37,11 @@ void	ft_add_symb(char **strs);
 
 void	ft_execution(int nbr_cmd, char **argv, char *envp[]);
 void	ft_launch_child_1(int i, char **argv, char *envp[], int pipefd[2]);
-void	ft_launch_child_2(int i, char **argv, char *envp[], int pipefd[2]);
+void	ft_launch_child_2(int i, char **argv, char *envp[], int prev_pipe);
 void	ft_redirection_in(char *argv, int pipefd);
 void	ft_redirection_out(char *argv, int pipefd);
+void	ft_launch_other(int i, char **argv, char *envp[], int pipefd[2], int prev_pipe);
+void	ft_redirection_between(int pipefd, int prev_pipe);
 
 void	free_fault_cmd(char **strs);
 void	free_fault_execve(char **strs, char *cmd);

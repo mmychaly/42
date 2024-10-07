@@ -1,0 +1,7 @@
+apple
+1 banana r ?
+pp
+2 orange r ?
+grape
+apple
+banana

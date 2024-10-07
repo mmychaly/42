@@ -6,59 +6,67 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 22:27:49 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/09/28 19:12:07 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/04 19:45:55 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include "pipex_bonus.h"
 
 void	ft_execution(int nbr_cmd, char **argv, char *envp[])
 {
-	int	pid_first; //Для первого дочернего процесса
-	int	pid_last; //Для второго дочернего процесса
-	int pid_other;
+	int	pid;
 	int	pipefd[2]; //Массив инт для пайпа, 2 канала // 0 для чтения из пайпа 1 для записи в пайп
+	int prev_pipe;
 	int	status; //Для ослеживания как завершился процесс
 	int i;
 
 	i = 2;
-	if (pipe(pipefd) == -1) //Создаем пайп
-		ft_error_exit(1);
-	pid_first = fork(); //Создаем первый дочерний процесс
-	if (pid_first == -1)
-		ft_error_exit(1);
-	if (pid_first == 0) //Для дочернего процесса pid_first == 0 для родительского pid_first == pid дочернего процесса, только дочерний процесс сможет пройти в иф по этому условию 
-		ft_launch_child_1(i++, argv, envp, pipefd); //Запускаем основную функцию для дочернего процесса
-	while (nbr_cmd > 0)
+	prev_pipe = -1;
+	while (i < nbr_cmd + 2 )
 	{
-		pid_other = fork;
-		if (pid_other == -1)
+		if (i != nbr_cmd + 1 && pipe(pipefd) == -1) //Я буду создавать новый пайп пока не окажусь в последней комаде, для нее не нужен пайп так как использует чтение из прошлого и выводит в файл
 			ft_error_exit(1);
-		if (pid_other == 0) //Все тоже самое что и для первого 
-		ft_launch_child_other(i++, argv, envp, pipefd);
+		pid = fork();
+		if (pid == -1)
+			ft_error_exit(1);
+		if (pid == 0) //Все тоже самое что и для первого 
+		{
+			if (i == 2)
+				ft_launch_child_1(i, argv, envp, pipefd);
+			else if (i == nbr_cmd + 1)
+				ft_launch_child_2(i, argv, envp, prev_pipe);
+			else
+				ft_launch_other(i, argv, envp, pipefd, prev_pipe);
+		}
+		if (prev_pipe != -1)
+			close(prev_pipe);
+		if (i != nbr_cmd + 1) // Закрываем конец записи текущего пайпа в родительском процессе
+			close(pipefd[1]);
+		prev_pipe = pipefd[0];
+		if (i == nbr_cmd + 1) //Условие сработает если мы находимся в последнем процессе 
+			prev_pipe = pid; // Сохраняем PID последнего процесса, использую prev_pipe так он мне дальше не нужен
+		i++;
+		printf("pid == %i\n", pid);
 	}
-	pid_last = fork(); //Создаем второй дочерний процесс
-	if (pid_last == -1)
-		ft_error_exit(1);
-	if (pid_last == 0) //Все тоже самое что и для первого 
-		ft_launch_child_2(i++, argv, envp, pipefd);
-	close(pipefd[0]); //Закрываем каналы пайпа в родительском процессе так как мы их здесь не используем 
-	close(pipefd[1]); //Закрываем второй
-	waitpid(pid_first, &status, 0); //Родтельский процесс будет продолжит исполнять инструкции только после завершения первого дочеренго процесса
-	waitpid(pid_other, &status, 0); 
-	waitpid(pid_last, &status, 0); //Так же ждем пока не завершиться второй дочерний процесс
-	if (WIFEXITED(status)) //Принимаем статус , если возвращает 0 то завершили процесс корректно через exit //Обращаем внимание на статус последнего процесса
-		exit(WEXITSTATUS(status)); //Выводим значение с которым закрыли процесс
-	else
-		ft_error_exit(1); //Вышли из процесса не корректно 
+	while ((pid = waitpid(-1, &status, 0)) > 0) //параметр -1 указывает на то что мы ждем завершение любого дочернего процесса, что позволяет не указывать на конкретный процесс
+	{
+		if (pid == prev_pipe) //Мы проерим статус и выйдим из программы когда закончим последний дочерний процесс
+		{
+			printf("exit prev_pipe == %i\n", prev_pipe);
+			if (WIFEXITED(status))
+				exit(WEXITSTATUS(status));
+			else
+				ft_error_exit(1);
+		}
+	}
 }
 
 int	main(int argc, char **argv, char *envp[])
 {
 	int	nbr_cmd;
 
-	nbr_cmd = argc - 5;
-	if (argc == 5) //Проверяем количество аргументов , все что больше/меньше 5 не корректно //ВОзможно стоило проверить envp на NULL и выйти по ошибке 
+	nbr_cmd = argc - 3;
+	if (argc >= 5) //Проверяем количество аргументов , все что больше/меньше 5 не корректно //ВОзможно стоило проверить envp на NULL и выйти по ошибке 
 		ft_execution(nbr_cmd, argv, envp);
 	else
 	{

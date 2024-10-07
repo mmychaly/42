@@ -1,53 +1,44 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_launch_child_1.c                                :+:      :+:    :+:   */
+/*   ft_launch_child_other.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/03 02:32:34 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/10/04 05:00:13 by mmychaly         ###   ########.fr       */
+/*   Created: 2024/10/02 02:03:48 by mmychaly          #+#    #+#             */
+/*   Updated: 2024/10/02 06:38:49 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-void	ft_redirection_in(char *argv, int pipefd)
+void	ft_redirection_between(int pipefd, int prev_pipe)
 {
-	int		fd_in;
-
-	fd_in = open(argv, O_RDONLY, 0644); //Открываем файл из которого будем брать данные 
-	if (fd_in == -1)
+	if (dup2(prev_pipe, STDIN_FILENO) == -1) //Перенаправляем стандарный вход на файл,теперь когда команда запросит данные она возьмет их из файла а не из терминала
 	{
-		perror("open infile");
-		close(pipefd); //Если есть не смогли открыть то закрываем послений пайп и выходим из процесса
-		exit (EXIT_FAILURE);
-	}
-	if (dup2(fd_in, STDIN_FILENO) == -1) //Перенаправляем стандарный вход на файл,теперь когда команда запросит данные она возьмет их из файла а не из терминала
-	{
-		perror("dup2 fd_in");
+		perror("dup2 pipefd[0]");
+		close(prev_pipe);
 		close(pipefd); //Закрываем пайп 
-		close(fd_in); //Закрываем файловый дескриптор
 		exit (EXIT_FAILURE);
 	}
-	close(fd_in);//Закрываем файловый дескриптор так как мы уже перенаправили вход 
+	close(prev_pipe);
 	if (dup2(pipefd, STDOUT_FILENO) == -1) //Перенаправляем стандартный выход на конец записи,теперь после выполнения комманды команда выведет информацию не в терминал а в конец записи пайпа, который сохранит информацию в буффере
 	{
 		perror("dup2 pipefd[1]");
 		close(pipefd); //Закрываем пайп 
 		exit (EXIT_FAILURE);
 	}
-	close(pipefd); //Закрываем пайп , так как мы уже перенаправили канал вывода на пайп
+	close(pipefd);  //Закрываем пайп , так как мы уже перенаправили канал вывода на пайп
 }
 
-void	ft_launch_child_1(int i, char **argv, char *envp[], int pipefd[2]) //Функция записи в пайп
+void	ft_launch_other(int i, char **argv, char *envp[], int pipefd[2], int prev_pipe) //Функция записи в пайп
 {
 	char	**strs_argv;
 	char	*cmd;
 
-	printf("in ft_launch_child_1 // i = %i // i - 1 == %i\n", i, i - 1);
-	close(pipefd[0]); //Закрывае канал на чтение
-	ft_redirection_in(argv[i - 1], pipefd[1]); //Функция переадресации стандарных входа и выхода
+	printf("in ft_launch_other // i = %i \n", i);
+	close(pipefd[0]);
+	ft_redirection_between(pipefd[1], prev_pipe); //Функция переадресации стандарных входа и выхода
 	strs_argv = ft_split(argv[i], ' '); //Разделяем аргумент командной строки в которой указывалось имя команды и аргумент для нее
 	if (strs_argv == NULL)
 		ft_error_exit(1);
