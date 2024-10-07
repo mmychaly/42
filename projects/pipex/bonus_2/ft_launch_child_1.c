@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 02:32:34 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/10/05 05:36:26 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/07 18:16:15 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 void	ft_redirection_in(char *argv, int pipefd)
 {
 	int		fd_in;
-
 	fd_in = open(argv, O_RDONLY, 0644);
 	if (fd_in == -1)
 	{
@@ -45,7 +44,7 @@ void	ft_launch_child_1(int i, char **argv, char *envp[], int pipefd[2])
 	char	**strs_argv;
 	char	*cmd;
 
-	printf("in ft_launch_child_1\n");
+	printf("in ft_launch_child 1\n");
 	close(pipefd[0]);
 	ft_redirection_in(argv[i - 1], pipefd[1]);
 	if (argv[i][0] == '\0')
@@ -54,9 +53,32 @@ void	ft_launch_child_1(int i, char **argv, char *envp[], int pipefd[2])
 		exit(1);
 	}
 	strs_argv = ft_split(argv[i], ' ');
+	write(2, strs_argv[0], ft_strlen(strs_argv[0]));
+	write(2, "\n", 1);
+	if (i == 2)
+	{
+		write(2, strs_argv[1], ft_strlen(strs_argv[1]));
+		write(2, "\n", 1);
+	}
+	if (i == 2)
+	{
+		write(2, strs_argv[2], ft_strlen(strs_argv[2]));
+		write(2, "\n", 1);
+	}
 	if (strs_argv == NULL)
 		ft_error_exit(1);
 	strs_argv = check_strs(strs_argv);
+	write(2, "in ft_launch_child after check_strs\n", 36);
+	if (i == 2)
+	{
+		write(2, strs_argv[0], ft_strlen(strs_argv[0]));
+		write(2, "\n", 1);
+	}
+	if (i == 2)
+	{
+		write(2, strs_argv[1], ft_strlen(strs_argv[1]));
+		write(2, "\n", 1);
+	}
 	if (strs_argv == NULL)
 	{
 		write(2, "Error: command not found\n", 25);
