@@ -6,12 +6,11 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 03:56:22 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/10/10 00:38:31 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/09 21:36:31 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
+#include "pipex_bonus.h"
 
 void	free_fault_execve(char **strs, char *cmd)
 {
@@ -65,4 +64,11 @@ void	free_pipe(int fd)
 		free(line);
 		line = get_next_line(fd);
 	}
+}
+
+void	error_split(void)
+{
+	perror("ERROR split: ");
+	free_pipe(0);
+	exit(EXIT_FAILURE);
 }

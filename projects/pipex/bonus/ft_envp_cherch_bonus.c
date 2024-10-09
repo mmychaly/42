@@ -6,11 +6,11 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 02:22:54 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/10/10 00:16:45 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/08 05:21:15 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include "pipex_bonus.h"
 
 void	ft_add_symb(char **strs)
 {

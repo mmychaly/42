@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 22:44:20 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/08/08 04:59:25 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/10 00:45:45 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ size_t	ft_strlen(const char *s);
 size_t	ft_strlcpy(char *dest, const char *src, size_t size);
 char	*ft_strnstr(const char *big, const char *little, size_t len);
 char	*ft_strdup(const char *s);
+char	*get_next_line(int fd);
 
 char	*ft_envp_cherch(char *cmd, char **envp);
 char	*ft_creat_path(char **strs, char *cmd);
@@ -39,8 +40,13 @@ void	ft_launch_child_2(char **argv, char *envp[], int pipefd[2]);
 void	ft_redirection_in(char *argv, int pipefd);
 void	ft_redirection_out(char *argv, int pipefd);
 
-void	free_fault_cmd(char **strs);
 void	free_fault_execve(char **strs, char *cmd);
 void	ft_free_strs(char **strs);
 void	ft_error_exit(int nb);
+void	free_pipe(int fd);
+void	error_empty_cmd(void);
+void	error_split(void);
+void	free_error_cmd(char **strs_argv);
+void	error_open_outfile(int pipefd);
+
 #endif
