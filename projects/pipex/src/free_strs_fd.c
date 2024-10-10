@@ -6,12 +6,11 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/08 03:56:22 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/10/10 00:38:31 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/10 04:50:11 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
 
 void	free_fault_execve(char **strs, char *cmd)
 {
