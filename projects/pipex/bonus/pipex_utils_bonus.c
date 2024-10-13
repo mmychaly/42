@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 04:06:07 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/10/08 05:11:40 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/13 15:19:51 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,4 +58,10 @@ void	wait_processes(t_data *data)
 		}
 		pid = waitpid(-1, &status, 0);
 	}
+}
+
+void	exit_error_argum(void)
+{
+	write(2, "Error: Incorrect number of arguments\n", 37);
+	exit(EXIT_FAILURE);
 }

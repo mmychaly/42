@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 22:44:20 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/10/09 23:46:47 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/13 15:14:37 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ typedef struct s_data
 
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
 char	*get_next_line(int fd);
-void	launch_here_doc(char **argv, int pipefd[2]);
+void	launch_here_doc(t_data *data);
 char	*ft_strjoin(char const *s1, char const *s2);
 char	**ft_split(char const *s, char c);
 size_t	ft_strlen(const char *s);
@@ -70,4 +70,6 @@ void	error_open_outfile(int pipefd);
 void	error_dup2_out(int prev_pipe);
 void	free_pipe(int fd);
 void	error_split(void);
+void	exit_error_argum(void);
+
 #endif

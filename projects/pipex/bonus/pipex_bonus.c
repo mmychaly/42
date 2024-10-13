@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
+/*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 22:27:49 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/10/09 23:21:04 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/13 15:17:32 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,7 @@ void	execute_child(t_data *data, int pipefd[2])
 
 void	execute_child_here_doc(t_data *data, int pipefd[2])
 {
-	if (data->i == 2)
-		launch_here_doc(data->argv, pipefd);
-	else if (data->i == data->nbr_cmd + 1)
+	if (data->i == data->nbr_cmd + 1)
 		ft_launch_child_2(data);
 	else
 		ft_launch_other(data, pipefd);
@@ -66,8 +64,8 @@ void	execution_here_doc(t_data *data)
 	int	pipefd[2];
 	int	pid;
 
-	data->i = 2;
-	data->prev_pipe = -1;
+	data->i = 3;
+	launch_here_doc(data);
 	while (data->i < data->nbr_cmd + 2)
 	{
 		if (data->i != data->nbr_cmd + 1 && pipe(pipefd) == -1)
@@ -77,8 +75,7 @@ void	execution_here_doc(t_data *data)
 			ft_error_exit(1);
 		if (pid == 0)
 			execute_child_here_doc(data, pipefd);
-		if (data->prev_pipe != -1)
-			close(data->prev_pipe);
+		close(data->prev_pipe);
 		if (data->i != data->nbr_cmd + 1)
 			close(pipefd[1]);
 		if (data->i == data->nbr_cmd + 1)
@@ -94,6 +91,8 @@ int	main(int argc, char **argv, char *envp[])
 {
 	t_data	data;
 
+	if (argc == 1)
+		exit_error_argum();
 	ft_memset(&data, 0, sizeof(t_data));
 	data.nbr_cmd = argc - 3;
 	data.argv = argv;
@@ -109,9 +108,6 @@ int	main(int argc, char **argv, char *envp[])
 				ft_strlen(argv[1]))) != 0 && argc >= 5)
 		execution(&data);
 	else
-	{
-		write(2, "Error: Incorrect number of arguments\n", 37);
-		exit(EXIT_FAILURE);
-	}
+		exit_error_argum();
 	return (0);
 }
