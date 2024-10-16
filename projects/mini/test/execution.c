@@ -6,11 +6,11 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:06:33 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/10/16 15:49:53 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/15 20:25:15 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 
 
@@ -20,6 +20,6 @@ void	choice_execution(t_command *commands)
 		execution_cmd(commands); //Если нет пайпа исполняем 1 команду
 	else if (commands->is_pipe > 0 && commands->here_doc_file == 0)
 		execution_pipe(commands); //Исполняем команды с пайп но без here doc
-//	else if (commands->is_pipe > 0 && commands->here_doc_file > 0)
-//		execution_here_doc(commands); //Исполняем команды с here_doc и pipe
+/*	else if (commands->is_pipe > 0 && commands->here_doc_file > 0)
+		execution_here_doc(commands); //Исполняем команды с here_doc и pipe*/
 }

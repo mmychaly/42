@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 16:16:35 by azakharo          #+#    #+#             */
-/*   Updated: 2024/10/14 04:07:35 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/15 15:43:44 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ int	main(void)
 		commands = parse_pipeline(user_input);
 		if (commands)
 		{
-			execution_cmd(commands, envp);
+			execution_cmd(commands, );
 			free_commands(commands);
 			// Функция для освобождения структуры команды
 			free(user_input);
