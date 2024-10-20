@@ -6,32 +6,85 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 00:47:25 by artemii           #+#    #+#             */
-/*   Updated: 2024/10/17 21:05:45 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/20 18:20:09 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void ft_redirection_in(t_command *commands)
+void ft_redirection_in(t_data *data, int pipefd[2])
 {
     int fd_in;
- 
-    fd_in = open(commands->input_file, O_RDONLY, 0644);
+    
+    if(data->prev_pipe != -1)
+    {
+        free_pipe(data->prev_pipe);
+		close(data->prev_pipe);
+    }
+    if(data->here_doc_pfd != -1)
+    {
+        free_pipe(data->here_doc_pfd);
+		close(data->here_doc_pfd);
+    }
+    if (data->i != data->nb_pipe)
+        close(pipefd[0]);
+    fd_in = open(data->cmd[data->i]->input_file, O_RDONLY, 0644);
     if (fd_in == -1)
     {
         perror("Error opening input file");
-        exit(EXIT_FAILURE);
+        if (data->i != data->nb_pipe)
+            close(pipefd[1]);
+        exit(EXIT_FAILURE); //Trouver l'autre solution
     }
     if (dup2(fd_in, STDIN_FILENO) == -1)
     {
         perror("Error duplicating file descriptor for input");
+        if (data->i != data->nb_pipe)
+            close(pipefd[1]);
         close(fd_in);
-        exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE); //Trouver l'autre solution
     }
     close(fd_in); // Закрываем дескриптор файла после перенаправления
 }
 
-void	ft_redirection_out_cmd(t_command *commands, int flag_pipe)
+void	ft_redirection_here_doc(t_data *data, int pipefd[2])
+{
+    if(data->prev_pipe != -1)
+    {
+        free_pipe(data->prev_pipe);
+		close(data->prev_pipe);
+    }
+    if (data->i != data->nb_pipe)
+        close(pipefd[0]);
+	if (dup2(data->here_doc_pfd, STDIN_FILENO) == -1)
+	{
+		perror("Error: dup2 prev_pipe");
+		free_pipe(data->here_doc_pfd);
+		close(data->here_doc_pfd);
+        if (data->i != data->nb_pipe)
+            close(pipefd[1]);
+		exit (EXIT_FAILURE);
+	}
+	close(data->here_doc_pfd);
+}
+
+void	ft_redirection_pipe(t_data *data, int pipefd[2])
+{
+    if (data->i != data->nb_pipe)
+        close(pipefd[0]);
+    if (dup2(data->prev_pipe, STDIN_FILENO) == -1)
+	{
+		perror("Error: dup2 prev_pipe");
+		free_pipe(data->prev_pipe);
+		close(data->prev_pipe);
+        if (data->i != data->nb_pipe)
+            close(pipefd[1]);
+		exit (EXIT_FAILURE); //Trouver l'autre solution
+	}
+	close(data->prev_pipe);
+}
+
+void	ft_redirection_out_cmd(t_data *data, int flag_pipe)
 {
 	int	fd_out;
     
@@ -57,17 +110,10 @@ void	ft_redirection_out_cmd(t_command *commands, int flag_pipe)
 	close(fd_out);
 }
 
-void	ft_redirection_read_pipe(t_command *commands)
-{
-	if (dup2(commands->prev_pipe, STDIN_FILENO) == -1)
-	{
-		perror("Error: dup2 prev_pipe");
-		free_pipe(commands->prev_pipe);
-		close(commands->prev_pipe);
-		exit (EXIT_FAILURE);
-	}
-	close(commands->prev_pipe);
-}
+
+
+
+
 
 /*void ft_redirection_out_append(char *output_file)
 {

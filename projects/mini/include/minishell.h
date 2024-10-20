@@ -1,7 +1,7 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "libft/libft.h"
+# include "../libft/libft.h"
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <stdio.h>
@@ -12,24 +12,25 @@
 
 typedef struct s_cmd
 {
-	char *input_file; 
-	int		pos_input;
-	char *here_doc_file;  
-	int		pos_here_doc;
-	char *cmd;
-	char *cmd_arg; //Опция команды, если сможешь сразу отделить было бы круто
-	char *output_file; //Для переадресации выхода я еще не знаю нужно знать место положение или нет но возможно что да
-	char *append_file; 
-}				t_cmd
-
+    char *input_file;     // Для "<"
+    int pos_input;        // Позиция для приоритета входного редиректа
+    char *here_doc_file;  // Для "<<"
+    int pos_here_doc;     // Позиция для приоритета here_doc
+    char *cmd;            // Основная команда (например, "echo")
+    char *cmd_arg;        // Аргументы команды (например, "hello world")
+    char *output_file;    // Для ">"
+    char *append_file;    // Для ">>"
+    int pos_output;       // Позиция для приоритета вывода
+    int pos_append;       // Позиция для приоритета append
+} t_cmd;
 
 typedef struct s_data
 {
-	char **envp;
-	t_cmd **cmd;       
-	int nb_pipe;       // Количество пайпов
-	int prev_pipe; 
-}			t_data;
+    char **envp;      // Переменные окружения
+    t_cmd **cmd;      // Массив структур команд
+    int nb_pipe;      // Количество пайпов
+    int prev_pipe;    // Флаг пайпа для предыдущей команды
+} t_data;
 
 t_command	*parse_pipeline(char *input);
 // void	execute_pipeline(char ***commands, char **envp);
@@ -50,6 +51,7 @@ int		ft_strlen(const char *str);
 size_t	ft_strlcpy(char *dest, const char *src, size_t size);
 char	*ft_strnstr(const char *big, const char *little, size_t len);
 char	*ft_strdup(const char *s);
+
 char	*ft_envp_cherch(char *cmd, char **envp);
 char	*ft_creat_path(char **strs, char *cmd);
 void	ft_add_cmd(char **strs, char *cmd);
@@ -75,7 +77,5 @@ void		error_cmd(int flag);
 void		free_error_cmd(char **strs_argv, int flag);
 void		error_open_outfile(int flag);
 void		error_dup2_out(int prev_pipe, int flag);
-
-char		*get_next_line(int fd);
 
 #endif
