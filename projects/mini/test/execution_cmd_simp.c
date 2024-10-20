@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:53:45 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/10/16 19:44:02 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/19 01:05:34 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,12 @@ void	execution_here_doc(t_command *commands)
 {
 	char	*line;
 	int		pipefd1[2];
-	int		pipefd1[2];
+	int		pipefd2[2];
 	int		fd_in;
 
 	line = NULL;
-	if (pipe(pipefd) == -1)
+	if (pipe(pipefd1) == -1)
 		ft_error_exit(1);
-	commands->prev_pipe = pipefd[0];
 	line = get_next_line(0);
 	while (line != NULL)
 	{
@@ -31,15 +30,49 @@ void	execution_here_doc(t_command *commands)
 			free(line);
 			break ;
 		}
-		write(pipefd[1], line, ft_strlen(line));
+		write(pipefd1[1], line, ft_strlen(line));
 		free(line);
 		line = get_next_line(0);
 	}
-	close(pipefd[1]);
+	close(pipefd1[1]);
 	if (commands->input_file != NULL)
 	{
-		fd_in = open()
+		fd_in = open(commands->input_file, O_RDONLY, 0644);
+   		if (fd_in == -1)
+    	{
+      		perror("Error opening input file in here_doc");
+			free_pipe(pipefd1[0]);
+			close(pipefd1[0]);
+      		exit(EXIT_FAILURE);//Нужно продумать другой выход либо вернуть обратно в дочерний процесс
+    	}
+		if (pipe(pipefd2) == -1)
+		{
+			perror("Erorr in pipe(pipefd2) ");
+			free_pipe(pipefd1[0]);
+			close(pipefd1[0]);
+			exit(EXIT_FAILURE); //тоже самое //другой выход 
+		}
+		line = get_next_line(fd_in);
+		while (line != NULL)
+		{
+			write(pipefd2[1], line, ft_strlen(line));
+			free(line);
+			line = get_next_line(fd_in);
+		}
+		close(fd_in);
+		line = get_next_line(pipefd1[0]);
+		while (line != NULL)
+		{
+			write(pipefd2[1], line, ft_strlen(line));
+			free(line);
+			line = get_next_line(pipefd1[0]);
+		}
+		close(pipefd1[0]);
+		close(pipefd2[1]);
+		commands->prev_pipe = pipefd2[0];
 	}
+	else
+		commands->prev_pipe = pipefd1[0];
 }
 
 void	ft_launch_cmd(t_command *commands)
@@ -71,15 +104,17 @@ void	ft_launch_cmd(t_command *commands)
 
 void	ft_launch_here_doc(t_command *commands)
 {
-		char	**strs_argv;
+	char	**strs_argv;
 	char	*cmd;
+	char	*cat;
 
+	cat = "/bin/cat";
 	ft_redirection_read_pipe(commands);
 	if (commands->output_file != NULL || commands->append_file != NULL)
 		ft_redirection_out_cmd(commands, 1);
 	if (commands->argv[2] == NULL)
 	{
-		execve("cat", "cat", NULL);
+		execve(cat, NULL, NULL); //NULL? вместо второго аргумента
 	}	
 	if (commands->argv[2][0] == '\0')
 		error_empty_cmd(1);

@@ -1,3 +1,4 @@
-1
-8
-3
+oui 1
+non 2
+yes 1
+not 2

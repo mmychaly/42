@@ -10,18 +10,26 @@
 # include <sys/wait.h>
 # include <unistd.h>
 
-typedef struct s_command
+typedef struct s_cmd
+{
+	char *input_file; 
+	int		pos_input;
+	char *here_doc_file;  
+	int		pos_here_doc;
+	char *cmd;
+	char *cmd_arg; //Опция команды, если сможешь сразу отделить было бы круто
+	char *output_file; //Для переадресации выхода я еще не знаю нужно знать место положение или нет но возможно что да
+	char *append_file; 
+}				t_cmd
+
+
+typedef struct s_data
 {
 	char **envp;
-	char **argv;       
-	char *input_file;  // Файл для оператора <
-	char *here_doc_file;      // Флаг для оператора <<
-	char *output_file; // Файл для операторов > и >>
-	char *append_file;        // Флаг для оператора >>
-	int is_pipe;       // Флаг для пайпа
-
-	int prev_pipe; //Нужно с смого начала инициализировать 0 потом не трогать 
-}			t_command;
+	t_cmd **cmd;       
+	int nb_pipe;       // Количество пайпов
+	int prev_pipe; 
+}			t_data;
 
 t_command	*parse_pipeline(char *input);
 // void	execute_pipeline(char ***commands, char **envp);

@@ -17,8 +17,8 @@ int main(int argc, char **argv, char **envp)
 
     commands.envp = envp;
 	commands.argv = strs;
-	commands.input_file = NULL;
-	//commands.input_file = "infile.txt";
+	//commands.input_file = NULL;
+	commands.input_file = "infile.txt";
 	//commands.here_doc_file = NULL;
 	commands.here_doc_file = "LIM"; 
 	//commands.output_file = NULL;

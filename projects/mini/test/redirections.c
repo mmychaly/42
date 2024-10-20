@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 00:47:25 by artemii           #+#    #+#             */
-/*   Updated: 2024/10/15 17:33:51 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/17 21:05:45 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	ft_redirection_out_cmd(t_command *commands, int flag_pipe)
 	if (fd_out == -1)
     {
         if (flag_pipe == 1)
-		    error_open_outfile(1);
+		    error_open_outfile(1); //По идеи здесь без 1 так как данные выводим из команды и нет необходимости высвобождать пайп
         else
             error_open_outfile(0);
     }
