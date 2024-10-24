@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:53:45 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/10/20 19:04:31 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/22 04:04:13 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	execution_here_doc(t_data *data)
 {
 	char	*line;
 	int		pipefd[2];
-	int		fd_in;
+
 
 	line = NULL;
 	if (pipe(pipefd) == -1)
@@ -42,22 +42,27 @@ void	redirection_input(t_data *data, int pipefd[2])
 	if (data->cmd[data->i]->pos_here_doc > data->cmd[data->i]->pos_input)
 		ft_redirection_here_doc(data, pipefd);
 	else if (data->cmd[data->i]->pos_here_doc < data->cmd[data->i]->pos_input)
-		ft_redirection_input(data, pipefd);
+		ft_redirection_in(data, pipefd);
 	else if (data->cmd[data->i]->here_doc_file == NULL && data->cmd[data->i]->input_file == NULL && data->prev_pipe != -1)
 		ft_redirection_pipe(data, pipefd);
-	else 
+	else
+	{
 		if (data->i != data->nb_pipe)
     		close(pipefd[0]);
+	}
 }
 
 void	redirection_output(t_data *data, int pipefd[2])
 {
-	if (data->i != data->nb_pipe)
-		
 	if (data->cmd[data->i]->output_file != NULL || data->cmd[data->i]->append_file != NULL)
 		ft_redirection_out_cmd(data, pipefd);
 	else if (data->cmd[data->i]->output_file == NULL && data->cmd[data->i]->append_file == NULL && data->i != data->nb_pipe)
 		ft_redirection_out_pipe(data, pipefd);
+	else
+	{
+		if (data->i != data->nb_pipe)
+    		close(pipefd[1]);
+	}
 }
 
 void	ft_launch_cmd(t_data *data, int pipefd[2])
@@ -67,19 +72,19 @@ void	ft_launch_cmd(t_data *data, int pipefd[2])
 
 	redirection_input(data, pipefd);
 	redirection_output(data, pipefd);
-	if (commands->argv[2][0] == '\0')
-		error_empty_cmd(1);
-	strs_argv = ft_split(commands->argv[2], ' ');
+	if (data->cmd[data->i]->cmd[0] == '\0')
+		error_empty_cmd(data);
+	strs_argv = join_arg(data);
 	if (strs_argv == NULL)
-		error_split(1);
-	if (access(strs_argv[0], F_OK | X_OK) == 0)
-		cmd = ft_strdup(strs_argv[0]);
+		error_join_arg(data);
+	if (access(data->cmd[data->i]->cmd, F_OK | X_OK) == 0)
+		cmd = ft_strdup(data->cmd[data->i]->cmd);
 	else
-		cmd = ft_envp_cherch(strs_argv[0], commands->envp);
+		cmd = ft_envp_cherch(data->cmd[data->i]->cmd, data->envp);
 	if (cmd == NULL)
-		free_error_cmd(strs_argv, 1);
-	if (execve(cmd, strs_argv, commands->envp) == -1)
-		free_fault_execve(strs_argv, cmd, 1);  
+		free_error_cmd(strs_argv, data);
+	if (execve(cmd, strs_argv, data->envp) == -1)
+		free_fault_execve(strs_argv, cmd, data);
 }
 
 void	execution_cmd(t_data *data)
@@ -91,21 +96,30 @@ void	execution_cmd(t_data *data)
 	data->here_doc_pfd = -1;
 	data->i = 0;
 	while (data->i <= data->nb_pipe)
-	{
+	{	
 		if (data->cmd[data->i]->here_doc_file != NULL)
 			execution_here_doc(data);
 		if (data->i != data->nb_pipe && pipe(pipefd) == -1)
-			ft_error_exit(1);  //Trouver une autre solution
+		{
+			write(2, "ERROR: pipe",11);
+			data->exit_status = 1;
+			return ;
+		}
 		pid = fork();
 		if (pid == -1)
-			ft_error_exit(1);  //Trouver une autre solution
+		{
+			write(2,"ERROR: fork", 11);
+			data->exit_status = 1;
+			return ;
+		}
 		if (pid == 0)
 			ft_launch_cmd(data, pipefd);
-		if (data->here_doc_pfd != -1 )
+		if (data->here_doc_pfd != -1 ) //Здесь можно за одно высвобождать пайп если редирекция пошла из файла 
 		{
 			close(data->here_doc_pfd);
 			data->here_doc_pfd = -1;
 		}
+		data->flag_pipe = 0;
 		if (data->prev_pipe != -1)
 			close(data->prev_pipe);// Проверить вовремя ли закрывает пайп из launch_here_doc
 		if (data->i != data->nb_pipe)

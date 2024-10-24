@@ -33,25 +33,12 @@ typedef struct s_data
     int nb_pipe;      // Количество пайпов
     int i;            //commande actuel                                                               //add
     int prev_pipe;    // Флаг пайпа для предыдущей команды
-    int here_doc_pfd; // Flag pour here doc                                                             //add
+    int here_doc_pfd; // Flag pour here doc                                       //add
+    int flag_pipe;    //Что бы определить если запоненый пайп                                      //add
+    int exit_status;
 } t_data;
 
-/*typedef struct s_command
-{
-	char **envp;
-	char **argv;       
-	char *input_file;  // Файл для оператора <
-	char *here_doc_file;      // Флаг для оператора <<
-	char *output_file; // Файл для операторов > и >>
-	char *append_file;        // Флаг для оператора >>
-	int is_pipe;       // Флаг для пайпа
-
-	int prev_pipe; //Нужно с смого начала инициализировать 0 потом не трогать 
-}			t_command;*/
-
 void		parse_pipeline(t_data *command, char *input);
-// void	execute_pipeline(char ***commands, char **envp);
-//void		free_parsed_commands(t_data **commands);
 char		*find_command(char *cmd, char **envp);
 void		free_split(char **args);
 void		error_exit(const char *message);
@@ -75,28 +62,26 @@ void		choice_execution(t_data *data);
 void		execution_cmd(t_data *data);
 void		ft_launch_cmd(t_data *data, int pipefd[2]);
 void	    wait_processes(t_data *data);
+char        **join_arg(t_data *data);
 void		ft_launch_here_doc(t_data *data);
 void		execution_here_doc(t_data *data);
 
 void	redirection_input(t_data *data, int pipefd[2]);
 void	redirection_output(t_data *data, int pipefd[2]);
 
-void	ft_redirection_out_cmd(t_data *data, int flag_pipe);
-void    ft_redirection_in(t_data *data,int pipefd[2]);
+void    ft_redirection_in(t_data *data, int pipefd[2]);
 void	ft_redirection_here_doc(t_data *data, int pipefd[2]);
 void	ft_redirection_pipe(t_data *data, int pipefd[2]);
+void	ft_redirection_out_cmd(t_data *data, int pipefd[2]);
+void    ft_redirection_out_pipe(t_data *data, int pipefd[2]);
 
-void		free_fault_execve(char **strs, char *cmd, int flag);
+void		free_fault_execve(char **strs, char *cmd, t_data *data);
 void		ft_free_strs(char **strs);
 void		ft_error_exit(int nb);
 void		free_pipe(int fd);
-void		error_split(int flag);
-void		error_empty_cmd(int flag);
-void		error_cmd(int flag);
-void		free_error_cmd(char **strs_argv, int flag);
+void	    error_join_arg(t_data *data);
+void		error_empty_cmd(t_data *data);
+void		free_error_cmd(char **strs_argv, t_data *data);
 void		error_open_outfile(int flag);
-void		error_dup2_out(int prev_pipe, int flag);
-
-char		*get_next_line(int fd);
 
 #endif

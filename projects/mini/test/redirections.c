@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 00:47:25 by artemii           #+#    #+#             */
-/*   Updated: 2024/10/20 18:20:09 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/22 04:05:51 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,9 @@ void	ft_redirection_here_doc(t_data *data, int pipefd[2])
 		close(data->prev_pipe);
     }
     if (data->i != data->nb_pipe)
+    {
         close(pipefd[0]);
+    }
 	if (dup2(data->here_doc_pfd, STDIN_FILENO) == -1)
 	{
 		perror("Error: dup2 prev_pipe");
@@ -66,6 +68,7 @@ void	ft_redirection_here_doc(t_data *data, int pipefd[2])
 		exit (EXIT_FAILURE);
 	}
 	close(data->here_doc_pfd);
+    data->flag_pipe = 1;
 }
 
 void	ft_redirection_pipe(t_data *data, int pipefd[2])
@@ -82,19 +85,39 @@ void	ft_redirection_pipe(t_data *data, int pipefd[2])
 		exit (EXIT_FAILURE); //Trouver l'autre solution
 	}
 	close(data->prev_pipe);
+    data->flag_pipe = 1;
 }
 
-void	ft_redirection_out_cmd(t_data *data, int flag_pipe)
+void	ft_redirection_out_cmd(t_data *data, int pipefd[2])
 {
 	int	fd_out;
-    
-	if (commands->append_file != NULL)
-		fd_out = open(commands->append_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+
+    if (data->i != data->nb_pipe)
+    {
+        close(pipefd[1]);
+    }
+	if (data->cmd[data->i]->pos_append > data->cmd[data->i]->pos_output)
+    {
+        if (data->cmd[data->i]->output_file != NULL)
+        {
+            fd_out = open(data->cmd[data->i]->output_file, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+            if (fd_out == -1)
+            {
+                if (data->flag_pipe > 0)
+		            error_open_outfile(1); //По идеи здесь без 1 так как данные выводим из команды и нет необходимости высвобождать пайп
+                else
+                    error_open_outfile(0);
+            }
+            close(fd_out);
+        }
+		fd_out = open(data->cmd[data->i]->append_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+    }
 	else
-		fd_out = open(commands->output_file, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+		fd_out = open(data->cmd[data->i]->output_file, O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	if (fd_out == -1)
     {
-        if (flag_pipe == 1)
+
+        if (data->flag_pipe > 0)
 		    error_open_outfile(1); //По идеи здесь без 1 так как данные выводим из команды и нет необходимости высвобождать пайп
         else
             error_open_outfile(0);
@@ -102,7 +125,7 @@ void	ft_redirection_out_cmd(t_data *data, int flag_pipe)
 	if (dup2(fd_out, STDOUT_FILENO) == -1)
 	{
 		perror("dup2 fd_out");
-        if (flag_pipe == 1)
+        if (data->flag_pipe > 0)
 		    free_pipe(0);
 		close(fd_out);
 		exit (EXIT_FAILURE);
@@ -110,6 +133,18 @@ void	ft_redirection_out_cmd(t_data *data, int flag_pipe)
 	close(fd_out);
 }
 
+void    ft_redirection_out_pipe(t_data *data, int pipefd[2])
+{
+    if (dup2(pipefd[1], STDOUT_FILENO) == -1)
+	{
+		perror("Error: dup2 pipefd[1]");
+        if (data->flag_pipe > 0)
+		    free_pipe(0);
+		close(pipefd[1]);
+		exit (EXIT_FAILURE);
+	}
+    close(pipefd[1]);
+}
 
 
 

@@ -6,13 +6,13 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 04:08:02 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/10/15 17:10:55 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/22 04:04:42 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	free_fault_execve(char **strs, char *cmd, int flag)
+void	free_fault_execve(char **strs, char *cmd, t_data *data)
 {
 	int	i;
 
@@ -26,7 +26,7 @@ void	free_fault_execve(char **strs, char *cmd, int flag)
 	strs = NULL;
 	free(cmd);
 	cmd = NULL;
-	if (flag == 1)
+	if (data->flag_pipe > 0)
 		free_pipe(0);
 	perror("ERROR execve");
 	exit(126);
@@ -67,10 +67,10 @@ void	free_pipe(int fd)
 	}
 }
 
-void	error_split(int flag)
+void	error_join_arg(t_data *data)
 {
-	perror("ERROR split: ");
-	if (flag == 1)
+	write(2, "ERROR join_arg\n", 15);
+	if (data->flag_pipe > 0)
 		free_pipe(0);
 	exit(EXIT_FAILURE);
 }
