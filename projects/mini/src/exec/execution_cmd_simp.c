@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:53:45 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/02 19:32:59 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/03 18:06:34 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,13 +47,14 @@ void	execution_here_doc(t_data *data)
             free(line); // Освобождаем память, если она была выделена
 			g_pid = -1;
 			data->exit_status = 150;
+			printf("execution_here_doc\n");
             return; // Выходим из функции
         }
-        if (line == NULL) {
-            break; // Выходим, если достигнут конец ввода
+		if (line == NULL) {
+           break; // Выходим, если достигнут конец ввода
         }
         // Проверяем, достигли ли конца here_doc
-        if (ft_strncmp(data->cmd[data->i]->here_doc_file, line, ft_strlen(line) - 1) == 0) {
+       if (ft_strncmp(data->cmd[data->i]->here_doc_file, line, ft_strlen(line) - 1) == 0) {
             free(line);
             break;
         }
@@ -163,7 +164,7 @@ void	execution_cmd(t_data *data)
 		}
 		if (pid == 0)
 		{
-			signal(SIGINT, SIG_DFL);
+//			signal(SIGINT, SIG_DFL);
 			signal(SIGQUIT, SIG_DFL);
 			ft_launch_cmd(data, pipefd);
 		}

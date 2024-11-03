@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 16:16:35 by azakharo          #+#    #+#             */
-/*   Updated: 2024/11/02 19:13:51 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/03 18:01:43 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,7 @@ int	main(int argc, char **argv, char **envp)
 	(void)argc;
 	(void)argv;
 	struct sigaction sa;
+	ft_bzero(&sa, sizeof(sa));
     sa.sa_handler = handle_sigint; // Устанавливаем обработчик сигнала
     sa.sa_flags = 0; // Устанавливаем без SA_RESTART
     sigemptyset(&sa.sa_mask); // Очищаем маску сигналов

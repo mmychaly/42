@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 04:19:01 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/02 19:35:42 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/03 17:50:41 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 void handle_sigint(int sig) 
 {
 	(void) sig;
-//	write(2, "handle_sigint\n", 14);
 	if (g_pid == -1) 
 	{
 		write(1, "\n", 2);
@@ -23,25 +22,19 @@ void handle_sigint(int sig)
 		rl_replace_line("", 0);
 		rl_redisplay();
 	}
-	else if (g_pid == -5) 
+	else if (g_pid == -5)
 	{
 		write(1, "\n", 1);
 		g_pid = -10;
 	}
-/*	else if (g_pid > 0)
+	else if (g_pid > 0)
 	{
-		write(2, "other\n", 6);
-		printf("g_pid == %i\n", g_pid);
+		write(1, "\n", 2);
 		kill(g_pid, SIGINT);
-	}*/
+		g_pid = -100;
+	}
 }
-void handle_sigint_child(int sig) 
-{
-	(void) sig;
-	printf("salut\n");
-	write(2, "handle_sigint_child\n", 20);
-	exit (1366);
-}
+
 void	wait_processes(t_data *data)
 {
 	int	pid;
@@ -68,5 +61,7 @@ void	wait_processes(t_data *data)
 		}
 		pid = waitpid(-1, &status, 0);
 	}
+	if (g_pid == -100)
+		data->exit_status = 130;
 	g_pid = -1;
 }
