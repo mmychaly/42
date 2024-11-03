@@ -6,13 +6,13 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 16:16:35 by azakharo          #+#    #+#             */
-/*   Updated: 2024/11/02 19:13:51 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/28 20:39:22 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int g_pid;
+extern char	**environ;
 
 void	print_commands(t_data *data)
 {
@@ -100,16 +100,14 @@ int	main(int argc, char **argv, char **envp)
 {
 	char	*user_input;
 	t_data	*data;
-	g_pid = -1;
 	
 	(void)argc;
 	(void)argv;
-	struct sigaction sa;
-    sa.sa_handler = handle_sigint; // Устанавливаем обработчик сигнала
-    sa.sa_flags = 0; // Устанавливаем без SA_RESTART
-    sigemptyset(&sa.sa_mask); // Очищаем маску сигналов
-    sigaction(SIGINT, &sa, NULL);
-//	signal(SIGINT, handle_sigint);
+	struct sigaction sa_parent;
+    sa_parent.sa_handler = handle_sigint_parent;
+    sigemptyset(&sa_parent.sa_mask);
+    sa_parent.sa_flags = SA_RESTART;
+    sigaction(SIGINT, &sa_parent, NULL);
 	signal(SIGQUIT, SIG_IGN);
 	while (1)
 	{
@@ -128,6 +126,8 @@ int	main(int argc, char **argv, char **envp)
 		ft_memset(data, 0, sizeof(t_data));
 		data->envp = envp; //Считываем окружение , нужно для execve
 		parse_pipeline(data, user_input);
+		if (data->nb_pipe == 0)
+			signal(SIGINT, handle_sigint_parent);
 		print_commands(data);    // Вывод команд для дебага
 		printf("\n---------\n"); //Отделяем вывод команды от дебага
 		choice_execution(data);

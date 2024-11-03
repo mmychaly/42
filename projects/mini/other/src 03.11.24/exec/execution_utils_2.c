@@ -6,50 +6,50 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 04:19:01 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/02 19:35:42 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/28 20:46:54 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void handle_sigint(int sig) 
+volatile sig_atomic_t child_running = 0;
+
+// Обработчик для SIGINT в родительском процессе
+void handle_sigint_parent(int sig)
 {
 	(void) sig;
-//	write(2, "handle_sigint\n", 14);
-	if (g_pid == -1) 
-	{
-		write(1, "\n", 2);
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-	}
-	else if (g_pid == -5) 
-	{
-		write(1, "\n", 1);
-		g_pid = -10;
-	}
-/*	else if (g_pid > 0)
-	{
-		write(2, "other\n", 6);
-		printf("g_pid == %i\n", g_pid);
-		kill(g_pid, SIGINT);
-	}*/
+    if (!child_running) {
+		write(STDOUT_FILENO, "\nminishell$ ", 12);
+//        fflush(stdout);
+    }
 }
+
+// Обработчик для SIGINT в дочернем процессе
 void handle_sigint_child(int sig) 
 {
-	(void) sig;
-	printf("salut\n");
-	write(2, "handle_sigint_child\n", 20);
-	exit (1366);
+    (void)sig;
+    exit(130); // Завершаем дочерний процесс
 }
+
+/*void handle_sigint_parent(int sig) //не нужны
+{
+	(void)sig;
+
+   	write(STDOUT_FILENO, "\nminishell$ ", 12);
+}*/
+
+
 void	wait_processes(t_data *data)
 {
 	int	pid;
 	int	status;
 	int signal;
+
+	child_running = 1;
 	pid = waitpid(-1, &status, 0);
 	while (pid > 0)
 	{
+		child_running = 0;
 		if (pid == data->prev_pipe) //Здесь я неуверен
 		{
 			if (WIFEXITED(status))
@@ -68,5 +68,4 @@ void	wait_processes(t_data *data)
 		}
 		pid = waitpid(-1, &status, 0);
 	}
-	g_pid = -1;
 }

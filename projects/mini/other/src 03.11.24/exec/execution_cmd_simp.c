@@ -6,66 +6,34 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:53:45 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/02 19:32:59 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/10/28 20:43:45 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-
-char *get_line() {
-    char *buffer = malloc(256); // Простое выделение памяти для строки
-    if (!buffer) 
-		return NULL;
-    ssize_t n = read(0, buffer, 255); // Чтение из stdin
-    if (n <= 0) 
-	{
-        free(buffer);
-        return NULL; // Если ничего не прочитано, возвращаем NULL
-    }
-    buffer[n] = '\0'; // Завершаем строку
-    return buffer;
-}
 
 void	execution_here_doc(t_data *data)
 {
 	char	*line;
 	int		pipefd[2];
 
-	g_pid = -5;
-	data->heredoc_interrupted = 0;
 	line = NULL;
 	if (pipe(pipefd) == -1)
 		return ;
-	while (1)
+	line = get_next_line(0);
+	while (line != NULL)
 	{
-	    line = get_line();
-        if (g_pid == -10) 
+		if ((ft_strncmp(data->cmd[data->i]->here_doc_file, line, ft_strlen(line) - 1)) == 0)
 		{
-			close(pipefd[1]);
-			free_pipe(pipefd[0]);
-            close(pipefd[0]);
-            free(line); // Освобождаем память, если она была выделена
-			g_pid = -1;
-			data->exit_status = 150;
-            return; // Выходим из функции
-        }
-        if (line == NULL) {
-            break; // Выходим, если достигнут конец ввода
-        }
-        // Проверяем, достигли ли конца here_doc
-        if (ft_strncmp(data->cmd[data->i]->here_doc_file, line, ft_strlen(line) - 1) == 0) {
-            free(line);
-            break;
-        }
-
-        // Записываем в пайп
-        write(pipefd[1], line, ft_strlen(line));
-        free(line);
+			free(line);
+			break ;
+		}
+		write(pipefd[1], line, ft_strlen(line));
+		free(line);
+		line = get_next_line(0);
 	}
-	data->heredoc_interrupted = 1;
 	close(pipefd[1]);
 	data->here_doc_pfd = pipefd[0];
-	g_pid = -1;
 }
 
 void	redirection_input(t_data *data, int pipefd[2])
@@ -130,21 +98,19 @@ void	ft_launch_cmd(t_data *data, int pipefd[2])
 
 void	execution_cmd(t_data *data)
 {
-	int pid;
+	int	pid;
 	int	pipefd[2];
+	struct sigaction sa_child;
 
 	data->prev_pipe = -1;
 	data->here_doc_pfd = -1;
 	data->i = 0;
 	data->flag_pipe = 0;
-//	g_pid = -1;
 	while (data->i <= data->nb_pipe)
 	{	
 		if (data->cmd[data->i]->here_doc_file != NULL)
 		{
 			execution_here_doc(data);
-			if (data->heredoc_interrupted != 1)
-				return ;
 			if (data->here_doc_pfd == -1)
 				write(2, "ERROR in here_doc\n", 18);
 		}
@@ -163,12 +129,15 @@ void	execution_cmd(t_data *data)
 		}
 		if (pid == 0)
 		{
-			signal(SIGINT, SIG_DFL);
+			sa_child.sa_handler = handle_sigint_child;
+        	sigemptyset(&sa_child.sa_mask);
+        	sa_child.sa_flags = 0;
+			sigaction(SIGINT, &sa_child, NULL);
+//			setpgid(0, 0);
+//			signal(SIGINT, SIG_DFL);
 			signal(SIGQUIT, SIG_DFL);
 			ft_launch_cmd(data, pipefd);
 		}
-		else
-			g_pid = pid;
 		if (data->here_doc_pfd != -1 ) //Нужно ли высвобожать пайп в родительском если это уже сделанно в дочернем?
 		{
 			close(data->here_doc_pfd);

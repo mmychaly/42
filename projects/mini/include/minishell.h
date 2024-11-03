@@ -35,8 +35,11 @@ typedef struct s_data
     int here_doc_pfd; // канал для чтения данных принятых here_doc ,                                       //add
     int flag_pipe;    //Что бы определить если заполненый пайп                                      //add
     int exit_status;  //Сохраняем индекс последнего процесса запущеной команды
+
+    int heredoc_interrupted;
 } t_data;
 
+extern int g_pid;
 
 void		parse_pipeline(t_data *command, char *input);
 // void	execute_pipeline(char ***commands, char **envp);
@@ -95,6 +98,6 @@ void	    error_open_outfile(int flag , t_data *data);
 
 void	free_data(t_data *data);
 
-void handle_sigint_parent(int sig);
+void    handle_sigint(int sig);
 void handle_sigint_child(int sig);
 #endif
