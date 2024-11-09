@@ -37,6 +37,7 @@ typedef struct s_data
     int exit_status;  //Сохраняем индекс последнего процесса запущеной команды
 
     int heredoc_interrupted;
+    int exit_total;
 } t_data;
 
 extern int g_pid;

@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:53:45 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/06 04:48:49 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/09 18:17:40 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,6 +180,8 @@ void	execution_cmd(t_data *data)
 			data->prev_pipe = pid;
 		else
 			data->prev_pipe = pipefd[0];
+		if (data->exit_total == 1)
+			exit_func(data);
 		data->i++;
 	}
 	wait_processes(data);
