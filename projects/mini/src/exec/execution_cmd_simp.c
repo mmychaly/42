@@ -6,66 +6,63 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:53:45 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/03 18:06:34 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/06 04:48:49 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-char *get_line() {
-    char *buffer = malloc(256); // Простое выделение памяти для строки
-    if (!buffer) 
-		return NULL;
-    ssize_t n = read(0, buffer, 255); // Чтение из stdin
-    if (n <= 0) 
-	{
-        free(buffer);
-        return NULL; // Если ничего не прочитано, возвращаем NULL
-    }
-    buffer[n] = '\0'; // Завершаем строку
-    return buffer;
-}
 
 void	execution_here_doc(t_data *data)
 {
 	char	*line;
 	int		pipefd[2];
+	int		in;
 
-	g_pid = -5;
-	data->heredoc_interrupted = 0;
 	line = NULL;
+	g_pid = -5; //Показываем обработчику SIGINT что мы в HEREDOC
+	data->heredoc_interrupted = 0; //Костыль который помогает понять что мы выйшли из функции по ошибке//Сигналу
 	if (pipe(pipefd) == -1)
-		return ;
-	while (1)
 	{
-	    line = get_line();
-        if (g_pid == -10) 
-		{
-			close(pipefd[1]);
-			free_pipe(pipefd[0]);
-            close(pipefd[0]);
-            free(line); // Освобождаем память, если она была выделена
-			g_pid = -1;
-			data->exit_status = 150;
-			printf("execution_here_doc\n");
-            return; // Выходим из функции
-        }
-		if (line == NULL) {
-           break; // Выходим, если достигнут конец ввода
-        }
-        // Проверяем, достигли ли конца here_doc
-       if (ft_strncmp(data->cmd[data->i]->here_doc_file, line, ft_strlen(line) - 1) == 0) {
-            free(line);
-            break;
-        }
-
-        // Записываем в пайп
-        write(pipefd[1], line, ft_strlen(line));
-        free(line);
+		perror("ERROR in here doc");
+		return ;
 	}
-	data->heredoc_interrupted = 1;
+	in = dup(0);//Дублируем стандратный ввод в переменную так как мы в процессе получения сигнала закроем fd стандратного входа и нам его нужно будет востановить потом
+	write(1, "> ", 2);
+	line = get_next_line(0);
+	while (line != NULL)
+	{
+		
+		if (ft_strncmp(data->cmd[data->i]->here_doc_file, line, ft_strlen(line) - 1) == 0 && line[0] != '\n')
+		{
+			free(line);
+			break ;
+		}
+		write(pipefd[1], line, ft_strlen(line));
+		free(line);
+		write(1, "> ", 2);
+		line = get_next_line(0);
+	}
+	if (g_pid == -10) //Если мы вышли из цикла из за обработчика сигнала SIGINT то входим в это условие 
+	{
+		close(pipefd[1]); //Закрываем канал записи
+		free_pipe(pipefd[0]); //Освобождаем пайп если что то записали в него
+        close(pipefd[0]); // Закрываем канал чтения
+		if (dup2(in, 0) == -1) //Востанавливаем стандартный вход
+		{
+        	perror("dup2 failed");
+        	close(in);
+       		exit(1);
+    	}
+		close(in); //Закрываем fd который времено хранил указатель на стандартный вход
+		g_pid = -1; //Возвращаем в глобальную переменную значение которое указывает что мы в родительском процессе
+		data->exit_status = 130; //Обнавляем статус закрытия команды
+        return; 
+    }
 	close(pipefd[1]);
-	data->here_doc_pfd = pipefd[0];
+	close(in);
+	data->here_doc_pfd = pipefd[0];//А не должен ли я закрыть этот канал pipefd[0] ?
+	data->heredoc_interrupted = 1; //Значение указывает что мы корректно отработали в here doc и можно переходить к запуску дочерних процессов
 	g_pid = -1;
 }
 
@@ -103,13 +100,14 @@ void	ft_launch_cmd(t_data *data, int pipefd[2])
 
 	redirection_input(data, pipefd);
 	redirection_output(data, pipefd);
-	if (data->cmd[data->i]->cmd_arg[1] != NULL)//Вставь сюда вторую строку из массива аргументов -v
+	check_builtin(data);
+	if (data->cmd[data->i]->cmd_arg[1] != NULL)
 	{
-		if (access(data->cmd[data->i]->cmd_arg[1], F_OK) == 0)  //тоже самое -v
+		if (access(data->cmd[data->i]->cmd_arg[1], F_OK) == 0)
 		{
 			if (data->flag_pipe == 1)
 				free_pipe(0);
-       		if (access(data->cmd[data->i]->cmd_arg[1], R_OK) == -1)//тоже самое -v
+       		if (access(data->cmd[data->i]->cmd_arg[1], R_OK) == -1)
       	  	{
 				write(2, "Error file in arg :Permission denied\n", 37);
 				free_data(data);
@@ -124,9 +122,9 @@ void	ft_launch_cmd(t_data *data, int pipefd[2])
 	else
 		cmd = ft_envp_cherch(data->cmd[data->i]->cmd, data->envp);
 	if (cmd == NULL)
-		free_error_cmd(data);//Переделай функции убери strs_argv -v
-	if (execve(cmd, data->cmd[data->i]->cmd_arg, data->envp) == -1)//Вместо strs_argv поставь масив для аргументов -v
-		free_fault_execve(cmd, data);//Переделай функции убери strs_argv -v
+		free_error_cmd(data);
+	if (execve(cmd, data->cmd[data->i]->cmd_arg, data->envp) == -1)
+		free_fault_execve(cmd, data);
 }
 
 void	execution_cmd(t_data *data)
@@ -138,13 +136,12 @@ void	execution_cmd(t_data *data)
 	data->here_doc_pfd = -1;
 	data->i = 0;
 	data->flag_pipe = 0;
-//	g_pid = -1;
 	while (data->i <= data->nb_pipe)
 	{	
 		if (data->cmd[data->i]->here_doc_file != NULL)
 		{
 			execution_here_doc(data);
-			if (data->heredoc_interrupted != 1)
+			if (data->heredoc_interrupted != 1)//Если значение 0 значит работа here doc завершилась не корректно и нам нужно обратно в главный цикл
 				return ;
 			if (data->here_doc_pfd == -1)
 				write(2, "ERROR in here_doc\n", 18);
@@ -164,13 +161,12 @@ void	execution_cmd(t_data *data)
 		}
 		if (pid == 0)
 		{
-//			signal(SIGINT, SIG_DFL);
-			signal(SIGQUIT, SIG_DFL);
+			signal(SIGQUIT, SIG_DFL); //Функция которая обрабатывает сигнал ctrl '\' . В дочернем процессе ,выходит из процесса
 			ft_launch_cmd(data, pipefd);
 		}
 		else
-			g_pid = pid;
-		if (data->here_doc_pfd != -1 ) //Нужно ли высвобожать пайп в родительском если это уже сделанно в дочернем?
+			g_pid = pid;//После создания дочернего процесса , находясь в родительском помещаем в глобальную переменную pid дочернего процесса
+		if (data->here_doc_pfd != -1 )
 		{
 			close(data->here_doc_pfd);
 			data->here_doc_pfd = -1;
@@ -188,3 +184,26 @@ void	execution_cmd(t_data *data)
 	}
 	wait_processes(data);
 }
+
+
+/*
+		data->stdin_backup = dup(1);
+		printf("befor stdin_backup %i\n", data->stdin_backup);
+		data->stdout_backup = dup(0);
+		printf("befor stdin_backup %i\n", data->stdout_backup);
+
+
+
+//		if (STDIN_FILENO != data->stdin_backup)
+		printf("after STDIN_FILENO %i\n", STDIN_FILENO);
+		printf("after STDOUT_FILENO %i\n", STDOUT_FILENO);
+		printf("------\nstdin_backup %i\n", data->stdin_backup);
+		printf("stdin_backup %i\n", data->stdout_backup);
+ 		dup2(data->stdin_backup, STDIN_FILENO);
+		printf("after dup2 STDIN_FILENO %i\n", STDIN_FILENO);
+//		if (STDOUT_FILENO != data->stdout_backup)
+ 	    dup2(data->stdout_backup, STDOUT_FILENO);
+		printf("after dup2 STDOUT_FILENO %i\n", STDOUT_FILENO);
+ 		close(data->stdin_backup);
+ 		close(data->stdout_backup);
+		*/

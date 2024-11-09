@@ -99,5 +99,9 @@ void	    error_open_outfile(int flag , t_data *data);
 void	free_data(t_data *data);
 
 void    handle_sigint(int sig);
-void handle_sigint_child(int sig);
+
+void	check_builtin(t_data *data);
+void	echo(t_data *data);
+int	    check_option_n(char *arg);
+void	close_input(t_data *data);
 #endif
