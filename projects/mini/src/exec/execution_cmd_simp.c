@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:53:45 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/09 18:17:40 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/10 18:10:56 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,6 +136,7 @@ void	execution_cmd(t_data *data)
 	data->here_doc_pfd = -1;
 	data->i = 0;
 	data->flag_pipe = 0;
+	data->exit_total = 0;
 	while (data->i <= data->nb_pipe)
 	{	
 		if (data->cmd[data->i]->here_doc_file != NULL)
@@ -145,6 +146,12 @@ void	execution_cmd(t_data *data)
 				return ;
 			if (data->here_doc_pfd == -1)
 				write(2, "ERROR in here_doc\n", 18);
+		}
+		if (ft_strcmp(data->cmd[data->i]->cmd, "exit") == 0)
+		{
+			exit_total(data);
+			if (data->exit_total  == 1)
+				return ;
 		}
 		if (data->i != data->nb_pipe && pipe(pipefd) == -1)
 		{

@@ -105,4 +105,7 @@ void	check_builtin(t_data *data);
 void	echo(t_data *data);
 int	    check_option_n(char *arg);
 void	close_input(t_data *data);
+
+void	exit_total(t_data *data);
+void	exit_close_input(t_data *data);
 #endif
