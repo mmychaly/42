@@ -48,48 +48,51 @@ void	exit_total(t_data *data)
 	i_2 = 0;
 	flag = 0;
 	nbr_args = 0;
+	status = 0;
 	close_input(data);
 	close (1);
 	while (data->cmd[data->i]->cmd_arg[nbr_args] != NULL)
 		nbr_args++;
-	if (data->cmd[data->i]->cmd_arg[1] == NULL)
-	{
+	if (data->nb_pipe == 0)
 		write(2, "exit\n", 5);
-//		data->exit_total = 1;
-		free_data(data);
-//		free(data->user_input);
-//		rl_clear_history();
-		exit(0);
-	}
-	
-	while (data->cmd[data->i]->cmd_arg[1][i_2] != '\0')
+	if (data->cmd[data->i]->cmd_arg[1] != NULL)
 	{
-		if (flag == 0 && (data->cmd[data->i]->cmd_arg[1][i_2] == '-' || data->cmd[data->i]->cmd_arg[1][i_2] == '+'))
+		while (data->cmd[data->i]->cmd_arg[1][i_2] != '\0')
 		{
+			if (flag == 0 && (data->cmd[data->i]->cmd_arg[1][i_2] == '-' || data->cmd[data->i]->cmd_arg[1][i_2] == '+'))
+			{
+				i_2++;
+				flag = 1;
+			}
+			if (ft_isdigit(data->cmd[data->i]->cmd_arg[1][i_2]) == 0)
+			{
+				write(2, "exit: numeric argument required\n", 32);
+				free_data(data);
+				rl_clear_history();
+				exit(2);
+			}
 			i_2++;
-			flag = 1;
 		}
-		if (ft_isdigit(data->cmd[data->i]->cmd_arg[1][i_2]) == 0)
+		if (nbr_args > 2)
 		{
-			write(2, "exit\nexit: numeric argument required\n", 37);
+			write(2, "exit: too many arguments\n", 25);
 			free_data(data);
-//			free(data->user_input);
-//			rl_clear_history();
-			exit(2);
+			rl_clear_history();
+			if (data->nb_pipe == 0)
+			{
+				data->exit_total = 1;//Pour pouvoir sortir dans main sans commancer 
+				data->exit_status = 1;
+				return ;
+			}
+			else
+				exit (1) ;
 		}
-		i_2++;
+		status = ft_atoi(data->cmd[data->i]->cmd_arg[1]);
+		if (status < 0 || status > 255)
+			status = status % 256;
 	}
-	if (nbr_args > 2)
-	{
-		write(2, "exit\nexit: too many arguments\n", 30);
-		free_data(data);
-//		free(data->user_input); //Почему то был лик
-		exit (1) ;
-	}
-	status = ft_atoi(data->cmd[data->i]->cmd_arg[1]);
-	if (status < 0 || status > 255)
-		status = status % 256;
-	write(2, "exit\n", 5);
+//	free(data->user_input); peut etre ca aussi
 	free_data(data);
+	rl_clear_history();
 	exit(status);
 }
