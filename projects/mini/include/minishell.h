@@ -27,6 +27,7 @@ typedef struct s_cmd
 
 typedef struct s_data
 {
+    char    *user_input;
     char **envp;      // Переменные окружения
     t_cmd **cmd;      // Массив структур команд
     int nb_pipe;      // Количество пайпов
@@ -107,5 +108,5 @@ int	    check_option_n(char *arg);
 void	close_input(t_data *data);
 
 void	exit_total(t_data *data);
-void	exit_close_input(t_data *data);
+void	check_exit_total(t_data *data);
 #endif

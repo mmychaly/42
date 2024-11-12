@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 16:16:35 by azakharo          #+#    #+#             */
-/*   Updated: 2024/11/05 22:59:12 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/11 05:00:40 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,12 +98,10 @@ void	free_data(t_data *data)
 
 int	main(int argc, char **argv, char **envp)
 {
-	char	*user_input;
 	t_data	*data;
 	int exit_status;
+	char    *temp_user_input;
 	
-
-//	(void)argc;
 	(void)argv;
 	if (argc > 2) //Проверка на количество аргументов
 	{
@@ -116,11 +114,11 @@ int	main(int argc, char **argv, char **envp)
 	signal(SIGQUIT, SIG_IGN); //Функция которая обрабатывает сигнал ctrl '\' . В родительском процессе , игнорирует сигнал
 	while (1)
 	{
-		user_input = readline("minishell$ ");
-		if (!user_input)
+		temp_user_input = readline("minishell$ ");
+		if (!temp_user_input)
 			break ;
-		if (ft_strlen(user_input) > 0)
-			add_history(user_input);
+		if (ft_strlen(temp_user_input) > 0)
+			add_history(temp_user_input);
 		data = malloc(sizeof(t_data));
 		if (!data)
 		{
@@ -129,15 +127,17 @@ int	main(int argc, char **argv, char **envp)
 		}
 		ft_memset(data, 0, sizeof(t_data));
 		data->envp = envp; //Считываем окружение , нужно для execve
-		parse_pipeline(data, user_input);
+		data->user_input = temp_user_input;
+		parse_pipeline(data, data->user_input);
 		data->exit_status = exit_status; //Перед запуском новой команды подгружаем статус старой команды
 		print_commands(data);    // Вывод команд для дебага
 		printf("\n---------\n"); //Отделяем вывод команды от дебага
 		choice_execution(data);
 		printf("status %i\n", data->exit_status);
 		exit_status = data->exit_status; //Сохраняем статус завершения команды перед освобождением
+		check_exit_total(data);
+		free(data->user_input);
 		free_data(data);
-		free(user_input);
 	}
 	rl_clear_history();
 	return (0);

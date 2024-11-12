@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:53:45 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/10 18:10:56 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/11 04:40:57 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,12 +147,6 @@ void	execution_cmd(t_data *data)
 			if (data->here_doc_pfd == -1)
 				write(2, "ERROR in here_doc\n", 18);
 		}
-		if (ft_strcmp(data->cmd[data->i]->cmd, "exit") == 0)
-		{
-			exit_total(data);
-			if (data->exit_total  == 1)
-				return ;
-		}
 		if (data->i != data->nb_pipe && pipe(pipefd) == -1)
 		{
 			write(2, "ERROR: pipe",11);
@@ -187,8 +181,6 @@ void	execution_cmd(t_data *data)
 			data->prev_pipe = pid;
 		else
 			data->prev_pipe = pipefd[0];
-		if (data->exit_total == 1)
-			exit_func(data);
 		data->i++;
 	}
 	wait_processes(data);
