@@ -1,6 +1,5 @@
-2323
-3232
-sr999
-22222
-2525
-ff
+oui 1
+non 2
+peut etre
+yes 1
+not 2

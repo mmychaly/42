@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 16:16:35 by azakharo          #+#    #+#             */
-/*   Updated: 2024/11/11 05:00:40 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/19 13:35:03 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,47 +61,113 @@ void	print_commands(t_data *data)
 	}
 }
 
-void	free_data(t_data *data)
+char	**copy_envp(char **envp)
+{
+	int		i;
+	int		count;
+	char	**new_envp;
+
+	count = 0;
+	while (envp[count] != NULL)
+		count++;
+	new_envp = malloc(sizeof(char *) * (count + 1));
+	if (!new_envp)
+		return (NULL);
+	i = 0;
+	while (i < count)
+	{
+		new_envp[i] = ft_strdup(envp[i]); // Дублирую каждую строку
+		if (!new_envp[i])
+		{
+			while (--i >= 0)
+				free(new_envp[i]);
+			free(new_envp);
+			return (NULL);
+		}
+		i++;
+	}
+	new_envp[count] = NULL;
+	return (new_envp);
+}
+
+void	free_data_cmd(t_data *data)
 {
 	int	i;
 	int	j;
 
+	// Освобождаем каждую команду в data->cmd
 	i = 0;
-	while (data->cmd[i] != NULL)
+	if (data->cmd)
 	{
-		if (data->cmd[i]->cmd_arg)
+		while (data->cmd[i] != NULL)
 		{
-			j = 0;
-			while (data->cmd[i]->cmd_arg[j])
+			if (data->cmd[i]->cmd_arg)
 			{
-				free(data->cmd[i]->cmd_arg[j]);
-				j++;
+				j = 0;
+				while (data->cmd[i]->cmd_arg[j])
+				{
+					free(data->cmd[i]->cmd_arg[j]);
+					j++;
+				}
+				free(data->cmd[i]->cmd_arg);
 			}
-			free(data->cmd[i]->cmd_arg);
+			if (data->cmd[i]->cmd)
+				free(data->cmd[i]->cmd);
+			if (data->cmd[i]->input_file)
+				free(data->cmd[i]->input_file);
+			if (data->cmd[i]->here_doc_file)
+				free(data->cmd[i]->here_doc_file);
+			if (data->cmd[i]->output_file)
+				free(data->cmd[i]->output_file);
+			if (data->cmd[i]->append_file)
+				free(data->cmd[i]->append_file);
+			if (data->cmd[i]->here_doc_pfd != 0)
+				//Закрываем канал чтения из here doc
+			{
+				close(data->cmd[i]->here_doc_pfd);
+				data->cmd[i]->here_doc_pfd = 0;
+			}
+			free(data->cmd[i]);
+			i++;
 		}
-		if (data->cmd[i]->cmd)
-			free(data->cmd[i]->cmd);
-		if (data->cmd[i]->input_file)
-			free(data->cmd[i]->input_file);
-		if (data->cmd[i]->here_doc_file)
-			free(data->cmd[i]->here_doc_file);
-		if (data->cmd[i]->output_file)
-			free(data->cmd[i]->output_file);
-		if (data->cmd[i]->append_file)
-			free(data->cmd[i]->append_file);
-		free(data->cmd[i]);
+		free(data->cmd);
+		data->cmd = NULL;
+	}
+}
+
+void	free_envp(t_data *data)
+{
+	int	i;
+
+	i = 0;
+	while (data->envp[i] != NULL)
+	{
+		free(data->envp[i]);
 		i++;
 	}
-	free(data->cmd);
-	free(data);
+	free(data->envp);
+	data->envp = NULL;
+}
+
+void	free_all_data(t_data *data)
+{
+	if (data)
+	{
+		if (data->cmd != NULL)
+			free_data_cmd(data); // Освобождаем команды и связанные строки
+		if (data->envp != NULL)
+			free_envp(data); // Освобождаем переменные окружения
+		if (data->user_input != NULL)
+			free(data->user_input);
+		free(data); // Освобождаем структуру data
+	}
 }
 
 int	main(int argc, char **argv, char **envp)
 {
 	t_data	*data;
-	int exit_status;
-	char    *temp_user_input;
-	
+	int		exit_status;
+
 	(void)argv;
 	if (argc > 2) //Проверка на количество аргументов
 	{
@@ -112,33 +178,45 @@ int	main(int argc, char **argv, char **envp)
 	g_pid = -1; //-1 == родительский процесс
 	signal(SIGINT, handle_sigint); //Функция которая обрабатывает сигнал ctrl c , во всех процессах
 	signal(SIGQUIT, SIG_IGN); //Функция которая обрабатывает сигнал ctrl '\' . В родительском процессе , игнорирует сигнал
+	data = malloc(sizeof(t_data));
+	if (!data)
+	{
+		perror("malloc failed");
+		return (1);
+	}
+	ft_memset(data, 0, sizeof(t_data));
+	data->envp = copy_envp(envp); //Считываем окружение , нужно для execve
 	while (1)
 	{
-		temp_user_input = readline("minishell$ ");
-		if (!temp_user_input)
-			break ;
-		if (ft_strlen(temp_user_input) > 0)
-			add_history(temp_user_input);
-		data = malloc(sizeof(t_data));
-		if (!data)
+		data->user_input = readline("minishell$ ");
+		if (!data->user_input)
 		{
-			perror("malloc failed");
-			return (1);
+			ft_printf("exit\n");
+			break ;
 		}
-		ft_memset(data, 0, sizeof(t_data));
-		data->envp = envp; //Считываем окружение , нужно для execve
-		data->user_input = temp_user_input;
+		if (ft_strlen(data->user_input) > 0)
+			add_history(data->user_input);
+		data->back_in_main = 0;
 		parse_pipeline(data, data->user_input);
-		data->exit_status = exit_status; //Перед запуском новой команды подгружаем статус старой команды
+		//Перед запуском новой команды подгружаем статус старой команды
+		if (data->back_in_main == 1)
+		{
+			exit_status = data->exit_status;
+			free_data_cmd(data);
+			free(data->user_input);
+			//printf("status after return (in main with fault %i\n", data->exit_status);
+			continue ; // Пропускаем выполнение команды
+		}
+		data->exit_status = exit_status;
 		print_commands(data);    // Вывод команд для дебага
 		printf("\n---------\n"); //Отделяем вывод команды от дебага
 		choice_execution(data);
 		printf("status %i\n", data->exit_status);
-		exit_status = data->exit_status; //Сохраняем статус завершения команды перед освобождением
-		check_exit_total(data);
+		exit_status = data->exit_status;	//Сохраняем статус завершения команды перед освобождением
+		free_data_cmd(data);
 		free(data->user_input);
-		free_data(data);
 	}
+	free_all_data(data);
 	rl_clear_history();
 	return (0);
 }

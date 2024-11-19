@@ -6,7 +6,7 @@
 #    By: artemii <artemii@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/29 17:39:46 by azakharo          #+#    #+#              #
-#    Updated: 2024/10/15 01:52:12 by artemii          ###   ########.fr        #
+#    Updated: 2024/11/10 19:23:19 by artemii          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -49,6 +49,7 @@ SOURCES =	ft_atoi.c \
 			ft_putstr_fd.c \
 			ft_putendl_fd.c \
 			ft_putnbr_fd.c \
+			ft_realloc.c \
 			extra_functions/ft_printf/ft_printf.c \
 			extra_functions/ft_printf/print_functions.c \
 			extra_functions/get_next_line/get_next_line.c \

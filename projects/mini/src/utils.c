@@ -65,49 +65,4 @@ void	error_exit(const char *message)
 	exit(EXIT_FAILURE);
 }
 
-static void skip_spaces(const char *str, int *i)
-{
-    while (str[*i] && str[*i] == ' ')
-        (*i)++;
-}
 
-static char *get_token_in_quotes(const char *str, int *i, char quote_char)
-{
-    int start = ++(*i);
-    while (str[*i] && str[*i] != quote_char)
-        (*i)++;
-    if (str[*i] == quote_char)
-        (*i)++;
-    
-    char *token = ft_strndup(str + start, (*i) - start - 1);
-    return token;
-}
-
-char **ft_split_quotes(const char *input)
-{
-    char **tokens = malloc(sizeof(char *) * (strlen(input) / 2 + 2)); // например половина строки + запас
-    int i = 0;
-    int token_count = 0;
-
-    while (input[i])
-    {
-        skip_spaces(input, &i);
-
-        if (input[i] == '\'' || input[i] == '"')  // Если начинается с кавычки
-        {
-            char quote_char = input[i];
-            tokens[token_count++] = get_token_in_quotes(input, &i, quote_char);
-        }
-        else  // Если это обычный токен без кавычек
-        {
-            int start = i;
-            while (input[i] && input[i] != ' ' && input[i] != '\'' && input[i] != '"')
-                i++;
-            tokens[token_count++] = ft_strndup(input + start, i - start);
-        }
-
-        skip_spaces(input, &i);
-    }
-    tokens[token_count] = NULL;  // Завершаем массив токенов
-    return tokens;
-}
