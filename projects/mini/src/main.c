@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 16:16:35 by azakharo          #+#    #+#             */
-/*   Updated: 2024/11/19 13:35:03 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/20 16:45:50 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,7 +204,6 @@ int	main(int argc, char **argv, char **envp)
 			exit_status = data->exit_status;
 			free_data_cmd(data);
 			free(data->user_input);
-			//printf("status after return (in main with fault %i\n", data->exit_status);
 			continue ; // Пропускаем выполнение команды
 		}
 		data->exit_status = exit_status;

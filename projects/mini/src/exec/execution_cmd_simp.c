@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:53:45 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/19 16:13:25 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/20 07:23:48 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ void	execution_here_doc(t_cmd *cmd, t_data *data)
 
 void	redirection(t_data *data)
 {
+	//Перенаправления на ввод
 	if (data->cmd[data->i]->pos_here_doc > data->cmd[data->i]->pos_input)
 		ft_redirection_here_doc(data);
 	else if (data->cmd[data->i]->pos_here_doc < data->cmd[data->i]->pos_input)
@@ -79,6 +80,7 @@ void	redirection(t_data *data)
 		if (data->i != data->nb_pipe)
     		close(data->pipefd[0]);
 	}
+	//Перенаправления на вывод
 	if (data->cmd[data->i]->output_file != NULL || data->cmd[data->i]->append_file != NULL)
 		ft_redirection_out_cmd(data);
 	else if (data->cmd[data->i]->output_file == NULL && data->cmd[data->i]->append_file == NULL && data->i != data->nb_pipe)

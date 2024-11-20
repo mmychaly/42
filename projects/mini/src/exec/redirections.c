@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 00:47:25 by artemii           #+#    #+#             */
-/*   Updated: 2024/11/19 17:25:31 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/20 16:45:10 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,18 @@ void ft_redirection_in(t_data *data)
         perror("Error opening input file");
         if (data->i != data->nb_pipe)
             close(data->pipefd[1]);
-        free_data_cmd(data);
-        exit(EXIT_FAILURE);
+        if (data->nb_pipe == 0 && data->builtin_cmd == 1)
+	    {
+    		data->back_in_main = 1;
+    		data->exit_status = 1;
+    		return ;
+    	}
+    	else
+    	{
+    		free_all_data(data);
+    		rl_clear_history();
+    		exit (EXIT_FAILURE) ;
+	    }
     }
     if (data->nb_pipe == 0 && data->builtin_cmd == 1)
         close(fd_in);
@@ -49,6 +59,7 @@ void ft_redirection_in(t_data *data)
             close(data->pipefd[1]);
         close(fd_in);
         free_all_data(data);
+        rl_clear_history();
         exit(EXIT_FAILURE);
         }
         close(fd_in); // Закрываем дескриптор файла после перенаправления
@@ -80,8 +91,18 @@ void	ft_redirection_here_doc(t_data *data)
             data->cmd[data->i]->here_doc_pfd = 0;
             if (data->i != data->nb_pipe)
                 close(data->pipefd[1]);
-            free_all_data(data);
-            exit (EXIT_FAILURE);
+            if (data->nb_pipe == 0 && data->builtin_cmd == 1)
+	        {
+    		    data->back_in_main = 1;
+    		    data->exit_status = 1;
+    		    return ;
+    	    }
+    	    else
+    	    {
+           		free_all_data(data);
+        		rl_clear_history();
+                exit (EXIT_FAILURE) ;
+	        }
         }
         close(fd_in);
     }
@@ -102,6 +123,7 @@ void	ft_redirection_here_doc(t_data *data)
             if (data->i != data->nb_pipe)
                 close(data->pipefd[1]);
             free_all_data(data);
+            rl_clear_history();
     		exit (EXIT_FAILURE);
 	    }
         close(data->cmd[data->i]->here_doc_pfd);
@@ -122,6 +144,7 @@ void	ft_redirection_pipe(t_data *data)
         if (data->i != data->nb_pipe)
             close(data->pipefd[1]);
         free_all_data(data);
+        rl_clear_history();
 		exit (EXIT_FAILURE);
 	}
 	close(data->prev_pipe);
@@ -131,7 +154,7 @@ void	ft_redirection_pipe(t_data *data)
 void	ft_redirection_out_cmd(t_data *data)
 {
 	int	fd_out;
-    if (data->nb_pipe == 0 && data->builtin_cmd == 1 && data->display_builtin_cmd == 1)
+    if (data->nb_pipe == 0 && data->builtin_cmd == 1 && data->display_builtin_cmd == 1)//Сохраняем стандартный канал вывода
         data->std_out = dup(1);
     if (data->i != data->nb_pipe)
     {
@@ -145,9 +168,19 @@ void	ft_redirection_out_cmd(t_data *data)
             if (fd_out == -1)
             {
                 if (data->flag_pipe > 0)
-		            error_open_outfile(1, data);
-                else
-                    error_open_outfile(0, data);
+                    free_pipe(0);
+                if (data->nb_pipe == 0 && data->builtin_cmd == 1)
+	            {
+    		        data->back_in_main = 1;
+    		        data->exit_status = 1;
+    	            return ;
+                }
+	            else    	            
+                {
+           		    free_all_data(data);
+        		    rl_clear_history();
+                    exit (EXIT_FAILURE);
+	            }
             }
             close(fd_out);
         }
@@ -161,9 +194,19 @@ void	ft_redirection_out_cmd(t_data *data)
             if (fd_out == -1)
             {
                 if (data->flag_pipe > 0)
-		            error_open_outfile(1, data);
-                else
-                    error_open_outfile(0, data);
+                    free_pipe(0);
+                if (data->nb_pipe == 0 && data->builtin_cmd == 1)
+	            {
+    		        data->back_in_main = 1;
+    		        data->exit_status = 1;
+    	            return ;
+                }
+	            else    	            
+                {
+           		    free_all_data(data);
+        		    rl_clear_history();
+                    exit (EXIT_FAILURE);
+	            }
             }
             close(fd_out);
         }
@@ -172,12 +215,22 @@ void	ft_redirection_out_cmd(t_data *data)
 	if (fd_out == -1)
     {
         if (data->flag_pipe > 0)
-		    error_open_outfile(1, data);
-        else
-            error_open_outfile(0, data);
+             free_pipe(0);
+        if (data->nb_pipe == 0 && data->builtin_cmd == 1)
+	    {
+    		data->back_in_main = 1;
+    		data->exit_status = 1;
+    	    return ;
+        }
+	    else    	            
+        {
+           	free_all_data(data);
+        	rl_clear_history();
+            exit (EXIT_FAILURE);
+	    }
     }
     if (data->nb_pipe == 0 && data->builtin_cmd == 1 && data->display_builtin_cmd != 1)
-        	close(fd_out);
+        close(fd_out);
     else
     {
 	    if (dup2(fd_out, STDOUT_FILENO) == -1)
@@ -186,9 +239,17 @@ void	ft_redirection_out_cmd(t_data *data)
             if (data->flag_pipe > 0)
 		      free_pipe(0);
 		    close(fd_out);
-          free_all_data(data);
+            if (data->nb_pipe == 0 && data->builtin_cmd == 1 && data->display_builtin_cmd == 1)
+            {
+                data->back_in_main = 1;
+    		    data->exit_status = 1;
+    	        return ;
+            }
+            free_all_data(data);
+            rl_clear_history();
 		    exit (EXIT_FAILURE);
 	    }
+        printf("STDOUT_FILENO == %i\n", STDOUT_FILENO);
         close(fd_out);
     }
 }
@@ -202,6 +263,7 @@ void    ft_redirection_out_pipe(t_data *data)
 		    free_pipe(0);
 		close(data->pipefd[1]);
         free_all_data(data);
+        rl_clear_history();
 		exit (EXIT_FAILURE);
 	}
     close(data->pipefd[1]);

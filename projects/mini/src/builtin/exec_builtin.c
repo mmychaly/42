@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 04:50:13 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/19 17:22:06 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/20 16:45:32 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 void	check_builtin_command(t_data *data)
 {
-
 	if (ft_strcmp(data->cmd[data->i]->cmd, "exit") == 0)
 		data->builtin_cmd = 1;
 	else if (ft_strcmp(data->cmd[data->i]->cmd, "export") == 0)
@@ -38,7 +37,6 @@ void	check_builtin_command(t_data *data)
 		data->builtin_cmd = 1;
 		data->display_builtin_cmd = 1;
 	}
-
 }
 
 void	redirection_builtin_command(t_data *data)
@@ -64,8 +62,8 @@ void	execute_builtin_command(t_data *data)
 			return ;
 		}
 		args = data->cmd[data->i]->cmd_arg;
-		check_builtin_command(data);
-		if (data->nb_pipe == 0 && data->builtin_cmd == 1)
+		check_builtin_command(data);//Проверям наши ли это команды или нет а так же выводятли они результат или нет 
+		if (data->nb_pipe == 0 && data->builtin_cmd == 1)//Если это наши команды то запускаем переадресацию на ввод/вывод
 			redirection_builtin_command(data);
 		if (ft_strcmp(data->cmd[data->i]->cmd, "echo") == 0)
 			echo(data);
@@ -79,5 +77,17 @@ void	execute_builtin_command(t_data *data)
 			print_env(data);
 		else if (ft_strcmp(args[0], "pwd") == 0)
 			pwd(data);
+	}
+	if (data->nb_pipe == 0 && data->builtin_cmd == 1 && data->display_builtin_cmd == 1 && (data->cmd[data->i]->output_file != NULL || data->cmd[data->i]->append_file != NULL))//Востанавливаем стандартный вывод после env/echo/pwd
+	{
+		if (dup2(data->std_out, 1) == -1)
+		{
+			perror("Error: dup2 in execute_builtin_command");
+	    	close(data->std_out);
+			free_all_data(data);
+        	rl_clear_history();
+	    	exit(1);
+		}
+		close(data->std_out);
 	}
 }

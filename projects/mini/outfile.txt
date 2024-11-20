@@ -1,62 +1,8 @@
-SHELL=/bin/zsh
-SESSION_MANAGER=local/made-f0Ar6s10.clusters.42paris.fr:@/tmp/.ICE-unix/5077,unix/made-f0Ar6s10.clusters.42paris.fr:/tmp/.ICE-unix/5077
-USER_ZDOTDIR=/home/mmychaly
-QT_ACCESSIBILITY=1
-COLORTERM=truecolor
-XDG_CONFIG_DIRS=/etc/xdg/xdg-ubuntu:/etc/xdg
-SSH_AGENT_LAUNCHER=gnome-keyring
-XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0
-XDG_MENU_PREFIX=gnome-
-TERM_PROGRAM_VERSION=1.95.3
-GNOME_DESKTOP_SESSION_ID=this-is-deprecated
-GTK_IM_MODULE=ibus
-SSH_AUTH_SOCK=/run/user/108134/keyring/ssh
-XMODIFIERS=@im=ibus
-DESKTOP_SESSION=ubuntu
-GTK_MODULES=gail:atk-bridge
-PWD=/home/mmychaly/projects_home/projects/mini
-KRB5CCNAME=FILE:/tmp/krb5cc_108134_YvM2wZ
-XDG_SESSION_DESKTOP=ubuntu
-LOGNAME=mmychaly
-XDG_SESSION_TYPE=x11
-GPG_AGENT_INFO=/run/user/108134/gnupg/S.gpg-agent:0:1
-SYSTEMD_EXEC_PID=5096
-_=/usr/bin/env
-XAUTHORITY=/home/mmychaly/.Xauthority
-VSCODE_GIT_ASKPASS_NODE=/usr/share/code/code
-XDG_GREETER_DATA_DIR=/var/lib/lightdm-data/mmychaly
-GJS_DEBUG_TOPICS=JS ERROR;JS LOG
-VSCODE_INJECTION=1
-HOME=/home/mmychaly
-LANG=en_US.UTF-8
-XDG_CURRENT_DESKTOP=Unity
-GIT_ASKPASS=/usr/share/code/resources/app/extensions/git/dist/askpass.sh
-XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0
-INVOCATION_ID=985dbf61dba041ea8f5c82a556cc6388
-MANAGERPID=4487
-CHROME_DESKTOP=code.desktop
-GJS_DEBUG_OUTPUT=stderr
-VSCODE_GIT_ASKPASS_EXTRA_ARGS=
-XDG_SESSION_CLASS=user
-TERM=xterm-256color
-ZDOTDIR=/home/mmychaly
-LIBVIRT_DEFAULT_URI=qemu:///system
-USER=mmychaly
-VSCODE_GIT_IPC_HANDLE=/run/user/108134/vscode-git-77234fc9e3.sock
-DISPLAY=:0
-SHLVL=2
-QT_IM_MODULE=ibus
-XDG_RUNTIME_DIR=/run/user/108134
-DOCKER_HOST=unix:///run/user/108134/docker.sock
-VSCODE_GIT_ASKPASS_MAIN=/usr/share/code/resources/app/extensions/git/dist/askpass-main.js
-JOURNAL_STREAM=8:40496
-XDG_DATA_DIRS=/usr/share/ubuntu:/usr/share/gnome:/home/mmychaly/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share:/var/lib/snapd/desktop
-GDK_BACKEND=x11
-PATH=/home/mmychaly/bin:/home/mmychaly/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-GDMSESSION=ubuntu
-ORIGINAL_XDG_CURRENT_DESKTOP=ubuntu:GNOME
-DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/108134/bus
-GIO_LAUNCHED_DESKTOP_FILE_PID=5496
-GIO_LAUNCHED_DESKTOP_FILE=/usr/share/applications/code.desktop
-OLDPWD=/home/mmychaly
-TERM_PROGRAM=vscode
+STDOUT_FILENO == 1
+/home/mikerf/42/projects/mini
+after func
+befor dup2
+STDOUT_FILENO == 1
+trttt
+after func
+befor dup2
