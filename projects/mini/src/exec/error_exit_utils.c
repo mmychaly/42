@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 04:08:02 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/18 03:35:27 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/25 01:01:17 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ void	free_fault_execve(char *cmd, t_data *data)
 	if (data->flag_pipe > 0)
 		free_pipe(0);
 	free_all_data(data);
+	rl_clear_history();
 	perror("ERROR execve");
 	exit(126);
 }
@@ -37,15 +38,6 @@ void	ft_free_strs(char **strs)
 	strs = NULL;
 }
 
-void	ft_error_exit(int nb)
-{
-	perror("ERROR");
-	if (nb == 0)
-		exit(0);
-	else
-		exit(EXIT_FAILURE);
-}
-
 void	free_pipe(int fd)
 {
 	char	*line;
@@ -58,11 +50,10 @@ void	free_pipe(int fd)
 	}
 }
 
-void	error_join_arg(t_data *data)
+void	error_fork(t_data *data)
 {
-	write(2, "ERROR join_arg\n", 15);
-	if (data->flag_pipe > 0)
-		free_pipe(0);
-	free_data_cmd(data);
-	exit(EXIT_FAILURE);
+	write(2, "ERROR: fork\n", 12);
+	close(data->pipefd[1]);
+	close(data->pipefd[0]);
+	data->exit_status = 1;
 }

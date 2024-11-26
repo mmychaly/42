@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export_var.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/25 01:50:30 by mmychaly          #+#    #+#             */
+/*   Updated: 2024/11/25 02:35:09 by mmychaly         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../include/minishell.h"
 
 static char	*get_key(const char *input)
@@ -10,7 +22,7 @@ static char	*get_key(const char *input)
 	return (ft_substr(input, 0, equal_pos - input));
 }
 
-static int	update_or_add_var(t_data *data, char *new_var, char *key)
+int	update_or_add_var(t_data *data, char *new_var, char *key)
 {
 	int		i;
 	char	**new_envp;

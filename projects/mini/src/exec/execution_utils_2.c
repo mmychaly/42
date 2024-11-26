@@ -6,16 +6,16 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 04:19:01 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/18 04:08:02 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/25 01:21:43 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void handle_sigint(int sig) //Обработчик сигнала SIGINT == ctrl c
+void	handle_sigint(int sig)
 {
 	(void) sig;
-	if (g_pid == -1 || g_pid == -50) //Если мы в родительском процессе, просто выводим новую строку minishell$ и пермещаемся на нее
+	if (g_pid == -1 || g_pid == -50)
 	{
 		write(1, "\n", 2);
 		rl_on_new_line();
@@ -23,42 +23,46 @@ void handle_sigint(int sig) //Обработчик сигнала SIGINT == ctrl
 		rl_redisplay();
 		g_pid = -50;
 	}
-	else if (g_pid == -5) //Если мы в родительском процессе но here doc . Останавливаем here doc
+	else if (g_pid == -5)
 	{
 		write(1, "\n", 1);
-		close(0);//Закрытие стандартного ввода сразу прекращает работу функции gnl и выкидывает из цикла 
-		g_pid = -10; //Показываем функции here doc что она закончила цикл из за SIGINT
+		close(0);
+		g_pid = -10;
 	}
-	else if (g_pid > 0)//Если в момент получения SIGINT есть дочерний процесс мы его закроем, при этом родительский процесс на сигнал не реагирует, только получает статус дочернего процесса закрытого по сигналу
-		kill(g_pid, SIGINT); //Функция для закрытия дочерних процессов
+	else if (g_pid > 0)
+		kill(g_pid, SIGINT);
+}
+
+void	check_status(t_data *data, int status)
+{
+	int	signal;
+
+	if (WIFEXITED(status))
+		data->exit_status = (WEXITSTATUS(status));
+	else if (WIFSIGNALED(status))
+	{
+		signal = WTERMSIG(status);
+		data->exit_status = 128 + signal;
+		if (data->exit_status == 131)
+			write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
+		else if (data->exit_status == 130)
+			write(STDOUT_FILENO, "\n", 1);
+	}
+	else
+		data->exit_status = 1;
 }
 
 void	wait_processes(t_data *data)
 {
 	int	pid;
 	int	status;
-	int signal;
+
 	pid = waitpid(-1, &status, 0);
 	while (pid > 0)
 	{
-		if (pid == data->prev_pipe) //Здесь я неуверен
-		{
-			if (WIFEXITED(status))
-				data->exit_status = (WEXITSTATUS(status));
-			else if (WIFSIGNALED(status)) 
-			{
-				signal = WTERMSIG(status);//Обрабатывает закрытие процесса через сигналы 
-				data->exit_status = 128 + signal;
-				if (data->exit_status == 131) //Статус закрытия процесса через sigquit
-					write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
-				else if	(data->exit_status == 130) //Статус закрытия процесса через sigint
-					write(STDOUT_FILENO, "\n", 1);
-			}
-			else
-				data->exit_status = 1;
-		}
+		if (pid == data->prev_pipe)
+			check_status(data, status);
 		pid = waitpid(-1, &status, 0);
 	}
-	g_pid = -1;//После того как точно закрыли все дочерний процессы и находимся в родительском 
-	//требуется вернуть глобальную переменную к -1 и можно возвращаться в основной цикл на новый круг.
+	g_pid = -1;
 }
