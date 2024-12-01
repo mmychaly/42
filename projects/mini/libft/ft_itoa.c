@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_itoa.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: artemii <artemii@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 21:09:09 by azakharo          #+#    #+#             */
-/*   Updated: 2024/11/23 14:44:55 by artemii          ###   ########.fr       */
+/*   Updated: 2024/11/26 15:35:52 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ char	*ft_itoa(int nb)
 	if (!str)
 		return (NULL);
 	str[len] = '\0';
-
 	if (n == 0)
 	{
 		str[0] = '0';

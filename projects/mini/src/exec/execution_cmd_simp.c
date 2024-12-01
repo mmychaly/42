@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:53:45 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/23 06:02:00 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/29 22:57:26 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	read_line_here_doc(char *here_doc_file, int pipefd)
 			line = get_next_line(0);
 		}
 	}
-	if (line == NULL && g_pid != -10)
+	if (line == NULL && g_sig != 2)
 		exit_eof(lim);
 }
 
@@ -45,22 +45,23 @@ void	execution_here_doc(t_cmd *cmd, char *here_doc_file, t_data *data)
 	int		pipefd[2];
 	int		in;
 
-	g_pid = -5;
+	signal(SIGINT, handle_sigint_heredoc);
 	if (cmd->here_doc_pfd > 0)
 		close_here_doc_pfd(cmd->here_doc_pfd);
 	if (pipe(pipefd) == -1)
 		return ;
 	in = dup(0);
 	read_line_here_doc(here_doc_file, pipefd[1]);
-	if (g_pid == -10)
+	if (g_sig == 2)
 	{
 		sigint_heredoc(data, pipefd, in);
+		handle_signals();
 		return ;
 	}
 	close(pipefd[1]);
 	close(in);
 	cmd->here_doc_pfd = pipefd[0];
-	g_pid = -1;
+	handle_signals();
 }
 
 void	redirection(t_data *data)

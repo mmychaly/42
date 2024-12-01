@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: artemii <artemii@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 00:52:19 by artemii           #+#    #+#             */
-/*   Updated: 2024/11/26 02:02:38 by artemii          ###   ########.fr       */
+/*   Updated: 2024/11/29 23:17:10 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ char	**copy_envp(char **envp)
 
 void	handle_signals(void)
 {
-	signal(SIGINT, handle_sigint);
+	signal(SIGINT, handle_sigint_newline);
 	signal(SIGQUIT, SIG_IGN);
 }
 
@@ -62,11 +62,11 @@ void	reset_data_flags(t_data *data)
 
 void	handle_pid_status(t_data *data, int *exit_status)
 {
-	if (g_pid == -50)
+	if (g_sig == 2)
 	{
 		data->exit_status = 130;
 		*exit_status = 130;
-		g_pid = -1;
+		g_sig = 0;
 	}
 }
 

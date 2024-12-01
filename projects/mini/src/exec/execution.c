@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:06:33 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/24 22:52:56 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/11/29 23:09:18 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ void	ft_launch_cmd(t_data *data)
 {
 	char	*cmd;
 
+	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
 	redirection(data);
 	execute_builtin_command(data);
@@ -31,6 +32,7 @@ void	ft_launch_cmd(t_data *data)
 	if (cmd == NULL)
 		free_error_cmd(data);
 	check_dir(data, cmd);
+	close_other_fd(data);
 	if (execve(cmd, data->cmd[data->i]->cmd_arg, data->envp) == -1)
 		free_fault_execve(cmd, data);
 }
@@ -57,6 +59,7 @@ void	execution_cmd(t_data *data)
 {
 	int	pid;
 
+	signal(SIGINT, SIG_IGN);
 	while (data->i <= data->nb_pipe)
 	{
 		if (data->i != data->nb_pipe && pipe(data->pipefd) == -1)
@@ -73,8 +76,6 @@ void	execution_cmd(t_data *data)
 		}
 		if (pid == 0)
 			ft_launch_cmd(data);
-		else
-			g_pid = pid;
 		manage_fd(data, pid);
 		data->i++;
 	}

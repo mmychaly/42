@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: artemii <artemii@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 00:47:05 by artemii           #+#    #+#             */
-/*   Updated: 2024/11/26 00:51:20 by artemii          ###   ########.fr       */
+/*   Updated: 2024/11/29 23:13:32 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,10 +99,7 @@ static void	process_pipeline_commands(t_data *data, char **command_tokens,
 		ft_memset(data->cmd[i], 0, sizeof(t_cmd));
 		parse_single_command(data->cmd[i], command_tokens[i], data);
 		if (data->back_in_main == 1)
-		{
-			free_split(command_tokens);
 			return ;
-		}
 		i++;
 	}
 }
