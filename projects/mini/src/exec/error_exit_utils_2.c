@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 04:07:52 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/29 22:43:49 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/03 02:48:12 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,24 @@ void	sigint_heredoc(t_data *data, int pipefd[2], int in)
 	}
 	close(in);
 	data->back_in_main = 1;
-	g_sig = 0;
 	data->exit_status = 130;
+	g_sig = 0;
+}
+
+int	check_cmd(t_data *data)
+{
+	int	flag;
+
+	flag = 0;
+	if (data->i - 1 < 0 || data->cmd[data->i - 1]->cmd == NULL)
+		return (0);
+	if (ft_strcmp(data->cmd[data->i - 1]->cmd, "cat") == 0
+		&& data->cmd[data->i - 1]->here_doc_file == NULL
+		&& data->cmd[data->i - 1]->input_file == NULL && data->i - 1 == 0)
+		flag = 1;
+	if (ft_strcmp(data->cmd[data->i - 1]->cmd, "grep") == 0
+		&& data->cmd[data->i - 1]->here_doc_file == NULL
+		&& data->cmd[data->i - 1]->input_file == NULL && data->i - 1 == 0)
+		flag = 1;
+	return (flag);
 }

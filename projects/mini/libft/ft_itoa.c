@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 21:09:09 by azakharo          #+#    #+#             */
-/*   Updated: 2024/11/26 15:35:52 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/01 15:39:03 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,18 @@ static int	length(long nb)
 	return (len);
 }
 
+char	*handle_zero(void)
+{
+	char	*str;
+
+	str = malloc(2 * sizeof(char));
+	if (!str)
+		return (NULL);
+	str[0] = '0';
+	str[1] = '\0';
+	return (str);
+}
+
 char	*ft_itoa(int nb)
 {
 	char	*str;
@@ -39,17 +51,13 @@ char	*ft_itoa(int nb)
 	int		len;
 
 	n = nb;
+	if (n == 0)
+		return (handle_zero());
 	len = length(n);
 	str = malloc(sizeof(char) * (len + 1));
 	if (!str)
 		return (NULL);
 	str[len] = '\0';
-	if (n == 0)
-	{
-		str[0] = '0';
-		str[1] = '\0';
-		return (str);
-	}
 	if (n < 0)
 	{
 		str[0] = '-';
@@ -62,7 +70,6 @@ char	*ft_itoa(int nb)
 	}
 	return (str);
 }
-
 
 /*
 #include <stdio.h>

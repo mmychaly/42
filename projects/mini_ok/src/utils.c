@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 00:52:19 by artemii           #+#    #+#             */
-/*   Updated: 2024/11/30 04:22:38 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/01 10:29:09 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,6 @@ void	handle_sigint_status(t_data *data, int *exit_status)
 {
 	if (g_sig == 2)
 	{
-		printf("in main\n");
 		data->exit_status = 130;
 		*exit_status = 130;
 		g_sig = 0;

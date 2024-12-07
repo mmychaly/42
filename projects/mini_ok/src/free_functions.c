@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_functions.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: artemii <artemii@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 01:01:36 by artemii           #+#    #+#             */
-/*   Updated: 2024/11/26 02:36:33 by artemii          ###   ########.fr       */
+/*   Updated: 2024/12/04 01:39:55 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ void	free_data_cmd(t_data *data)
 	if (!data->cmd)
 		return ;
 	i = 0;
+	close_prev_pipes_in_parent(data);
 	while (data->cmd[i])
 	{
 		free_cmd_resources(data->cmd[i]);

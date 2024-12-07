@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 16:55:56 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/25 01:04:39 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/04 02:19:24 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ int	exit_cmds_builtin(t_data *data, char *error, int status, char *most_by_free)
 	}
 	else
 	{
+		close_other_fd(data);
+		close_prev_pipes_in_child(data);
 		free_all_data(data);
 		rl_clear_history();
 		exit (status);
@@ -48,6 +50,8 @@ void	exit_eof(char *lim)
 
 void	exit_only_child(t_data *data, int status)
 {
+	close_other_fd(data);
+	close_prev_pipes_in_child(data);
 	free_all_data(data);
 	rl_clear_history();
 	exit(status);

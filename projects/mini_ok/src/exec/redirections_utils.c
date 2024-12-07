@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 06:14:18 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/23 20:32:15 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/04 02:44:44 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,12 @@
 
 void	manage_fd_redirection_input(t_data *data, int flag_heredoc)
 {
-	if (data->prev_pipe != -1)
+	if (data->i != 0)
 	{
-		free_pipe(data->prev_pipe);
-		close(data->prev_pipe);
+		if (check_cmd(data) == 0)
+			free_pipe(data->cmd[data->i - 1]->prev_pipe);
+		close(data->cmd[data->i - 1]->prev_pipe);
+		data->cmd[data->i - 1]->prev_pipe = 0;
 	}
 	if (flag_heredoc == 1)
 	{
@@ -68,6 +70,8 @@ void	redirection_input_stdin(t_data *data, int fd_in)
 		if (data->i != data->nb_pipe)
 			close(data->pipefd[1]);
 		close(fd_in);
+		close_other_fd(data);
+		close_prev_pipes_in_child(data);
 		free_all_data(data);
 		rl_clear_history();
 		exit(EXIT_FAILURE);
@@ -84,6 +88,8 @@ void	redirection_here_doc_stdin(t_data *data)
 		data->cmd[data->i]->here_doc_pfd = 0;
 		if (data->i != data->nb_pipe)
 			close(data->pipefd[1]);
+		close_other_fd(data);
+		close_prev_pipes_in_child(data);
 		free_all_data(data);
 		rl_clear_history();
 		exit (EXIT_FAILURE);

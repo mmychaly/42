@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 06:14:18 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/23 20:32:15 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/03 06:18:07 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@ void	manage_fd_redirection_input(t_data *data, int flag_heredoc)
 {
 	if (data->prev_pipe != -1)
 	{
-		free_pipe(data->prev_pipe);
+		if (check_cmd(data) == 0)
+			free_pipe(data->prev_pipe);
 		close(data->prev_pipe);
 	}
 	if (flag_heredoc == 1)

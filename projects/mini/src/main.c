@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 16:16:35 by azakharo          #+#    #+#             */
-/*   Updated: 2024/11/29 23:14:32 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/01 11:11:19 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ int	main(int argc, char **argv, char **envp)
 		data->user_input = readline("minishell$ ");
 		process_user_input(data, &exit_status);
 		reset_data_flags(data);
-		handle_pid_status(data, &exit_status);
+		handle_sigint_status(data, &exit_status);
 		parse_and_execute(data, &exit_status);
 	}
 	return (0);

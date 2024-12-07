@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 04:50:13 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/25 01:48:08 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/03 21:47:23 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,22 @@ void	check_builtin_command(t_data *data)
 
 void	redirection_builtin_command(t_data *data)
 {
+	int i;
+
+	i = 0;
+	while (ft_strnstr(data->envp[i], "PATH", 4) == 0 )
+	{
+		i++;
+		if (data->envp[i] == NULL)
+		{
+			write(2, "ERROR: don't find PATH\n", 23);
+			data->exit_status = 127;
+			if (data->cmd[0]->here_doc_pfd != 0) //Проверить как работает 
+				free_pipe(data->cmd[0]->here_doc_pfd);
+			data->back_in_main = 1;
+			return ;
+		}
+	}
 	if (data->cmd[data->i]->pos_here_doc > data->cmd[data->i]->pos_input)
 	{
 		ft_redirection_here_doc(data);

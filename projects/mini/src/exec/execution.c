@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:06:33 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/29 23:09:18 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/03 22:54:25 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,7 @@ void	ft_launch_cmd(t_data *data)
 {
 	char	*cmd;
 
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
+	signal(SIGQUIT, sig_upd);
 	redirection(data);
 	execute_builtin_command(data);
 	if (data->cmd[data->i]->cmd == NULL)
@@ -28,7 +27,7 @@ void	ft_launch_cmd(t_data *data)
 	if (access(data->cmd[data->i]->cmd, F_OK | X_OK) == 0)
 		cmd = ft_strdup(data->cmd[data->i]->cmd);
 	else
-		cmd = ft_envp_cherch(data->cmd[data->i]->cmd, data->envp);
+		cmd = ft_envp_cherch(data->cmd[data->i]->cmd, data->envp, data);
 	if (cmd == NULL)
 		free_error_cmd(data);
 	check_dir(data, cmd);
@@ -37,31 +36,25 @@ void	ft_launch_cmd(t_data *data)
 		free_fault_execve(cmd, data);
 }
 
-void	manage_fd(t_data *data, int pid)
+void	sig_upd(int sig)
 {
-	if (data->cmd[data->i]->here_doc_pfd != 0)
-	{
-		close(data->cmd[data->i]->here_doc_pfd);
-		data->cmd[data->i]->here_doc_pfd = 0;
-	}
-	data->flag_pipe = 0;
-	if (data->prev_pipe != -1)
-		close(data->prev_pipe);
-	if (data->i != data->nb_pipe)
-		close(data->pipefd[1]);
-	if (data->i == data->nb_pipe)
-		data->prev_pipe = pid;
-	else
-		data->prev_pipe = data->pipefd[0];
+	g_sig = sig;
+}
+
+void	child_handler(int sig)
+{
+	g_sig = sig;
+	write(1, "\n", 1);
+	exit(130);
 }
 
 void	execution_cmd(t_data *data)
 {
 	int	pid;
 
-	signal(SIGINT, SIG_IGN);
 	while (data->i <= data->nb_pipe)
 	{
+		signal(SIGINT, sig_upd);
 		if (data->i != data->nb_pipe && pipe(data->pipefd) == -1)
 		{
 			write(2, "ERROR: pipe\n", 12);

@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:53:45 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/30 03:52:40 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/04 02:01:35 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void	redirection(t_data *data)
 	else if (data->cmd[data->i]->pos_here_doc < data->cmd[data->i]->pos_input)
 		ft_redirection_in(data);
 	else if (data->cmd[data->i]->here_doc_file == NULL
-		&& data->cmd[data->i]->input_file == NULL && data->prev_pipe != -1)
+		&& data->cmd[data->i]->input_file == NULL && data->i != 0)
 		ft_redirection_pipe(data);
 	else
 	{
@@ -107,4 +107,20 @@ void	check_file_args(t_data *data)
 			}
 		}
 	}
+}
+
+void	manage_fd(t_data *data, int pid)
+{
+	if (data->cmd[data->i]->here_doc_pfd != 0)
+	{
+		close(data->cmd[data->i]->here_doc_pfd);
+		data->cmd[data->i]->here_doc_pfd = 0;
+	}
+	data->flag_pipe = 0;
+	if (data->i != data->nb_pipe)
+		close(data->pipefd[1]);
+	if (data->i == data->nb_pipe)
+		data->last = pid;
+	else
+		data->cmd[data->i]->prev_pipe = data->pipefd[0];
 }

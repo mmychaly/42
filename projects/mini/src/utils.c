@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 00:52:19 by artemii           #+#    #+#             */
-/*   Updated: 2024/11/29 23:17:10 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/01 10:29:09 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	reset_data_flags(t_data *data)
 	data->display_builtin_cmd = 0;
 }
 
-void	handle_pid_status(t_data *data, int *exit_status)
+void	handle_sigint_status(t_data *data, int *exit_status)
 {
 	if (g_sig == 2)
 	{
@@ -69,32 +69,3 @@ void	handle_pid_status(t_data *data, int *exit_status)
 		g_sig = 0;
 	}
 }
-
-/*char	*find_command(char *cmd, char **envp)
-{
-	char	**paths;
-	char	*path;
-	char	*cmd_path;
-	int		i;
-
-	while (*envp && ft_strncmp("PATH=", *envp, 5) != 0)
-		envp++;
-	if (!*envp)
-		return (NULL);
-	paths = ft_split(*envp + 5, ':');
-	i = -1;
-	while (paths[++i])
-	{
-		path = ft_strjoin(paths[i], "/");
-		cmd_path = ft_strjoin(path, cmd);
-		free(path);
-		if (access(cmd_path, F_OK | X_OK) == 0)
-		{
-			free_split(paths);
-			return (cmd_path);
-		}
-		free(cmd_path);
-	}
-	free_split(paths);
-	return (NULL);
-} */

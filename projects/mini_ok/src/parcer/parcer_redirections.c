@@ -6,7 +6,7 @@
 /*   By: artemii <artemii@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 00:47:10 by artemii           #+#    #+#             */
-/*   Updated: 2024/11/26 00:53:44 by artemii          ###   ########.fr       */
+/*   Updated: 2024/12/01 17:50:33 by artemii          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,70 +40,79 @@ char	**realloc_array(char **array, char *new_element)
 	return (new_array);
 }
 
-void	handle_redir_file(t_cmd *cmd, char *token, int *redir_position,
-		int redir_type)
+int	split_token_on_redirection(char *token, char **before, char **redir,
+		char **after)
 {
-	if (redir_type == 0)
-	{
-		cmd->input_file = ft_strdup(token);
-		cmd->pos_input = (*redir_position)++;
-		cmd->input_files = realloc_array(cmd->input_files, ft_strdup(token));
-	}
-	else if (redir_type == 1)
-	{
-		cmd->output_file = ft_strdup(token);
-		cmd->pos_output = (*redir_position)++;
-		cmd->output_files = realloc_array(cmd->output_files, ft_strdup(token));
-	}
-	else if (redir_type == 2)
-	{
-		cmd->append_file = ft_strdup(token);
-		cmd->pos_append = (*redir_position)++;
-		cmd->append_files = realloc_array(cmd->append_files, ft_strdup(token));
-	}
-	else if (redir_type == 3)
-	{
-		cmd->here_doc_file = ft_strdup(token);
-		cmd->pos_here_doc = (*redir_position)++;
-		cmd->here_doc_files = realloc_array(cmd->here_doc_files,
-				ft_strdup(token));
-	}
-}
+	int	i;
+	int	redir_len;
 
-void	handle_redirection(t_cmd *cmd, char **tokens, int *i,
-		int *redir_position)
-{
-	int	redir_type;
-
-	if (ft_strcmp(tokens[*i], "<") == 0)
-		redir_type = 0;
-	else if (ft_strcmp(tokens[*i], ">") == 0)
-		redir_type = 1;
-	else if (ft_strcmp(tokens[*i], ">>") == 0)
-		redir_type = 2;
-	else if (ft_strcmp(tokens[*i], "<<") == 0)
-		redir_type = 3;
+	i = 0;
+	while (token[i] && !ft_strchr("<>", token[i]))
+		i++;
+	if (token[i])
+	{
+		if (i > 0)
+			*before = ft_strndup(token, i);
+		if (token[i + 1] && (token[i + 1] == '>' || token[i + 1] == '<'))
+		{
+			if (token[i + 2] && (token[i + 2] == '>' || token[i + 2] == '<'))
+				return (-1);
+			redir_len = 2;
+		}
+		else
+			redir_len = 1;
+		*redir = ft_strndup(token + i, redir_len);
+		*after = ft_strdup(token + i + redir_len);
+	}
 	else
-		return ;
-	(*i)++;
-	handle_redir_file(cmd, tokens[*i], redir_position, redir_type);
+		*before = ft_strdup(token);
+	return (0);
 }
 
-void	handle_command_args(t_cmd *cmd, char **tokens, int *i, int *arg_idx)
+void	process_redirection_token(t_cmd *cmd, char *token, int *i,
+		char **tokens)
+{
+	char	*before;
+	char	*redir;
+	char	*after;
+
+	before = NULL;
+	redir = NULL;
+	after = NULL;
+	if (!token)
+		return ;
+	if (split_token_on_redirection(token, &before, &redir, &after) == -1)
+		return (handle_missing_after(cmd, before, "wrong  sign", after));
+	handle_before_token(cmd, before);
+	if (redir && (!after || *after == '\0'))
+	{
+		if (tokens[*i + 1])
+		{
+			(*i)++;
+			free(after);
+			after = ft_strdup(tokens[*i]);
+		}
+		else
+			return (handle_missing_after(cmd, before, redir, after));
+	}
+	handle_redir_token(cmd, after, redir);
+	free_temp_redir(before, after, redir);
+}
+
+void	handle_command_args(t_cmd *cmd, char **tokens, int *i)
 {
 	int	j;
 
 	j = 0;
+	if (!cmd || !tokens || (i && !tokens[*i]))
+		return ;
 	if (cmd->cmd_arg == NULL)
 	{
 		cmd->cmd_arg = malloc(sizeof(char *) * 100);
 		if (!cmd->cmd_arg)
 			return ;
 		while (j < 100)
-		{
-			cmd->cmd_arg[j] = NULL;
-			j++;
-		}
+			cmd->cmd_arg[j++] = NULL;
 		cmd->cmd = ft_strdup(tokens[*i]);
 		if (!cmd->cmd)
 		{
@@ -112,7 +121,11 @@ void	handle_command_args(t_cmd *cmd, char **tokens, int *i, int *arg_idx)
 			return ;
 		}
 	}
-	cmd->cmd_arg[(*arg_idx)++] = ft_strdup(tokens[*i]);
+	if (i && tokens[*i])
+	{
+		cmd->cmd_arg[cmd->agr_idx] = ft_strdup(tokens[*i]);
+		cmd->agr_idx++;
+	}
 }
 
 void	handle_here_docs(t_cmd *cmd, t_data *data)

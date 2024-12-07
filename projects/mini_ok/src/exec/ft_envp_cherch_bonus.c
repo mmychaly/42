@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 02:22:54 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/25 01:24:32 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/04 03:33:42 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,20 +66,16 @@ void	check_dir(t_data *data, char *cmd)
 		if (data->flag_pipe > 0)
 			free_pipe(0);
 		free(cmd);
-		free_all_data(data);
-		rl_clear_history();
-		exit(1);
+		free_child(data, 1);
 	}
 	if (S_ISDIR(path_stat.st_mode))
 	{
 		write(2, cmd, ft_strlen(cmd));
-		write(2, ": command not found\n", 20);
+		write(2, ": command not found is dir\n", 27);
 		if (data->flag_pipe > 0)
 			free_pipe(0);
 		free(cmd);
-		free_all_data(data);
-		rl_clear_history();
-		exit(127);
+		free_child(data, 127);
 	}
 }
 
@@ -112,13 +108,14 @@ char	*ft_creat_path(char **strs, char *cmd)
 	return (res);
 }
 
-char	*ft_envp_cherch(char *cmd, char **envp)
+char	*ft_envp_cherch(char *cmd, char **envp, t_data *data)
 {
 	int		i;
 	char	**strs;
 	char	*res;
 
 	i = 0;
+	check_path(data);
 	while (ft_strnstr(envp[i], "PATH", 4) == 0)
 		i++;
 	strs = ft_split(envp[i] + 5, ':');

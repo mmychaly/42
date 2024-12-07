@@ -8,6 +8,7 @@ SRCS = src/main.c\
 		src/exec/execution_cmd_simp.c\
 		src/exec/redirections.c\
 		src/exec/execution_utils_2.c\
+		src/exec/execution_utils_3.c\
 		src/exec/ft_envp_cherch_bonus.c\
 		src/exec/error_exit_utils.c\
 		src/exec/error_exit_utils_2.c\
@@ -28,6 +29,7 @@ SRCS = src/main.c\
 		src/parcer/parcer_utils.c \
 		src/parcer/parcer_utils_2.c \
 		src/parcer/parcer_redirections.c \
+		src/parcer/parcer_redirections_utils.c \
 		src/update_shlvl.c \
 		src/free_functions.c
 

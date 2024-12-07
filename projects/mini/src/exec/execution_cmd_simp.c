@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 00:53:45 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/29 22:57:26 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/03 04:01:33 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,5 +106,18 @@ void	check_file_args(t_data *data)
 				exit(1);
 			}
 		}
+	}
+}
+
+void	close_other_fd(t_data *data)
+{
+	int	i_2;
+
+	i_2 = 0;
+	while (data->cmd[i_2] != NULL)
+	{
+		if (data->cmd[i_2]->here_doc_pfd != 0)
+			close(data->cmd[i_2]->here_doc_pfd);
+		i_2++;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 04:19:01 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/30 06:35:16 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/04 01:44:07 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	handle_sigint_newline(int sig)
 {
 	g_sig = sig;
-	write(1, "\n9", 2);
+	write(1, "\n", 2);
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
@@ -24,7 +24,7 @@ void	handle_sigint_newline(int sig)
 void	handle_sigint_heredoc(int sig)
 {
 	g_sig = sig;
-	write(1, "\n5", 1);
+	write(1, "\n", 1);
 	close(0);
 }
 
@@ -32,8 +32,6 @@ void	check_status(t_data *data, int status)
 {
 	int	signal;
 
-	if (g_sig == 2)
-		printf("in  check_status\n");
 	if (WIFEXITED(status))
 		data->exit_status = (WEXITSTATUS(status));
 	else if (WIFSIGNALED(status))
@@ -43,13 +41,10 @@ void	check_status(t_data *data, int status)
 		if (data->exit_status == 131)
 			write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
 		else if (data->exit_status == 130)
-			write(STDOUT_FILENO, "\n5", 2);
+			write(STDOUT_FILENO, "\n", 2);
 	}
 	else
 		data->exit_status = 1;
-	if (g_sig == 2)
-		printf("in  check_status end\n");	
-//	g_sig = 0;
 }
 
 void	wait_processes(t_data *data)
@@ -59,22 +54,20 @@ void	wait_processes(t_data *data)
 
 	pid = waitpid(-1, &status, 0);
 	while (pid > 0)
-	{	
+	{
 		if (g_sig == 3)
 		{
-			printf("in waitpid sigquit \n");
+			g_sig = 0;
+			kill(pid, SIGQUIT);
 		}
 		if (g_sig == 2)
 		{
-			printf("in waitpid sigint\n");
 			g_sig = 0;
 			kill(pid, SIGINT);
 		}
-		if (pid == data->prev_pipe)
+		if (pid == data->last)
 			check_status(data, status);
 		pid = waitpid(-1, &status, 0);
 	}
-	if (g_sig == 2)
-		printf("in  wait_processes end\n");	
 	handle_signals();
 }

@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 18:27:10 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/11/23 20:35:27 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/04 02:48:47 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,8 @@ int	redirection_output_stdout(t_data *data, int fd_out)
 		}
 		else
 		{
+			close_other_fd(data);
+			close_prev_pipes_in_child(data);
 			free_all_data(data);
 			rl_clear_history();
 			exit (EXIT_FAILURE);

@@ -6,7 +6,7 @@
 /*   By: artemii <artemii@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 00:47:10 by artemii           #+#    #+#             */
-/*   Updated: 2024/11/28 15:17:09 by artemii          ###   ########.fr       */
+/*   Updated: 2024/12/01 17:50:33 by artemii          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,59 +40,79 @@ char	**realloc_array(char **array, char *new_element)
 	return (new_array);
 }
 
-void	update_redirection(char **target_file, char ***file_array, char *token)
+int	split_token_on_redirection(char *token, char **before, char **redir,
+		char **after)
 {
-	if (*target_file)
-		free(*target_file);
-	*target_file = ft_strdup(token);
-	*file_array = realloc_array(*file_array, ft_strdup(token));
+	int	i;
+	int	redir_len;
+
+	i = 0;
+	while (token[i] && !ft_strchr("<>", token[i]))
+		i++;
+	if (token[i])
+	{
+		if (i > 0)
+			*before = ft_strndup(token, i);
+		if (token[i + 1] && (token[i + 1] == '>' || token[i + 1] == '<'))
+		{
+			if (token[i + 2] && (token[i + 2] == '>' || token[i + 2] == '<'))
+				return (-1);
+			redir_len = 2;
+		}
+		else
+			redir_len = 1;
+		*redir = ft_strndup(token + i, redir_len);
+		*after = ft_strdup(token + i + redir_len);
+	}
+	else
+		*before = ft_strdup(token);
+	return (0);
 }
 
-void	handle_redirection(t_cmd *cmd, char **tokens, int *i,
-		int *redir_position)
+void	process_redirection_token(t_cmd *cmd, char *token, int *i,
+		char **tokens)
 {
-	if (ft_strcmp(tokens[*i], "<") == 0)
+	char	*before;
+	char	*redir;
+	char	*after;
+
+	before = NULL;
+	redir = NULL;
+	after = NULL;
+	if (!token)
+		return ;
+	if (split_token_on_redirection(token, &before, &redir, &after) == -1)
+		return (handle_missing_after(cmd, before, "wrong  sign", after));
+	handle_before_token(cmd, before);
+	if (redir && (!after || *after == '\0'))
 	{
-		(*i)++;
-		cmd->pos_input = (*redir_position)++;
-		update_redirection(&cmd->input_file, &cmd->input_files, tokens[*i]);
+		if (tokens[*i + 1])
+		{
+			(*i)++;
+			free(after);
+			after = ft_strdup(tokens[*i]);
+		}
+		else
+			return (handle_missing_after(cmd, before, redir, after));
 	}
-	else if (ft_strcmp(tokens[*i], ">") == 0)
-	{
-		(*i)++;
-		cmd->pos_output = (*redir_position)++;
-		update_redirection(&cmd->output_file, &cmd->output_files, tokens[*i]);
-	}
-	else if (ft_strcmp(tokens[*i], ">>") == 0)
-	{
-		(*i)++;
-		cmd->pos_append = (*redir_position)++;
-		update_redirection(&cmd->append_file, &cmd->append_files, tokens[*i]);
-	}
-	else if (ft_strcmp(tokens[*i], "<<") == 0)
-	{
-		(*i)++;
-		cmd->pos_here_doc = (*redir_position)++;
-		update_redirection(&cmd->here_doc_file, &cmd->here_doc_files,
-			tokens[(*i)]);
-	}
+	handle_redir_token(cmd, after, redir);
+	free_temp_redir(before, after, redir);
 }
 
-void	handle_command_args(t_cmd *cmd, char **tokens, int *i, int *arg_idx)
+void	handle_command_args(t_cmd *cmd, char **tokens, int *i)
 {
 	int	j;
 
 	j = 0;
+	if (!cmd || !tokens || (i && !tokens[*i]))
+		return ;
 	if (cmd->cmd_arg == NULL)
 	{
 		cmd->cmd_arg = malloc(sizeof(char *) * 100);
 		if (!cmd->cmd_arg)
 			return ;
 		while (j < 100)
-		{
-			cmd->cmd_arg[j] = NULL;
-			j++;
-		}
+			cmd->cmd_arg[j++] = NULL;
 		cmd->cmd = ft_strdup(tokens[*i]);
 		if (!cmd->cmd)
 		{
@@ -101,7 +121,11 @@ void	handle_command_args(t_cmd *cmd, char **tokens, int *i, int *arg_idx)
 			return ;
 		}
 	}
-	cmd->cmd_arg[(*arg_idx)++] = ft_strdup(tokens[*i]);
+	if (i && tokens[*i])
+	{
+		cmd->cmd_arg[cmd->agr_idx] = ft_strdup(tokens[*i]);
+		cmd->agr_idx++;
+	}
 }
 
 void	handle_here_docs(t_cmd *cmd, t_data *data)
