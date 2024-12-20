@@ -1,44 +1,43 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/12/13 02:30:49 by mmychaly          #+#    #+#             */
+/*   Updated: 2024/12/18 01:24:42 by mmychaly         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
-int	chek_args(int argc, char **args)
+
+void	launch_philosphers(t_data *data)
 {
 	int	i;
-	int	i_2;
-
+	pthread_t monitoring;
 	i = 0;
-	i_2 = 0;
-	if (argc != 5 | argc != 6)
+	data->start_time = get_time();
+	while(i < data->num_of_philos)
 	{
-		write(2, "Error: wrong number of arguments\n", 33);
-		return (1);
-	}
-	while (args[i] != NULL)
-	{
-		i_2 = 0;
-		if (args[i][0] == "+")
-			i_2++;
-		while (args[i][i_2] != '\0')
-		{
-			if (check_digit(args[i][i_2]) == 0)
-			{
-				printf("Error: wrong agrument (%s)\n", args[i]);
-				return (1);
-			}
-			i_2++;
-		}
-		if (ft_atoi(args[i]) <= 0)
-		{
-			printf("Error: wrong agrument (%s)\n", args[i]);
-			return (1);
-		}
+		data->philos[i].last_meal = data->start_time;
 		i++;
 	}
-	return (0);
-}
-
-void	init_data(t_data *data)
-{
-
+	i = 0;
+	while(i < data->num_of_philos)
+	{
+		pthread_create(&data->philos[i].thread, NULL, launch_routine, (void *)&data->philos[i]);
+		i++;
+	}
+	pthread_create(&monitoring, NULL, monitoring_philosophers, (void *)data);
+	i = 0;
+	while(i < data->num_of_philos)
+	{
+		pthread_join(data->philos[i].thread, NULL);
+		i++;
+	}
+	pthread_join(monitoring, NULL);
 }
 
 int	main(int argc, char *args[])
@@ -47,5 +46,9 @@ int	main(int argc, char *args[])
 
 	if (chek_args(argc, args) == 1)
 		return (1);
-	init_data(&data);
+	if (init_data(&data, argc, args) == 1)
+		return (1);
+	launch_philosphers(&data);
+	free_all(&data);
+	return (0);
 }
