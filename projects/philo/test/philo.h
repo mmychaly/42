@@ -20,8 +20,6 @@ typedef struct s_philo
 	int				num_eat;
 	int				*start_time;
 	int				*dead;
-	int				*l_flag;
-	int				*r_flag;
 
 	pthread_mutex_t		*l_fork;
 	pthread_mutex_t		*r_fork;
@@ -38,7 +36,6 @@ typedef struct s_data
 	int					num_eat;
 	int					flag_dead;
 	int					start_time;
-	int					*forks_flag;
 
 	t_philo				*philos;
 	pthread_mutex_t		mutex;
@@ -65,9 +62,7 @@ void	*monitoring_philosophers(void *arg);
 int check_dead(t_philo *philo);
 
 void	print_message(char *str, t_philo *philo);
-void	print_fork_message(char *str, int time, t_philo *philo);
 void	sleep_time(int time, t_philo *philo);
 int		get_time(void);
 void	free_all(t_data *data);
-void	unlock_mutex(t_philo *philo);
 #endif

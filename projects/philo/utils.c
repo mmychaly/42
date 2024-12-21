@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/12/21 06:57:56 by mmychaly          #+#    #+#             */
+/*   Updated: 2024/12/21 08:30:56 by mmychaly         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 int	ft_atoi(const char *nptr)
@@ -44,6 +56,7 @@ void	free_all(t_data *data)
 	}
 	pthread_mutex_destroy(&data->mutex);
 	free(data->forks);
+	free(data->forks_flag);
 	free(data->philos);
 }
 
@@ -71,10 +84,20 @@ void	sleep_time(int time, t_philo *philo)
 
 void	print_message(char *str, t_philo *philo)
 {
+		if (check_dead(philo) != 1)
+		{
+			pthread_mutex_lock(philo->general_mutex);
+			printf("%i %i %s\n",get_time() - *(philo->start_time), philo->id, str);
+			pthread_mutex_unlock(philo->general_mutex);
+		}
+}
+
+void	print_fork_message(char *str, int time, t_philo *philo)
+{
 	if (check_dead(philo) != 1)
 	{
 		pthread_mutex_lock(philo->general_mutex);
-		printf("%i %i %s\n",get_time() - *(philo->start_time), philo->id, str);
+		printf("%i %i %s\n",time - *(philo->start_time), philo->id, str);
 		pthread_mutex_unlock(philo->general_mutex);
 	}
 }

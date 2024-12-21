@@ -6,95 +6,48 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/13 02:31:22 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/12/21 08:32:28 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/18 06:21:49 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-//int lock_seconde_fork(t_philo *philo)
-
 int	lock_forks(t_philo *philo)
 {
-	int time_l_fork;
-	int time_r_fork;
-
-	time_l_fork = 0;
-	time_r_fork = 0;
 	if (philo->id % 2 == 0)
 	{
-		if (*(philo->r_flag) == 0)
-		{
-			pthread_mutex_lock(philo->r_fork);
-			*(philo->r_flag) = 1;
-			time_r_fork = get_time();
-		}
+		pthread_mutex_lock(philo->r_fork);
+		if (check_dead(philo) != 1)
+			print_message("has taken a fork //philo->r_fork//1", philo);
 	}	
 	else
 	{
-		if (*(philo->l_flag) == 0)
-		{
-			pthread_mutex_lock(philo->l_fork);
-			*(philo->l_flag) = 1;
-			time_l_fork = get_time();
-		}
+		pthread_mutex_lock(philo->l_fork);
+		if (check_dead(philo) != 1)
+			print_message("has taken a fork //philo->l_fork//1", philo);
 	}
 	if (philo->id % 2 == 0)
 	{
-		if (*(philo->l_flag) == 0 )
-		{
-			pthread_mutex_lock(philo->l_fork);
-			*(philo->l_flag) = 1;
-			time_l_fork = get_time();
-		}
-		else
+		if (pthread_mutex_lock(philo->l_fork) != 0)
 		{
 			pthread_mutex_unlock(philo->r_fork);
-			*(philo->r_flag) = 0;
-			time_r_fork = 0;
+			print_message("pthread_mutex_unlock(philo->r_fork);", philo);
 			return (1);
 		}
 		if (check_dead(philo) != 1)
-		{
-//			if (time_r_fork < 0)
-			printf("time_r_fork == %i id %i\n", time_r_fork, philo->id);
-			if (time_r_fork == 0)
-				time_r_fork = get_time();
-			print_fork_message("has taken a fork\n", time_r_fork, philo);
-//			if (time_l_fork < 0)
-			printf("time_l_fork == %i id %i\n", time_l_fork, philo->id);
-			print_fork_message("has taken a fork\n", time_l_fork, philo);
-		}	
+			print_message("has taken a fork //philo->l_fork//2", philo);
 	}
 	else
 	{
-		if (*(philo->r_flag) == 0)
-		{
-			pthread_mutex_lock(philo->r_fork);
-			*(philo->r_flag) = 1;
-			time_r_fork = get_time();
-		}
-		else
+		if (pthread_mutex_lock(philo->r_fork) != 0)
 		{
 			pthread_mutex_unlock(philo->l_fork);
-			*(philo->l_flag)  = 0;
-			time_l_fork = 0;
+			print_message("pthread_mutex_unlock(philo->l_fork);", philo);
 			return (1);
 		}
 		if (check_dead(philo) != 1)
-		{
-//			if (time_l_fork < 0)
-			printf("time_l_fork == %i id %i\n", time_l_fork, philo->id);
-			if (time_l_fork == 0)
-				time_l_fork = get_time() ;
-			print_fork_message("has taken a fork\n",time_l_fork, philo);
-//			if (time_r_fork < 0)
-			printf("time_r_fork == %i id %i\n", time_r_fork, philo->id);
-			print_fork_message("has taken a fork\n",time_r_fork, philo);
-		}
+			print_message("has taken a fork //philo->r_fork //2", philo);
 	}
-	time_l_fork = 0;
-	time_r_fork = 0;
 	return (0);
 }
 
@@ -107,9 +60,7 @@ void	philosopher_eat(t_philo *philo)
 	sleep_time(philo->time_to_eat, philo);
 	philo->eating += 1;
 	pthread_mutex_unlock(philo->l_fork);
-	*(philo->l_flag) = 0;
 	pthread_mutex_unlock(philo->r_fork);
-	*(philo->r_flag) = 0;
 }
 
 void	philosopher_sleep(t_philo *philo)
@@ -128,14 +79,20 @@ void	*launch_routine(void *arg)
 	t_philo *philo;
 
 	philo = (t_philo*) arg;
+//	printf("launch_routine philo == %i //philo->last_meal == %i //*(philo->start_time) == %i\n", philo->id, philo->last_meal, *(philo->start_time));
 	while (*(philo->dead) == 0 && philo->eating != philo->num_eat)
 	{
+//		printf("launch_routine in wh //philo == %i // eating == %i\n", philo->id, philo->eating);
 		if (check_dead(philo) == 1)
 			return (0);
 		if (lock_forks(philo) == 0)
 		{
 			if (check_dead(philo) == 1)
-				return (unlock_mutex(philo), NULL);
+			{
+				pthread_mutex_unlock(philo->l_fork);
+				pthread_mutex_unlock(philo->r_fork);
+				return (0);
+			}
 			philosopher_eat(philo);
 			if (check_dead(philo) == 1)
 				return (0);
@@ -144,8 +101,7 @@ void	*launch_routine(void *arg)
 				return (0);
 			philosopher_think(philo);
 		}
-		else 
-			usleep(1000);
 	}
+//	printf("fin //philo == %i // eating == %i\n", philo->id, philo->eating);
 	return (0);
 }

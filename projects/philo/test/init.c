@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/13 02:29:10 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/12/20 18:10:41 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/18 06:10:33 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,9 +69,7 @@ int	init_phelsophers(t_data *data)
 		data->philos[i].last_meal = data->start_time;
 		data->philos[i].general_mutex = &data->mutex;
 		data->philos[i].l_fork = &data->forks[i];
-		data->philos[i].l_flag = &data->forks_flag[i];
 		data->philos[i].r_fork = &data->forks[(i + 1) % data->num_of_philos];
-		data->philos[i].r_flag = &data->forks_flag[(i + 1) % data->num_of_philos];
 		i++;
 	}
 	return (0);
@@ -85,13 +83,9 @@ int	init_mutex(t_data *data)
 	data->forks = malloc(sizeof(pthread_mutex_t) * data->num_of_philos);
 	if (data->forks == NULL)
 		return (1);
-	data->forks_flag = malloc(sizeof(int) * data->num_of_philos);
-	if (data->forks_flag == NULL)
-		return (1);
 	while (i < data->num_of_philos)
 	{
 		pthread_mutex_init(&data->forks[i], NULL);
-		data->forks_flag[i] = 0;
 		i++;
 	}
 	pthread_mutex_init(&data->mutex, NULL);
