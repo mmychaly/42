@@ -57,12 +57,12 @@ bool checkDouble(const std::string& literal)
 		{
 			if ( i == 0 && (literal[i] == '-' || literal[i] == '+' ))
 			{
-				i++;
+				continue;
 			}
 			if (!isdigit(literal[i]) && literal[i] == '.' && flag_point == 0)
 			{
 				flag_point++;
-				i++;
+				continue;
 			}
 			if (!isdigit(literal[i]))
 				return false;
@@ -78,7 +78,7 @@ bool checkInt(const std::string& literal)
 		{
 			if ( i == 0 && (literal[i] == '-' || literal[i] == '+' ))
 			{
-				i++;
+				continue;
 			}
 			if (!isdigit(literal[i]))
 				return false;
@@ -109,7 +109,7 @@ void getPseudoLiterals(const std::string& literal)
 
 void getCharConvert(const std::string& literal)
 {
-	std::cout << "char: " << literal[0] << std::endl;
+	std::cout << "char: " << "'" << literal[0] << "'" << std::endl;
 	std::cout << "int: " << static_cast<int>(literal[0]) << std::endl;
 	std::cout << "float: " << std::fixed << std::setprecision(1) << static_cast<float>(literal[0]) << "f" << std::endl;
 	std::cout << "double: " << std::fixed << std::setprecision(1) << static_cast<double>(literal[0]) << std::endl;
@@ -148,7 +148,7 @@ void getnbr(const std::string& literal)
 		else if (static_cast<int>(nb) < 32 || static_cast<int>(nb) == 127)
 			std::cout << "char: Non displayable" << std::endl;
 		else
-			std::cout << "char: " << static_cast<char>(nb)<< std::endl;
+			std::cout << "char: " << "'" << static_cast<char>(nb) << "'" << std::endl;
 		std::cout << "int: " << static_cast<int>(nb) << std::endl;
 		std::cout << "float: " << std::fixed << std::setprecision(1) << static_cast<float>(nb) << "f" << std::endl;
 		std::cout << "double: " << std::fixed << std::setprecision(1) << nb << std::endl;
