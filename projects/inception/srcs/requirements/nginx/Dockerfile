@@ -1,4 +1,4 @@
 FROM alpine:3.21
-RUN apk update && apk upgrade && apk add --no-cache ngnix
+RUN apk update && apk upgrade && apk add --no-cache nginx
 EXPOSE 443
-CMD ["ngnix", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
