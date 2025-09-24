@@ -18,6 +18,7 @@ RUN apk update && apk upgrade && apk add --no-cache \
 	php${PHP_VERSION}-xml \
 	php${PHP_VERSION}-zip \
 	php${PHP_VERSION}-redis \
+	php${PHP_VERSION}-iconv \
 	wget \
 	unzip && \
 	sed -i "s|listen = 127.0.0.1:9000|listen = 9000|g" \
@@ -34,5 +35,5 @@ RUN wget https://wordpress.org/latest.zip && \
 	rm -rf wordpress latest.zip
 COPY ./requirements/wordpress/conf/wpconfig-create.sh .
 RUN sh wpconfig-create.sh && rm wpconfig-create.sh && \
-	chmod -R 0777 wpcontent/
+	chmod -R 0777 wp-content/
 CMD ["/usr/sbin/php-fpm83", "-F"]
