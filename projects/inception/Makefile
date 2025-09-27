@@ -25,10 +25,12 @@ clean: down
 
 fclean:
 		@printf " Clearing total of the all configurations ${name}...\n"
+		@docker-compose -f ./srcs/docker-compose.yml --env-file srcs/.env down -v
 		@if [ -n "$$(docker ps -qa)" ]; then docker stop $$(docker ps -qa); fi 
 		@docker system prune -a --force --volumes
 		@docker network prune --force
 		@docker volume prune --force
+		@docker volume rm srcs_db-volume srcs_wp-volume 2>/dev/null || true
 		@sudo rm -rf ~/data/wordpress/*
 		@sudo rm -rf ~/data/mariadb/*
 		@sudo rm -rf ~/data
