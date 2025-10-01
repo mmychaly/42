@@ -30,6 +30,11 @@ services:
       - "3306:3306"
     networks:
       - inception
+    environment:          # ← AJOUTER CETTE SECTION !
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_ROOT=${DB_ROOT}
     volumes:
       - db-volume:/var/lib/mysql
     restart: always
@@ -53,14 +58,16 @@ services:
 
 volumes:
   db-volume:
+    driver: local 
     driver_opts:
-      o: bind
       type: none
+      o: bind
       device: /home/${USER}/data/mariadb
   wp-volume:
+    driver: local 
     driver_opts:
-      o: bind
       type: none
+      o: bind
       device: /home/${USER}/data/wordpress
 
 networks:
