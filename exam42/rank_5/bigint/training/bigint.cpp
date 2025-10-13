@@ -162,11 +162,9 @@ bigint&	bigint::operator>>=(size_t nb)
 	{
 		digit.clear();
 		digit.push_back(0);
+		return *this;
 	}
-	else
-	{
-		digit.erase(digit.begin(), digit.begin() + nb);
-	}
+	digit.erase(digit.begin(), digit.begin() + nb);
 	return *this;
 }
 
@@ -226,7 +224,7 @@ std::vector<int> bigint::get_digit() const
 std::ostream& operator<<(std::ostream& o, const bigint& obj)
 {
 	std::vector<int> tmp = obj.get_digit();
-	for (int i = tmp.size() - 1; i >= 0; --i)
+	for (int i = tmp.size() -1 ; i >= 0; --i)
 	{
 		o << tmp[i];
 	}

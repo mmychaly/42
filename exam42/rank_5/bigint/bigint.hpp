@@ -23,28 +23,29 @@ class bigint
 		bigint& operator+=(const bigint& obj);
 		bigint& operator-=(const bigint& obj);
 
-		bigint& operator++();
+		bigint operator>>(size_t n) const;
+		bigint operator<<(size_t n) const;
+
+		bigint& operator>>=(size_t n);
+		bigint& operator<<=(size_t n);
+
+		bigint& operator++(void);
 		bigint operator++(int);
-
-		bigint operator>>(t_size n) const;
-		bigint operator<<(t_size n) const;
-
-		bigint& operator>>=(t_size n);
-		bigint& operator<<=(t_size n);
 
 		bool operator==(const bigint& obj) const;
 		bool operator!=(const bigint& obj) const;
-		bool operator<(const bigint& obj) const;
 		bool operator>(const bigint& obj) const;
-		bool operator<=(const bigint& obj) const;
+		bool operator<(const bigint& obj) const;
 		bool operator>=(const bigint& obj) const;
+		bool operator<=(const bigint& obj) const;
 
-		std::vector<int> get_digit() const;
-		void remov_first_zero();
+		void remove_zero(void);
+		std::vector<int> get_digit(void) const;
 
 	private:
 		std::vector<int> digit;
 };
 
-	std::ostream& operator<<(std::ostream& o, const bigint& obj) const;
+	std::ostream& operator<<(std::ostream& o, const bigint& obj);
+
 #endif
