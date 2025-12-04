@@ -1,8 +1,6 @@
 const Database = require('better-sqlite3'); //Здесь Database я вляется ссылкой на класс переданный через модуль
 const crypto = require('crypto');
-const { exists } = require('fs');
 const path = require('path');
-const { getUserByUsername } = require('../../temp/database');
 
 const dbPath = path.join('/app/data', 'database.db'); //Сохраняем путь к базе данных
 const db = new Database(dbPath); // через ссылку на класс создаем обект данного класса
@@ -30,7 +28,7 @@ function initDatabase() {
 
 	db.exec(`
 		CREATE TABLE IF NOT EXISTS sessions (
-		sessions_id TEXT PRIMARY KEY,
+		session_id TEXT PRIMARY KEY,
 		user_id TEXT UNIQUE NOT NULL,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		expires_at DATETIME NOT NULL,
@@ -38,6 +36,8 @@ function initDatabase() {
 		)
 	`);
 }
+
+//user_id TEXT UNIQUE NOT NULL, // il faut bien jerer unique. Verifier aue utiliateur na pas de sesion avant creer une nouvell
 
 function getAllUsers() {
 	return db.prepare('SELECT id, username, email, status, created_at FROM users').all();
@@ -48,8 +48,12 @@ function getUserById(id) {
 
 }
 
+function getUserByUsername(username) {
+	return db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+}
+
 function getUserByEmail(email) { //Pourauoi par tout nous avons selectiones les donnes et la on affiche tout
-	return db.prepare('SELECT * FROM users WHER email = ?').get(email);
+	return db.prepare('SELECT * FROM users WHERE email = ?').get(email);
 }
 
 function createUser(username, email, password) {
@@ -57,15 +61,15 @@ function createUser(username, email, password) {
 	const passwordHash = hashPassword(password);
 	const status = "online"; //Si on a etabli un utilisateur il dovien online
 	const newUser = db.prepare(`
-		INSERT INTO users (id, username, email, password, status) //Add status online?
+		INSERT INTO users (id, username, email, password, status)
 		VALUES	(?, ?, ?, ?, ?)
 	`);
-
+		 //Add status online?
 	newUser.run(id, username, email, passwordHash, status);//status ici?
 	return getUserById(id);
 }
 
-function deletUser(id) {
+function deleteUser(id) {
 	return db.prepare(`DELETE FROM users WHERE id = ?`).run(id);
 }
 
@@ -93,13 +97,13 @@ function getSessionUser(sessionId) {
 		SELECT u.id, u.username, u.status
 		FROM sessions s
 		JOIN users u ON s.user_id = u.id
-		WHERE s.ssession_id = ? AND s.expires_at > datetime(`now`)
+		WHERE s.session_id = ? AND s.expires_at > datetime('now')
 	`);
 
 	return stmt.get(sessionId);
 }
 
-//Pourquoi on fait stmt.get(sessionId) et pas le stmt.run()
+//Pourquoi on fait stmt.get(sessionId) et pas le run()
 //c`est auoi u et u.id? 
 //FROM sessions s pourauoi qpres select on pqs fais from users si le cilone vient de users?
 // comment ca fonction?
@@ -119,10 +123,25 @@ module.exports = {
 	getUserByUsername,
 	getUserByEmail,
 	createUser,
-	deletUser,
+	deleteUser,
 	verifyPassword,
 	createSession,
 	getSessionUser,
 	deleteSession,
 	cleanExpiredSessions
 };
+
+
+	// Mettre user online
+// 	db.prepare(`UPDATE users SET status = 'online' WHERE id = ?`).run(user.id);
+// 	deleteSession(sessionId);
+
+// db.prepare(`UPDATE users SET status = 'offline' WHERE id = ?`).run(userId);
+// db.exec(`
+// 	UPDATE users 
+// 	SET status = 'offline'
+// 	WHERE id IN (
+// 		SELECT user_id FROM sessions WHERE expires_at < datetime('now')
+// 	)
+// `);
+// deleteExpiredSessions();
