@@ -13,7 +13,7 @@ FragTrap::FragTrap(std::string str): ClapTrap(str)
 {
 	std::cout << "Constructors of FragTrap " << str << " called" << std::endl;
 	this->_hit = 100;
-	this->_energy = 100;
+//	this->_energy = 100;
 	this->_attack = 30;
 }
 

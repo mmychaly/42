@@ -30,7 +30,7 @@ services:
       - "3306:3306"
     networks:
       - inception
-    environment:          # ← AJOUTER CETTE SECTION !
+    environment:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}

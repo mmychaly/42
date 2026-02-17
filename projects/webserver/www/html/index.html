@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Welcome to our website for webserver project</title>
+	<style>
+		  body {
+        font-family: sans-serif;
+        background-image: url('/html_img/background_html_4.avif');
+			  background-size: cover;
+		  	background-position: center;
+			  background-repeat: no-repeat;
+        padding: 2rem;
+        max-width: 1000px;
+        margin: auto;
+        color: white;
+        min-height: 100vh;
+      }
+
+      h1, h2 {
+        text-align: center;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        margin-bottom: 30px;
+      }
+
+      h1 {
+        font-size: 32px;
+        margin-top: 20px;
+      }
+
+      h2 {
+        font-size: 24px;
+      }
+
+      form {
+        background: rgba(0, 0, 0, 0.8);
+        padding: 30px;
+        border-radius: 15px;
+        border:2px solid rgba(255, 255, 255, 0.3);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+
+      input[type="file"], input[type="text"], textarea {
+        font-size: 16px;
+        width: 100%;
+        max-width: 400px;
+        padding: 12px;
+        border:1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+
+      input[type="file"]::file-selector-button {
+        background: rgba(8, 48, 88, 0.8);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: 10px;
+      }
+
+      input[type="file"]::file-selector-button:hover {
+        background: rgba(8, 48, 88, 1);
+      }
+
+      input::placeholder, textarea::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      label {
+        color: #ccddff;
+        font-weight: bold;
+        margin-bottom: 5px;
+        align-self: flex-start;
+        margin-left: calc((100% - 400px) / 2);
+      }
+
+      textarea {
+        height: 100px;
+        resize: vertical;
+      }
+
+      button, input[type="submit"] {
+        padding: 8px 16px;
+        font-size: 16px;
+        border: none;
+        background-color: rgba(8, 48, 88, 0.8);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        width: auto;
+        min-width: 150px;
+        font-weight: normal;
+        transition: background-color 0.3s;
+      }
+
+      button:hover, input[type="submit"]:hover {
+        background-color: rgba(8, 48, 88, 1);
+      }
+
+      .file-list, .message-list {
+        background: rgba(0, 0, 0, 0.7);
+        padding: 30px;
+        border-radius: 15px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        margin-bottom: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+
+      .file-entry {
+        margin-bottom: 1rem;
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+      }
+
+      .file-entry img {
+        max-width: 100px;
+        max-height: 100px;
+        display: block;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        margin-right: 15px;
+      }
+
+      .file-info {
+        flex-grow: 1;
+        color: #f0f0f0;
+        font-weight: bold;
+      }
+
+      .file-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .file-actions a {
+        color: #ccddff;
+        text-decoration: none;
+        padding: 8px 16px;
+        background: rgba(8, 48, 88, 0.8);
+        border-radius: 5px;
+      }
+
+      .file-actions a:hover {
+        background: rgba(8, 48, 88, 1);
+      }
+
+      .preview {
+        margin-top: 1rem;
+        max-width: 200px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 20px;
+        color: #ccddff;
+        font-size: 18px;
+      }
+
+      .delete-btn {
+        background-color: rgba(140, 0, 0, 0.8);
+        border: 2px solid rgba(255, 0, 0, 0.5);
+      }
+
+      .delete-btn:hover {
+        background-color: rgba(140, 0, 0, 1);
+      }
+
+      .message {
+        padding: 20px;
+        margin-bottom: 15px;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .message-name {
+        font-weight: bold;
+        color: #ccddff;
+        font-size: 18px;
+      }
+
+      .message-date {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+        margin-left: 10px;
+      }
+
+      .message-content {
+        margin-top: 10px;
+        color: #f0f0f0;
+        line-height: 1.4;
+      }
+
+      .tabs {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+        gap: 5px;
+      }
+
+      .tab {
+        padding: 15px 30px;
+        background: rgba(0, 0, 0, 0.5);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px 10px 0 0;
+        cursor: pointer;
+        color: white;
+        font-size: 16px;
+        font-weight: normal;
+        transition: all 0.3s;
+      }
+
+      .tab:hover {
+        background: rgba(8, 48, 88, 0.8);
+      }
+
+      .tab.active {
+        background: rgba(8, 48, 88, 1);
+        font-weight: bold;
+        border-bottom: 2px solid rgba(8, 48, 88, 1);
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .status {
+        padding: 15px;
+        margin-top: 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .status-success {
+        background-color: rgba(0, 100, 0, 0.8);
+        color: #ccffcc;
+        border: 2px solid rgba(0, 255, 0, 0.6);
+      }
+
+      .status-error {
+        background-color: rgba(140, 0, 0, 0.8);
+        color: #ffdddd;
+        border: 2px solid rgba(255, 0, 0, 0.5);
+      }
+
+      #refreshBtn {
+        margin-bottom: 20px;
+      }
+      
+      @media (max-width: 768px) {
+        body {
+          padding: 1rem;
+        }
+
+        .tabs {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .tab {
+          margin-bottom: 5px;
+          border-radius: 10px;
+        }
+
+        .file-entry {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .file-entry img {
+          margin-right: 0;
+          margin-bottom: 10px;
+        }
+      }
+  </style>
+</head>
+<body>
+
+
+  <h1>Site for testing Webserv project</h1>
+
+  <div class="tabs">
+    <button class="tab active" onclick="openTab(event, 'upload-tab')">File Upload</button>
+    <button class="tab" onclick="openTab(event, 'messages-tab')">Send Messages</button>
+  </div>
+
+  <div id="upload-tab" class="tab-content active">
+    <h2>Image Upload</h2>
+
+    <form id="upload-form" method="POST" action="/" enctype="multipart/form-data">
+      <input type="file" name="file" id="fileInput" accept="image/jpeg,image/jpg,image/png,image/gif,image/avif" required>
+      <div id="previewContainer"></div>
+      <input type="submit" value="Upload File">
+      <div id="upload-status" class="status"></div>    
+    </form>
+
+    <div class="file-list">
+      <h2>Uploaded Files</h2>
+      <button id="refreshBtn" onclick="loadImageFiles()">Refresh List</button>
+      <div id="fileContainer">
+        <div class="loading">Loading file list...</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="messages-tab" class="tab-content">
+    <h2>Send Message</h2>
+
+    <form id="message-form" method="POST" action="/submit">
+      <label for="name">Your Name:</label>
+      <input type="text" name="name" id="name" required>
+
+      <label for="message">Message:</label>
+      <textarea name="message" id="message" required placeholder="Type your message here..."></textarea>
+
+      <input type="submit" value="Send Message">
+      <div id="message-status" class="status"></div>
+    </form>
+
+    <div class="message-list">
+      <h2>Sent Message</h2>
+      <button onclick="loadMessages()">Refresh Messages</button>
+      <div id="messagesContainer">
+        <div class="loading">Loading messages</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    const UPLOAD_URL = '/';
+
+    function openTab(evt, tabName) {
+      const tabs = document.getElementsByClassName("tab");
+      for (let i = 0; i < tabs.length; i++) {
+        tabs[i].className = tabs[i].className.replace(" active", "");
+      }
+
+      const tabContents = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < tabContents.length; i++) {
+        tabContents[i].className = tabContents[i].className.replace(" active", "");
+      }
+
+      document.getElementById(tabName).className += " active";
+      evt.currentTarget.className += " active";
+    }
+
+    const input = document.getElementById("fileInput");
+    const preview = document.getElementById("previewContainer");
+
+    input.addEventListener("change", function () {
+      preview.innerHTML = "";
+      const file = this.files[0];
+      if (file && file.type.startsWith("image/")) {
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        img.classList.add("preview");
+        preview.appendChild(img);
+      }
+    });
+
+    document.getElementById("upload-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const status = document.getElementById("upload-status");
+
+      status.textContent = "Uploading...";
+      status.className = "status";
+
+      fetch("/", {
+        method: "POST",
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+        status.textContent = "File uploaded successfully!";
+        status.className = "status status-success";
+        loadImageFiles();
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        status.textContent = "Error uploading: " + error.message;
+        status.className = "status status-error";
+      });
+    });
+
+    document.getElementById("message-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const status = document.getElementById("message-status");
+
+      status.textContent = "Sending...";
+      status.className = "status";
+
+      fetch("/submit", {
+        method: "POST",
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+
+        const now = new Date();
+        const dateTime = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit'});
+
+        lastSentMessage = {
+          name: formData.get('name'),
+          date: dateTime,
+          message: formData.get('message')
+        };
+
+        status.textContent = "Message sent successfully!";
+        status.className = "status status-success";
+        document.getElementById("message-form").reset();
+        loadMessages();
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        status.textContent = "Error sending: " + error.message;
+        status.className = "status status-error";
+      });
+    });
+
+    function loadImageFiles() {
+      const fileContainer = document.getElementById("fileContainer");
+      fileContainer.innerHTML = '<div class="loading">Loading file list...</div>';
+
+      fetch("/list_files.py")
+        .then(res => res.json())
+        .then(files => {
+          if (files.length === 0) {
+            fileContainer.innerHTML ='<p>No image file found.</p>';
+            return;
+          }
+
+          fileContainer.innerHTML = "";
+          files.forEach(file => {
+            const fileDiv = document.createElement('div');
+            fileDiv.className = "file-entry";
+
+            fileDiv.innerHTML = `
+              <img src="${file.url}" alt="${file.name}" width="100">
+              <div class="file-info">${file.name}</div>
+              <div class="file-actions">
+                <a href="${file.url}" target="_blank">View</a>
+                <button class="delete-btn" onclick="deleteFile('${file.url}', this)">Delete</button>
+                </div>
+            `;
+            
+            fileContainer.appendChild(fileDiv);
+          });
+        })
+        .catch(error=> {
+          console.error("Error loading files:", error);
+          fileContainer.innerHTML = `<p>Error loading file list: ${error.message}</p>`;
+        });
+    }
+
+    function deleteFile(filePath, button) {
+      if (confirm('Are you sure? You want to delete this file?')) {
+        fetch(filePath, {
+          method: 'DELETE'
+        })
+        .then(response => {
+          if (response.ok) {
+            const fileEntry = button.closest('.file-entry');
+            fileEntry.remove();
+            if (document.querySelectorAll('.file-entry').length === 0) {
+              document.getElementById('fileContainer').innerHTML = '<p>No files found.</p>';
+            }
+          } else {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          alert('Error deleting file: ' + error.message);
+        });
+      }
+    }
+
+    let lastSentMessage = null;
+
+    function loadMessages() {
+      const messagesContainer = document.getElementById("messagesContainer");
+      messagesContainer.innerHTML = '<div class="loading">Loading messages...</div>';
+
+
+      setTimeout(() => {
+        if (!lastSentMessage) {
+          messagesContainer.innerHTML = '<p>No messages sent yet.</p>';
+          return;
+        }
+
+        messagesContainer.innerHTML = '';
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message';
+        messageDiv.innerHTML = `
+          <div>
+            <span class="message-name">${lastSentMessage.name}</span>
+            <span class="message-date">${lastSentMessage.date}</span>
+          </div>
+          <div class="message-content">${lastSentMessage.message}</div>
+        `;
+
+        messagesContainer.appendChild(messageDiv);
+      } , 500);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadImageFiles();
+      loadMessages();
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,104 @@
+server {
+	listen 127.0.0.1:8001;
+	server_name localhost my_new_site;
+	error_page 404 /error/404.html;
+
+
+    location / {
+    root /www/html;
+    allow_methods GET POST DELETE;
+    index index.html index.htm;
+    autoindex on;
+    error_page 413 /error/413.html;
+    error_page 401 /error/401.html;
+    error_page 405 /error/405.html;
+    error_page 500 /error/500.html;
+    error_page 501 /error/501.html;
+    error_page 505 /error/505.html;
+	upload_path /www/html/uploads;
+	cgi .py /usr/bin/python3 30;
+    client_max_body_size 10M;
+    }
+
+        location /cookie  {
+            return 302 /cookie.html; 
+    }
+
+        location /session { 
+            return 302 /session.html; 
+    }
+
+    location /redirect_to_main_page {
+        return 302 /;
+    }
+
+    location /redirect_to_error {
+		root /www/html;
+		return 405;
+		error_page 405 /error/405.html;
+
+	}
+
+    location /redirect {
+        return 302 https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkSlSYTkwa_n-97GNYtglLb9lO6B-adBchUQ&s;
+    }
+
+	location /uploads {
+		root /www/html/uploads;
+		allow_methods GET POST DELETE;
+		error_page 404 /error/404.html;
+		error_page 405 /error/405.html;
+		error_page 413 /error/413.html;
+		error_page 500 /error/500.html;
+		autoindex on;
+		client_max_body_size 10M;
+		cgi .php /usr/bin/php-cgi 40;
+		cgi .py /usr/bin/python3 30;
+    }
+
+    location /php_cgi {
+		root /www/html/php_cgi;
+		allow_methods GET POST;
+		error_page 404 /error/404.html;
+		error_page 405 /error/405.html;
+		error_page 413 /error/413.html;
+		error_page 500 /error/500.html;
+		autoindex off;
+		index index.php;
+		upload_path /www/html/uploads;
+		client_max_body_size 10M;
+		cgi .php /usr/bin/php-cgi 40;
+    }
+
+    location /py_cgi {
+		root /www/html/py_cgi;
+		allow_methods GET POST;
+		error_page 404 /error/404.html;
+		error_page 405 /error/405.html;
+		error_page 413 /error/413.html;
+		error_page 500 /error/500.html;
+		autoindex off;
+		index index.py;
+		upload_path /www/html/uploads;
+		client_max_body_size 10M;
+		cgi .py /usr/bin/python3 30;
+    }
+}
+
+server {
+	listen 127.0.0.1:8080;
+	server_name mysite;
+	error_page 404 /errors/404.html;
+	
+	location / {
+        root /www/html;
+        index index.html index.htm;
+		allow_methods GET;
+    }
+
+	location /uploads/ {
+        root /www/html/uploads;
+		autoindex on;
+		allow_methods GET POST DELETE;
+    }
+}

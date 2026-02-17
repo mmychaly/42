@@ -8,7 +8,7 @@ DiamondTrap::DiamondTrap(void): ClapTrap(), ScavTrap(), FragTrap()
 	this->_energy = ScavTrap::_energy;
 	this->_hit = FragTrap::_hit;
 }
-DiamondTrap::DiamondTrap(std::string str):ClapTrap(str), ScavTrap(str), FragTrap(str)
+DiamondTrap::DiamondTrap(std::string str):ClapTrap(str + "_clap_name"), ScavTrap(), FragTrap()
 {
 	std::cout << "Constructors of DiamondTrap " << str << " called" << std::endl;
 	std::cout << "this->_energy " << this->get_energy() << std::endl;

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Тестовый сайт веб-сервера</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Тестирование веб-сервера</h1>
+    
+    <div class="nav-menu">
+      <a href="index.html" class="active">Главная</a>
+      <a href="upload.html">Загрузка файлов (POST)</a>
+      <a href="gallery.html">Галерея (GET/DELETE)</a>
+      <a href="test-api.html">API тесты</a>
+    </div>
+    
+    <div class="content-box">
+      <h2>Добро пожаловать на тестовый сайт!</h2>
+      <p>Этот сайт предназначен для тестирования различных функций веб-сервера:</p>
+      <ul>
+        <li><strong>GET</strong> - просмотр страниц и изображений</li>
+        <li><strong>POST</strong> - загрузка файлов и отправка форм</li>
+        <li><strong>DELETE</strong> - удаление загруженных файлов</li>
+      </ul>
+      <p>Выберите нужный раздел из меню выше.</p>
+      
+      <div class="server-info">
+        <h3>Информация о сервере:</h3>
+        <p id="server-time">Текущее время на сервере: загрузка...</p>
+        <button id="refresh-time">Обновить время (GET-запрос)</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.getElementById('refresh-time').addEventListener('click', function() {
+      fetch('time.txt?' + new Date().getTime())
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('server-time').textContent = 'Текущее время на сервере: ' + data;
+        })
+        .catch(error => {
+          console.error('Ошибка:', error);
+          document.getElementById('server-time').textContent = 'Ошибка получения времени';
+        });
+    });
+  </script>
+</body>
+</html>

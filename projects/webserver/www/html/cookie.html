@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Cookie demo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Cookie DEMO</h1>
+    <div class="content-box">
+
+      <h3>Add new cookie:</h3>
+      <label>
+        name:
+        <input type="text" id="cookieName" value="testCookie">
+      </label>
+      <label>
+        Value:
+        <input type="text" id="cookieValueInput" value="123">
+      </label>
+      <button id="setCookieBtn">Save cookie</button>
+
+      <h3>Now we have in browser:</h3>
+      <pre id="browserCookies"></pre>
+
+      <h3>Response from server:</h3>
+      <button id="updateServerBtn">Refresh response from server</button>
+      <pre id="serverResponse"></pre>
+    </div>
+  </div>
+
+  <script>
+    function showBrowserCookies() {
+      document.getElementById('browserCookies').textContent = document.cookie || '(нет доступных кук)';
+    }
+
+    function setCookie(name, value) {
+      // Устанавливаем куку с путём /
+      document.cookie = name + '=' + value + '; path=/';
+      showBrowserCookies();
+    }
+
+    function fetchFromServer() {
+      fetch('/api/cookie')
+        .then(r => r.text())
+        .then(t => {
+          document.getElementById('serverResponse').textContent = t;
+          showBrowserCookies();
+        });
+    }
+
+    document.getElementById('setCookieBtn').addEventListener('click', () => {
+      const name = document.getElementById('cookieName').value.trim();
+      const value = document.getElementById('cookieValueInput').value.trim();
+      if (name) {
+        setCookie(name, value);
+      }
+    });
+
+    document.getElementById('updateServerBtn').addEventListener('click', fetchFromServer);
+
+    // При загрузке
+    showBrowserCookies();
+  </script>
+</body>
+</html>

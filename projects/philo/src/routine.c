@@ -6,7 +6,7 @@
 /*   By: mmychaly <mmychaly@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/13 02:31:22 by mmychaly          #+#    #+#             */
-/*   Updated: 2024/12/27 04:39:57 by mmychaly         ###   ########.fr       */
+/*   Updated: 2024/12/27 22:50:44 by mmychaly         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,11 @@ void	*launch_routine(void *arg)
 			if (check_dead(philo))
 				return (unlock_mutex(philo), NULL);
 			philosopher_eat(philo);
+//			if (check_dead(philo) == 1)
+//				return (0);
 			philosopher_sleep(philo);
+//			if (check_dead(philo) == 1)
+//				return (0);
 			philosopher_think(philo);
 		}
 	}
