@@ -1,0 +1,74 @@
+services:
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend_nginx
+    ports:
+      - "8443:443"
+      - "8080:80"
+    restart: always
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html
+    depends_on:
+      - api-gateway
+    networks:
+      - transcendence
+
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    restart: always
+    depends_on:
+      - auth-service
+      - global-service
+    networks:
+      - transcendence
+
+  auth-service:
+    build:
+      context: ./backend/auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "3001"
+    restart: always
+    volumes:
+      - sqlite_data:/app/data
+    env_file:
+      - ./backend/.env
+    networks:
+      - transcendence
+
+  global-service:
+    build:
+      context: ./backend/global-service
+      dockerfile: Dockerfile
+    container_name: global-service
+    ports:
+      - "3002"
+    restart: always
+    volumes:
+      - sqlite_data:/app/data
+      - uploads_volume:/app/data/uploads/avatars
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - auth-service
+    networks:
+      - transcendence
+  
+volumes:
+  sqlite_data:
+    driver: local
+  uploads_volume:
+    driver: local
+  
+networks:
+  transcendence:
+    driver: bridge
