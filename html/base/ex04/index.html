@@ -9,12 +9,30 @@
 </head>
 <body>
 	<h1 class="title_h1">Titre of page for ex04</h1>
-	<form action="/login" method="GET">
+	<form action="/login" method="POST">
 		<label for="email">Votre email: </label>
 			<input type="email" name="email" id="email" required><br>
 		<label for="password">Votre password: </label>
 		<input type="password" name="password" id="password" minlength="8" required><br>
 		<button>Envoier</button><br>
+	</form>
+	<h2 class="title_h1">Test of checkbox</h2>
+	<form action="/data" method="POST">
+		<label><input type="checkbox" name="langages" value="Python"> Python</label>
+		<br>
+		<input type="checkbox" name="langages" value="C"> C <br>
+		<input type="checkbox" name="langages" value="JavaScript"> JavaScript <br><br>
+		<input type="submit" value="Envoyer">
+	</form>
+	<h2 class="title_h1">Test of File</h2>
+	<form action="/data" method="POST" enctype="multipart/form-data">
+		<label><input type="file" name="cv"> Your CV:</label><br><br>
+		<input type="submit" value="Envoyer">
+	</form>
+		<h2 class="title_h1">Test of textarea</h2>
+	<form action="/data" method="POST">
+		<textarea name="message" rows="5" cols="30" placeholder="Votre message" maxlength="500" required></textarea>
+		<br><br><input type="submit" value="Envoyer">
 	</form>
 </body>
 </html>
