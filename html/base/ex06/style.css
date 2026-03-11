@@ -1,0 +1,23 @@
+.title_h1 {
+	text-align: center;
+  color: rgb(54, 54, 122);
+   background-color: rgb(202, 210, 206);
+}
+
+.title_h2 {
+	text-align: center;
+  color: rgb(46, 52, 73);
+   background-color: rgb(191, 194, 190);
+}
+
+.card {
+  border: 2px solid black; 
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.shr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #999, transparent);
+}
