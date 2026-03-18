@@ -2,16 +2,79 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	color: rgb(4, 4, 37);
+	color: rgb(69, 51, 119);
 	font-size:40px;
 	
 }
 
 /*body { background-color: rgb(250, 250, 255); };*/
 body {
-	background-image: url("background_html_3.avif");
+	background-image: 
+		url("background_html_3.avif");
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
 	background-attachment: fixed;
 	}
+
+p {
+	display: flex;
+	font-size:20px;
+}
+
+
+h6 {
+	font-size: 30px;
+	margin: 10px 0 10px 0;
+	position: static;
+
+}
+
+nav {
+	padding: 0;
+	margin: 0;
+}
+
+ul {
+	display: flex;
+	flex-direction: column;
+	
+}
+
+h1 {
+	position: sticky;
+	top: 0;
+}
+
+li {
+	font-size: 20px;
+	
+}
+
+#sect1 {
+	display: flex;
+}
+
+#sect2 {
+	position: relative;
+	left: 100px;
+  	width: 700px;
+ 	height: 200px;
+  	background: gray;
+	z-index: 10;
+}
+
+h4 {
+	position: absolute;
+	bottom: 20px;
+	right: 0;
+	width: 100px;
+	height: 25px;
+	background: red;
+	z-index: -10;
+}
+
+footer {
+	position: fixed;
+	bottom: 0;
+}
