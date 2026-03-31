@@ -1,0 +1,20 @@
+p {
+	font-size: 20px;
+	color: rgb(150, 35, 35);
+}
+
+h1 {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: blanchedalmond;
+
+}
+
+#copyright {
+	position: absolute;
+	bottom: 10px;
+	left: 10px;
+	color: rgb(104, 29, 175);
+	font-size: 10px;
+}
