@@ -8,5 +8,11 @@ document.getElementById("test2").innerHTML = "<p id='test4'>test4</p> <p id='tes
 document.getElementById("test4").style.backgroundColor = "red";
 document.getElementById("test5").style.backgroundColor = "blue";
 
-//document.querySelector("test3").textContent = "bonjour";
+document.querySelector("#test3").textContent = "bonjour";
 
+function change()
+{
+	let test1 = document.getElementById("test1");
+	test1.textContent = "New text after change!";
+	test1.style.color = "black";
+}
