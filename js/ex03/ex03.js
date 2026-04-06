@@ -1,4 +1,5 @@
 "use strict"
+
 //Initialisation de variables et const avec differents types
 let num = 5;
 let str = "Salut";
@@ -6,7 +7,7 @@ let double = 0.5;
 let bool = true;
 let und;
 let obj = { name: "mika", 
-			str: "Hello Word!",
+			str: "Hello Word! ",
 			num: 34,
 			helloWord() {
 				console.log("Hello Word!");
@@ -37,12 +38,23 @@ obj.helloWord();
 docObj1.textContent = obj.name;
 docObj2.textContent = obj.num;
 docObj3.textContent = obj.str;
+docObj4.textContent = obj.str + constStr;
 
-str = `Combinaison de strings , ${constStr}`;
-console.log(str);
-console.log(str.length);
-console.log(obj.name.length);
-console.log(obj.name.toUpperCase());
-console.log(obj.helloWord());
+//string methods
+console.log("test string methods")
+console.log("lenght: ", obj.str.length);
+console.log("indexOf: ", obj.str.indexOf("Word"));
+console.log("slice: ", obj.str.slice(0, 6));
+console.log("substring: ", obj.str.substring(6, 10));
+console.log("includes: ", obj.str.includes("!")); //": ", 
+console.log("replace: ", obj.str.replace("Word", "Mike"));
+console.log("replaceAll: ", obj.str.replaceAll("l", "tt"));
+console.log("toLocaleLowerCase: ", obj.str.toLocaleLowerCase());
+console.log("toLocaleUpperCase: ", obj.str.toLocaleUpperCase());
+console.log("trim: ", obj.str.trim(), obj.str.trim().length); //Delete the space in ending
+console.log("split: ", obj.str.split(" "));//split:  Array(3) [ "Hello", "Word!", "" ]
+console.log("split[1]: ", obj.str.split(" ")[1]);//split[1]:  Word!
+let split = obj.str.split(" ");
+console.log("join: ", split.join(" "));
 
 
