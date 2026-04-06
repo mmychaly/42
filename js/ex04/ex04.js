@@ -59,11 +59,60 @@ array.forEach(function(elem) {
 });
 
 console.log("array[array.indexOf(elem)].toLocaleUpperCase()");
-array.forEach(function(elem, index) {
+array.forEach((elem, index) => {
 	if (typeof elem == "string")
  		array[index] = elem.toLocaleUpperCase();
 });
 
-array.forEach(function(elem, index) {
-	console.log("index", index, elem);
+array.forEach((elem, index) => {
+	console.log("index", index, ":", elem);
+});
+
+
+console.log("\nMethods of array");
+console.log("Push + unshift"); //Ajouter un element a la fin et ajouter un element devant.
+array.push("by");
+array.unshift("Chao");
+console.log("array:", array);
+
+console.log("pop + shift"); //Supprimer un element a la fin et supprimer un element devant.
+array.pop();
+array.shift("Chao");
+console.log("array:", array);
+
+console.log("slice + splice");//Copier l'element . Supprimer un element de array
+let newObj = array.slice(1, 2);
+array.splice(1, 1);
+console.log(newObj, "\n", array);
+
+
+console.log("includes + indexOf");//Verifier l'element + trouver son index 
+console.log(array.includes("SALUT"), ":", array.indexOf("SALUT"));
+
+
+//map() //Creer un nouveau tab.en gardent la taille de tab initiale
+console.log("\nmap()");
+array.push({name: "Mika", age: 34});
+array.push({name: "Alizée", age: 32});
+
+array.forEach((elem, index) => {
+	console.log("index", index, ":", elem);
+});
+
+let arrayNew= array.map(elem => {
+	if (typeof elem == "object")
+		return elem.name;
+	else
+		return elem;
+});
+
+arrayNew.forEach((elem, index) => {
+	console.log("index", index, ":", elem);
+});
+
+console.log("\n filter()");//Creer un array juste avec les elements choisis
+
+let arrayObj = array.filter(elem => typeof elem === "object");
+arrayObj.forEach((elem, index) => {
+	console.log("index", index, ":", elem);
 });
