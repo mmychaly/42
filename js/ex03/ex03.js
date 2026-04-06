@@ -41,7 +41,7 @@ docObj3.textContent = obj.str;
 docObj4.textContent = obj.str + constStr;
 
 //string methods
-console.log("test string methods")
+console.log("\nTest string methods")
 console.log("lenght: ", obj.str.length);
 console.log("indexOf: ", obj.str.indexOf("Word"));
 console.log("slice: ", obj.str.slice(0, 6));
@@ -56,5 +56,4 @@ console.log("split: ", obj.str.split(" "));//split:  Array(3) [ "Hello", "Word!"
 console.log("split[1]: ", obj.str.split(" ")[1]);//split[1]:  Word!
 let split = obj.str.split(" ");
 console.log("join: ", split.join(" "));
-
 
