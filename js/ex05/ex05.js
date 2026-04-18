@@ -1,8 +1,11 @@
 "use strict"
 
 
-let docObject = document.getElementById("test2");
-let startBtn = document.getElementById("startBtn")
+const docObject = document.getElementById("test2");
+const startBtn = document.getElementById("startBtn")
+const modalObj = document.getElementById("modal");
+const openBtn = document.getElementById("openBtn");
+const closeBtn = document.getElementById("closeBtn");
 
 startBtn.addEventListener("click", () => {
 	let message = alert("Merci d'accepter!");
@@ -17,6 +20,12 @@ startBtn.addEventListener("click", () => {
 		docObject.textContent= "You didn't respond";
 });
 
+openBtn.addEventListener("click", () => {
+	modalObj.style.display = "block";
+});
 
+closeBtn.addEventListener("click", () => {
+	modalObj.style.display = "none";
+});
 
 
