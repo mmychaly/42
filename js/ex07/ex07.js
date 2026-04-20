@@ -47,3 +47,18 @@ function Users(name, age, phrase)
 let userAlizée = new Users("Alizée", 32, "Hi!");
 for (let key in userAlizée)
 	console.log(key, ": ", userAlizée[key]);
+
+console.log("\nClass");
+
+class ClassUser {
+	constructor(name, age) {
+		this.name = name;
+		this.age = age;
+	}
+	sayHello() {
+		console.log("Salut! My first name is " + this.name, ".I am "+ this.age + "years old");
+	}
+}
+
+let newUser = new ClassUser("Alex", 33);
+newUser.sayHello();
