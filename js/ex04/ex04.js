@@ -125,3 +125,8 @@ let sortArray = [2, -1, 9, 50, 5, 110, 0];
 sortArray.sort((a,b) => a - b);
 sortArray.forEach(item => console.log(item));
 console.log(sortArray);
+
+console.log("\n reduce()");
+let reducArr = [10, 8, 2 , 35];
+let sum = reducArr.reduce((sum, n) => sum + n, 0);
+console.log(sum);
