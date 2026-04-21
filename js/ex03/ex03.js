@@ -22,6 +22,12 @@ console.log("Let: ", und, num, str, bool, double, obj);
 console.log("Const: ", constStr);
 console.log("Var: ", varObj.name, varObj.str);
 
+console.log("for of")
+for (let char of obj.str)
+	console.log(char);
+
+
+
 
 //Display on the page  + work with string methods
 let docObj1 = document.getElementById("test1");
@@ -47,8 +53,6 @@ console.log("indexOf: ", obj.str.indexOf("Word"));
 console.log("slice: ", obj.str.slice(0, 6));
 console.log("substring: ", obj.str.substring(6, 10));
 console.log("includes: ", obj.str.includes("!")); //": ", 
-console.log("replace: ", obj.str.replace("Word", "Mike"));
-console.log("replaceAll: ", obj.str.replaceAll("l", "tt"));
 console.log("toLocaleLowerCase: ", obj.str.toLocaleLowerCase());
 console.log("toLocaleUpperCase: ", obj.str.toLocaleUpperCase());
 console.log("trim: ", obj.str.trim(), obj.str.trim().length); //Delete the space in ending
@@ -56,4 +60,6 @@ console.log("split: ", obj.str.split(" "));//split:  Array(3) [ "Hello", "Word!"
 console.log("split[1]: ", obj.str.split(" ")[1]);//split[1]:  Word!
 let split = obj.str.split(" ");
 console.log("join: ", split.join(" "));
+
+
 
