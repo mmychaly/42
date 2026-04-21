@@ -119,3 +119,9 @@ let arrayObj = array_4.filter(item => typeof item === "object");//If true , retu
 arrayObj.forEach((item, index) => {
 	console.log("index", index, ":", item);
 });
+
+console.log("\nsort()")
+let sortArray = [2, -1, 9, 50, 5, 110, 0];
+sortArray.sort((a,b) => a - b);
+sortArray.forEach(item => console.log(item));
+console.log(sortArray);
