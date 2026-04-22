@@ -1,5 +1,6 @@
 "use strict";
 
+
 const objTest = document.getElementById("test1");
 const objTest2 = document.getElementById("test2");
 const objTest3 = document.getElementById("test3");
@@ -84,3 +85,46 @@ let objMap = new Map(Object.entries(obj));
 console.log(objMap);
 
 objMap.forEach((value, key) => console.log(`${key} : ${value}`));
+
+console.log("\nSuppresion content of map");
+objMap.clear();
+console.log(objMap);
+console.log(`size == ${objMap.size}`);
+
+
+console.log("\nSet");
+
+let newSet = new Set();
+
+newSet.add(1);
+newSet.add(3);
+newSet.add(99);
+newSet.add(-5);
+newSet.add(42);
+newSet.add(1);
+newSet.add(99);
+console.log(newSet);
+console.log(`Which is the size? : ${newSet.size}`);
+console.log(`Set has value 99? : ${newSet.has(99)}`);
+console.log(`Set has value 105? : ${newSet.has(105)}`);
+
+console.log("\nBrowse with forEach");
+newSet.forEach(value => console.log(value));
+
+newSet.delete(-5);
+console.log("\nBrowse with for of + delete one item");
+for (let value of newSet)
+	console.log(value);
+
+console.log("\nConverse to array");
+
+let arraySet = [...newSet];
+console.log(arraySet);
+
+let  newArrSet = new Set(arraySet);
+console.log(newArrSet);
+
+console.log("\nSuppresion content of Set");
+newArrSet.clear();
+console.log(newArrSet);
+console.log(`size == ${newArrSet.size}`);
