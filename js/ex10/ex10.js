@@ -51,3 +51,35 @@ let [newFirst, ...array]= data;
 console.log(`in newFirst: ${newFirst}, in array: ${array}`);
 
 
+
+
+
+
+console.log("\nUse destructuring in function");
+console.log("\nDisplay value of array from arguments of fuction");
+function getData([firstArg, secondeArg, thirdArg] = [0,0,0])
+{
+	console.log(`Fisrt value: ${firstArg}, seconde value: ${secondeArg}, third value: ${thirdArg}`);
+}
+getData(data);
+getData();
+
+
+
+
+console.log("\nDisplay value of object from arguments of fuction");
+function simpleUser({name: nameUser, age: ageUser, city: cityUser} = {})
+{
+	console.log(`FUnction simpleUser : Name: ${nameUser}, age: ${ageUser}, city: ${cityUser}`);
+}
+
+simpleUser(user);
+simpleUser();
+
+
+function hardUser({name = "Anonymous", age = 99, city = "Unknown", other: {adress = "Unknown Adress"} = {}} = {})
+{
+	console.log(`Function hardUser: Name: ${name}, age: ${age}, city: ${city}, other: ${adress}`);
+}
+hardUser(userUp);
+hardUser();
