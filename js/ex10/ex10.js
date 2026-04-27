@@ -1,5 +1,6 @@
 "use strict";
 
+
 const objTest = document.getElementById("test1");
 const objTest2 = document.getElementById("test2");
 const objTest3 = document.getElementById("test3");
@@ -41,14 +42,14 @@ let userUp = {
 
 let {name: newName, age: newAge, city: newCity, other: {adress}} = userUp;
 
-console.log(`${newName} live in ${newCity}, ${adress}`);
+console.log(`Destructuring of object with ${newName} live in ${newCity}, ${adress}`);
 
 let [one, ,three] = data;
 
-console.log(`Array. one: ${one}, three: ${three}`);
+console.log(`Destructuring of Array. One: ${one}, three: ${three}`);
 
 let [newFirst, ...array]= data;
-console.log(`in newFirst: ${newFirst}, in array: ${array}`);
+console.log(`Destructuring with array. NewFirst: ${newFirst}, in array: ${array}`);
 
 
 let dataUp = [
@@ -58,15 +59,26 @@ let dataUp = [
 
 let [{user: user1, age: ageUser1}, {user: user2, age: ageUser2}] = dataUp;
 
-console.log(`DataUp. First user: ${user1}, ${ageUser1}. Second user: ${user2}, ${ageUser2}`);
+console.log(`Destructuring of array with objects. First user: ${user1}, ${ageUser1}. Second user: ${user2}, ${ageUser2}`);
 
+let newMap = new Map([
+	["a", 21],
+	["b", 42]
+]);
 
+console.log("\nDestructuring of Map. Use forEach");
+newMap.forEach((value, key) => console.log(key, ":", value));
 
+console.log("Destructuring of Map. Use for of");
+for (let [key, value] of newMap)
+	console.log(key, ":", value)
 
-
+console.log("Destructuring of Map. Use map");
+let arrayMap = [...newMap].map(([key, value]) => value * 2);
+arrayMap.forEach((value) => console.log(value));
 
 console.log("\nUse destructuring in function");
-console.log("\nDisplay value of array from arguments of fuction");
+console.log("\nDisplay value of array from arguments in fuction");
 
 function getData([firstArg, secondArg, thirdArg] = [0,0,0])
 {
@@ -79,7 +91,7 @@ getData();
 
 
 
-console.log("\nDisplay value of object from arguments of fuction");
+console.log("\nDisplay value of object from arguments in fuction");
 function simpleUser({name: nameUser, age: ageUser, city: cityUser} = {})
 {
 	console.log(`Function simpleUser : Name: ${nameUser}, age: ${ageUser}, city: ${cityUser}`);
