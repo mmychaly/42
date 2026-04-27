@@ -77,6 +77,9 @@ console.log("Destructuring of Map. Use map");
 let arrayMap = [...newMap].map(([key, value]) => value * 2);
 arrayMap.forEach((value) => console.log(value));
 
+console.log("Destructuring of Array with object. Use map");
+dataUp.map(({user}) => console.log(user));
+
 console.log("\nUse destructuring in function");
 console.log("\nDisplay value of array from arguments in fuction");
 
