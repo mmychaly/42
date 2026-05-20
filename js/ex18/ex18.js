@@ -62,7 +62,6 @@ console.log("\nTry acces for private property, privateRule in second user");
 user2.usePrivateMethod();
 
 class OtherData extends User {
-	showUserMethode() {}
 	constructor(name, age, email, city, number)
 	{
 		super(name, age, email);
