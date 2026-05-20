@@ -47,8 +47,11 @@ newUser.userRules;
 testObj.textContent = newUser.showUser();
 testObj2.textContent = user2.showUser();
 
-console.log("Display simple property ", newUser.rules); //We can display property simple == true
-console.log("Try acces for user privateRule: ", newUser.privateRule);
+console.log("\nDisplay simple property ", newUser.rules); //We can display property simple == true
+console.log("\nTry acces for private property, privateRule: ", newUser.privateRule);
+console.log("Try acces for private property, privateRule with private method usePrivateMethod");
 newUser.usePrivateMethod();
+console.log("Try set other value for private property, privateRule with private method setPrivateMethod");
 newUser.setPrivateMethod(true);
 newUser.usePrivateMethod();
+
