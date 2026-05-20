@@ -17,6 +17,7 @@ class User{
 	}
 
 	sayHi() {console.log(`Hello, my name is ${this.name}`)};//Method of class in User.prototype
+	saySimpleHi() {console.log("Salut!")};
 	showUser() { return `User: ${this.name}, ${this.age}, ${this.email}`};
 
 	#showPrivateRule() {return this.#privateRule};
@@ -60,3 +61,28 @@ newUser.usePrivateMethod();
 console.log("\nTry acces for private property, privateRule in second user");
 user2.usePrivateMethod();
 
+class OtherData extends User {
+	showUserMethode() {}
+	constructor(name, age, email, city, number)
+	{
+		super(name, age, email);
+		this.city = city;
+		this.number = number;
+	}
+
+	sayHiFromUser() {
+			super.saySimpleHi();
+	}
+	
+	showFullUser() {
+		console.log(super.showUser(), this.city, this.number);
+	}
+}
+
+let fullUser = new OtherData("Mychaly", 34, "mmychaly@dfdf.com", "Paris", "07649949");
+
+console.log("\nTest heritage de class");
+fullUser.sayHi();
+fullUser.saySimpleHi();
+fullUser.showFullUser();
+console.log(fullUser.showUser());
