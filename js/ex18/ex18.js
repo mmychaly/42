@@ -28,7 +28,7 @@ class User{
 	usePrivateMethod() {console.log(this.#showPrivateRule())};
 	setPrivateMethod(value) {this.#setPrivateRule(value)};
 	
-	get userRules() {console.log(`User ${this.name} has rules: ${this.rules}`)}; //Getter for display value
+	get userRules() {console.log(`User ${this.name} has rules: ${this.rules}. Information from getter`)}; //Getter for display value
 	set userRules(value) {
 		if (value == true)
 			this.rules = value;
@@ -38,8 +38,10 @@ class User{
 let newUser = new User("Mika", 34, "mmychaly@dfdfdf.com");
 let user2 = new User("Alizée", 32, "a_alizée@ffsfsfs.com");
 
-newUser.sayHi();
+newUser.sayHi();//Use method from class
 //newUser.showRules();
+
+console.log("\nUse getter and setter in class");
 newUser.userRules; //Launch getter. We don't make value
 newUser.userRules = true; // For launch setter ae need add a value
 newUser.userRules;
@@ -54,4 +56,7 @@ newUser.usePrivateMethod();
 console.log("Try set other value for private property, privateRule with private method setPrivateMethod");
 newUser.setPrivateMethod(true);
 newUser.usePrivateMethod();
+
+console.log("\nTry acces for private property, privateRule in second user");
+user2.usePrivateMethod();
 
