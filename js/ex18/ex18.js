@@ -91,3 +91,9 @@ console.log(fullUser.showUser());
 
 console.log("\nUse static variable and methode");
 User.showCounter();
+
+console.log("\nTest instanceof");
+console.log(`User ${newUser.name} is instance of User: `, (newUser instanceof User));
+console.log(`User ${newUser.name} is instance of OtherData: `, (newUser instanceof OtherData));//false
+console.log(`User ${fullUser.name} is instance of OtherData: `, (fullUser instanceof OtherData));
+console.log(`User ${fullUser.name} is instance of User: `, (fullUser instanceof User));//Heritage 
