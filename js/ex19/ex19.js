@@ -1,5 +1,6 @@
 "use strict";
 
+
 class AnimalOwner{
 	constructor(name)
 	{
@@ -64,3 +65,36 @@ newCat.showCat();
 newCat.showAnimalOwner();
 newCat.goEat();
 newCat.goWalk();
+
+
+console.log("\nTest try catch");
+
+//sayHelloNew(); //Sans try catch ici le programme s'arret mais avec try catch on recois les error mais l'execution continue
+
+try {
+	console.log("We are in try");
+	sayHello();
+} catch(err){
+	console.log("We are in catch");
+	console.log(err);
+	console.log("Just error name: ", err.name);
+	console.log("Just error message: ", err.message);
+
+} finally {
+	console.log("We are in finally");
+}
+
+console.log("After try catch");
+
+console.log("\nTest throw");
+
+try {
+	console.log("In try befor throw");
+	throw new Error("Error enforced");
+	console.log("In try after throw");
+} catch(err)
+{
+	console.log("In catch");
+	console.log(err.message);
+}
+console.log("After try catch");
