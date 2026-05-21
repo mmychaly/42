@@ -7,7 +7,7 @@ const testObj2 = document.getElementById("test2");
 class User{
 	static counter = 0; //Static variable . appartien que a class
 	rules = false; //Simple property
-	#_privateRule = false;
+	#privateRule = false;
 
 	constructor(name, age, email)
 	{
@@ -21,14 +21,14 @@ class User{
 	saySimpleHi() {console.log("Salut!")};
 	showUser() { return `User: ${this.name}, ${this.age}, ${this.email}`};
 
-	#_showPrivateRule() {return this.#_privateRule};
-	#_setPrivateRule(value) {
+	#showPrivateRule() {return this.#privateRule};
+	#setPrivateRule(value) {
 		if (value == true || value == false)
-			this.#_privateRule = value;
+			this.#privateRule = value;
 	};
 
-	usePrivateMethod() {console.log(this.#_showPrivateRule())};
-	setPrivateMethod(value) {this.#_setPrivateRule(value)};
+	usePrivateMethod() {console.log(this.#showPrivateRule())};
+	setPrivateMethod(value) {this.#setPrivateRule(value)};
 	
 	get userRules() {console.log(`User ${this.name} has rules: ${this.rules}. Information from getter`)}; //Getter for display value
 	set userRules(value) {
