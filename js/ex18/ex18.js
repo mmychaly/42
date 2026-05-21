@@ -5,12 +5,13 @@ const testObj = document.getElementById("test1");
 const testObj2 = document.getElementById("test2");
 
 class User{
-
+	static counter = 0; //Static variable . appartien que a class
 	rules = false; //Simple property
-	#privateRule = false;
+	#_privateRule = false;
 
 	constructor(name, age, email)
 	{
+		User.counter++;
 		this.name = name;
 		this.age = age;
 		this.email = email;
@@ -20,20 +21,22 @@ class User{
 	saySimpleHi() {console.log("Salut!")};
 	showUser() { return `User: ${this.name}, ${this.age}, ${this.email}`};
 
-	#showPrivateRule() {return this.#privateRule};
-	#setPrivateRule(value) {
+	#_showPrivateRule() {return this.#_privateRule};
+	#_setPrivateRule(value) {
 		if (value == true || value == false)
-			this.#privateRule = value;
+			this.#_privateRule = value;
 	};
 
-	usePrivateMethod() {console.log(this.#showPrivateRule())};
-	setPrivateMethod(value) {this.#setPrivateRule(value)};
+	usePrivateMethod() {console.log(this.#_showPrivateRule())};
+	setPrivateMethod(value) {this.#_setPrivateRule(value)};
 	
 	get userRules() {console.log(`User ${this.name} has rules: ${this.rules}. Information from getter`)}; //Getter for display value
 	set userRules(value) {
 		if (value == true)
 			this.rules = value;
 	} ;//Setter for set a value
+
+	static showCounter() {console.log(User.counter)};
 }
 
 let newUser = new User("Mika", 34, "mmychaly@dfdfdf.com");
@@ -85,3 +88,6 @@ fullUser.sayHi();
 fullUser.saySimpleHi();
 fullUser.showFullUser();
 console.log(fullUser.showUser());
+
+console.log("\nUse static variable and methode");
+User.showCounter();
