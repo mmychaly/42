@@ -1,16 +1,24 @@
 "use strict";
 
-let num = 15;
-let desNum = 5.25448
+let a = [5, 5, 10];
+let b = [...a];
+let set = new Set()
 
-console.log(desNum.toFixed(2));
-console.log(num.toString);
-console.log(Number("8484"));
-console.log(Math.max(2, 548, 5));
-console.log(Math.min(1,5,3));
-console.log(Math.random() * 10);
-console.log(Math.random() * 10);
-console.log(Math.floor(Math.random() * 10));
-console.log(Math.round(5.7));
-console.log(Math.abs(0.2 + 0.5));
+console.log(Math.max(...a));
+console.log(b);
+let g = [...a, ...y]
+console.log(g);
+
+let obj = {
+	name: "mika",
+	age: 34
+}
+
+console.log(obj);
+let copy = {...obj};
+console.log(copy);
+
+
+
+
 //console.log();
