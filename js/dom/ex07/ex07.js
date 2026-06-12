@@ -12,3 +12,10 @@ console.log("Use getBoundingClientRect");
 let data = test1.getBoundingClientRect();
 console.log(data);
 
+console.log("Use elementFromPoint");
+
+document.addEventListener("mousemove", e => {
+	const elem = document.elementFromPoint(e.clientX, e.clientY);
+	console.log(`X == ${e.clientX}\nXY == ${e.clientY}`);
+	console.log(elem);
+});
