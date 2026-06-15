@@ -23,7 +23,15 @@ document.addEventListener("dblclick", (event) =>
 		console.log(`Event: ${event.type}, Target: ${event.target.tagName}`);
 });
 
-document.addEventListener("mousemove", event =>
-	{
-		console.log(`Event: ${event.type}, Target: ${event.target.tagName}, X: ${event.clientX} Y: ${event.clientY}`);
+// document.addEventListener("mousemove", event =>
+// 	{
+// 		console.log(`Event: ${event.type}, Target: ${event.target.tagName}, X: ${event.clientX} Y: ${event.clientY}`);
+// });
+
+articleTest.addEventListener("mouseover", event => {
+ 		console.log(`Event: ${event.type}, Target: ${event.target.tagName}, RelatedTarget: ${event.relatedTarget.tagName}`);
+});
+
+articleTest.addEventListener("mouseout", event => {
+ 		console.log(`Event: ${event.type}, Target: ${event.target.tagName}, RelatedTarget: ${event.relatedTarget.tagName}`);
 });
