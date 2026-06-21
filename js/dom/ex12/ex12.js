@@ -16,3 +16,6 @@ form_2.addEventListener("submit", event => {
 	console.log(`Input text: ${form_2.elements.email.name} == ${form_2.elements[0].value}`);		
 	console.log(`Input checkbox: ${form_2.elements.input_4.id} == ${form_2.elements["input_4"].checked}`);
 });
+
+
+

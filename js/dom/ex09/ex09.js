@@ -9,10 +9,14 @@ const btn3 = document.querySelector("#btn_3");
 //Bubbling phase, propogation d'envenement
 document.addEventListener("click", (event) => {
 	console.log(`Target: ${event.target.tagName} , id: ${event.target.id}. Current Target: ${event.currentTarget.nodeName}. Phase ${event.eventPhase}`);
-},);
+});
+
 artic.addEventListener("click", (event) => {
+	if (event.target.closest('button') == null || event.target.closest('input') == null)
+		return;
 	console.log(`Target: ${event.target.tagName} , id: ${event.target.id}. Current Target: ${event.currentTarget.tagName}. Phase ${event.eventPhase}`);
 });
+
 test2.addEventListener("click", (event) => {
 	console.log(`Target: ${event.target.tagName} , id: ${event.target.id}. Current Target: ${event.currentTarget.tagName}. Phase ${event.eventPhase}`);
 });

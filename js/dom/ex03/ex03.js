@@ -43,7 +43,7 @@ console.log(mainTest.lastChild.childNodes[0].textContent);
 //Use remove
 test3.remove();
 
-//Use inserAjacentHTML end cloneNode
+//Use inserAjacentHTML and cloneNode
 let clone = testPrepend.cloneNode(true);
 clone.id = "clone1";
 newP.insertAdjacentHTML("beforebegin", "<hr><p>Lolo</p>");
