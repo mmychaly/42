@@ -28,3 +28,8 @@ myForm.addEventListener("submit", e => {
 });
 
 //myForm.requestSubmit();
+
+myForm.addEventListener("copy", e => console.log("Copy launch"));
+myForm.addEventListener("paste", e => console.log("Paste launch"));
+myForm.addEventListener("cut", e => console.log("Cut launch"));
+
