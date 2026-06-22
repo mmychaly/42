@@ -19,3 +19,12 @@ myForm.addEventListener("change", e => {
 		console.log(data.get("email"));
 	}
 });
+
+myForm.addEventListener("submit", e => {
+	e.preventDefault();
+	console.log("submit event");
+	let data = new FormData(myForm);
+	console.log(`All data.\nName: ${data.get("name")}.\nEmail: ${data.get("email")}.\nPassword: ${data.get("password")}.`);
+});
+
+//myForm.requestSubmit();
