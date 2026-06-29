@@ -53,3 +53,6 @@ window.addEventListener("popstate", (e) => {
 history.replaceState({url: "/"}, "", "/");
 renderPage(location.pathname);
 console.log("location.pathname initial", location.pathname);
+
+setTimeout(() => history.back(), 5000);
+setTimeout(() => history.forward(), 7000);
