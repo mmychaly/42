@@ -1,0 +1,26 @@
+p {
+	position: relative;
+	left: 50px;
+	font-size: 20px;
+	width: 100px;
+	height: 30px;
+	color: rgb(108, 130, 91);
+	background-color: rgb(117, 137, 104);
+	overflow: auto;
+	padding: 20px;
+}
+
+
+h1 {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: rgba(201, 197, 209, 0.825);
+}
+
+h2 {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: rgba(96, 93, 157, 0.825);
+}
