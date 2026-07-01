@@ -12,3 +12,8 @@ navigator.geolocation.getCurrentPosition(position => {
 });
 
 console.log(navigator.cookieEnabled);
+
+console.log("window screen: ", screen.width , screen.height);
+
+const art = document.querySelector("article");
+art.addEventListener("click", () => window.open("https://google.com", "_blank", "width=500,height=400"));
