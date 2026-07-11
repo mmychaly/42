@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import SendHello from './SendHello'
 import SendOther from './SendOther'
-import User from './User'
+import { User } from './User'
 function App() {
   return (<>
             <SendOther />
