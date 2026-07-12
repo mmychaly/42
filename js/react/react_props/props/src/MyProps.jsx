@@ -26,6 +26,7 @@ function SayHello(props) //Use simple acces
 			<h2 style={{marginTop: '30px', textAlign: 'center'}}>Other data</h2>
 			<p>{props.data.city}</p>
 			<p>{props.data.Student}</p>
+			<p>{props.other[0]}</p>
 		</>
 	)
 
@@ -37,12 +38,13 @@ function MyProps(){
 		city: "Paris",
 		Student: "School 42"
 	};
+	const arrWork = ["SSIAP", "ADS"];
 
 	return (
 		<>
 			<SayHello text="Hi from composent React"/>
 			<User name="Mika" age={34} allowed={true} />
-			<DisplayData data={otherData} />
+			<DisplayData data={otherData} other = {arrWork} />
 		</>
 	)
 
