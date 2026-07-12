@@ -19,21 +19,30 @@ function SayHello(props) //Use simple acces
 
 }
 
-// function DisplayData(props){
+ function DisplayData(props){
+	
+	return (
+		<>
+			<h2 style={{marginTop: '30px', textAlign: 'center'}}>Other data</h2>
+			<p>{props.data.city}</p>
+			<p>{props.data.Student}</p>
+		</>
+	)
 
-// }
+ }
 
 function MyProps(){
 	
-	// otherData = {
-	// 	city: "paris",
-	// 	Student: "42"
-	// }
+	const otherData = {
+		city: "Paris",
+		Student: "School 42"
+	};
 
 	return (
 		<>
 			<SayHello text="Hi from composent React"/>
 			<User name="Mika" age={34} allowed={true} />
+			<DisplayData data={otherData} />
 		</>
 	)
 
@@ -41,4 +50,3 @@ function MyProps(){
 
 export default MyProps;
 
-//		<DisplayData data={otherData} />
