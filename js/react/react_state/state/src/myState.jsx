@@ -17,7 +17,7 @@ function Counter()
 	
 	  return (
 		<>
-		  <h1 style={{textAlign: 'center'}}>Use state</h1>
+		  <h2>Use Counter</h2>
 		  <Button func={handler}/> 
 		  <p>Counter: {counter}</p>
 		</>
