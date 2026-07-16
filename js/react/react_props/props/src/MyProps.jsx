@@ -8,12 +8,13 @@ function User({name, age, allowed}) //use destructuration
 	</>)
 }
 
-function SayHello(props) //Use simple acces
+function SayHello({text, children}) //Use simple acces
 {	
 	return (
 		<>
 			<h1 style={{marginTop: '10px', textAlign: 'center'}}>Use props</h1>
-			<p>{props.text}</p>
+			<p>{text}</p>
+			<p>{children}</p>
 		</>
 	)
 
@@ -42,7 +43,7 @@ function MyProps(){
 
 	return (
 		<>
-			<SayHello text="Hi from composent React"/>
+			<SayHello text="Hi from composent React">"Use text from children"</SayHello>
 			<User name="Mika" age={34} allowed={true} />
 			<DisplayData data={otherData} other = {arrWork} />
 		</>
