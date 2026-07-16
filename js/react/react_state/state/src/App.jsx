@@ -1,8 +1,7 @@
-import { useState } from 'react'
-
+import Counter from "./myState.jsx"
 
 function App() {
-    return (<h1>Use State</h1>);
+    return (<Counter />);
 }
 
 export default App
