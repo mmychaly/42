@@ -1,5 +1,6 @@
-import Counter from "./myState.jsx"
-import Changer from "./wordChange.jsx"
+import Counter from "./MyState.jsx"
+import Changer from "./WordChange.jsx"
+import ManyCounters from "./ManyCounters.jsx";
 
 function App() {
     return (
@@ -7,6 +8,8 @@ function App() {
         <h1 style={{textAlign:"Center"}}>Use state</h1>
         <Counter />
         <Changer />
+        <ManyCounters />
+        <Counter />
       </>
     );
 }
