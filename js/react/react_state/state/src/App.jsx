@@ -1,6 +1,7 @@
 import Counter from "./MyState.jsx"
 import Changer from "./WordChange.jsx"
 import ManyCounters from "./ManyCounters.jsx";
+import InitialCounter from "./InitialCounter.jsx"
 
 function App() {
     return (
@@ -10,6 +11,7 @@ function App() {
         <Changer />
         <ManyCounters />
         <Counter />
+        <InitialCounter value={42} />
       </>
     );
 }
