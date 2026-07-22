@@ -33,7 +33,7 @@ function InputComp()
 
 	return (
 		<>
-			<h1>Use event react</h1>
+			<h1>Use event react with input + form</h1>
 			<InputFunc handleChange={handleChangeInput}/>
 			<FormFunc handleChange={handleChangeForm}/>
 			<p>{text}</p>
