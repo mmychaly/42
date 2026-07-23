@@ -7,32 +7,15 @@ function FormComp()
 
 	function handlerChangeFormInput(event)
 	{
-		if (event.target.name == "user")
-		{
-			setTextIntput(textIntputName.map((value, index) => {
-					if (index === 0)
-						return value = event.target.value;
-					else if (index == 1)
-						return value;
-			}));
-			console.log(`handlerChangeFormInput for user: ${textIntputName[0]}`);
-		}
-		else if (event.target.name == "email")
-		{
-			setTextIntput(textIntputName.map((value, index) => {
-					if (index === 1)
-						return value = event.target.value;
-					else if (index == 0)
-						return value;
-			}));
-			console.log("handlerChangeFormInput for email: ", textIntputName[1]);
-		}
+		const {name, value} = event.target;
+		const index = name === "user" ? 0 : 1;
+
+		setTextIntput(prev => prev.map((v, i) => i === index ? value : v));
 	}
 
 	function handlerSubmitForm(event)
 	{
 		event.preventDefault();
-		console.log(`handlerSubmitForm. User: ${textIntputName[0]} // email: ${textIntputName[1]}`);
 		setUser([...textIntputName]);
 	}
 
