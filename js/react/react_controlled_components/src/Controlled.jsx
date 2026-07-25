@@ -13,7 +13,7 @@ function Controlled()
 		if (longuer === 5)
 			setTempStorage("");
 		else
-			setTempStorage(event.target.value)
+			setTempStorage(event.target.value.toUpperCase())
 		console.log("tempStorage: ", tempStorage);
 	}
 
@@ -27,7 +27,7 @@ function Controlled()
 		<>
 			<h1>Use controlled components</h1>
 			<form onSubmit={hadlerSubmit}>
-				<input value={tempStorage} onChange={handlerChange}/>
+				<input onChange={handlerChange}/>
 				<button type="submit">Submit</button>
 				<p>{value}</p>
 			</form>
