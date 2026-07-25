@@ -15,7 +15,6 @@ function Controlled()
 		else
 			setTempStorage(event.target.value)
 		console.log("tempStorage: ", tempStorage);
-		
 	}
 
 	function hadlerSubmit(event)
