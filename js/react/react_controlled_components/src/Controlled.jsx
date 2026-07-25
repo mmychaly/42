@@ -28,7 +28,7 @@ function Controlled()
 		<>
 			<h1>Use controlled components</h1>
 			<form onSubmit={hadlerSubmit}>
-				<input onChange={handlerChange}/>
+				<input value={tempStorage} onChange={handlerChange}/>
 				<button type="submit">Submit</button>
 				<p>{value}</p>
 			</form>
