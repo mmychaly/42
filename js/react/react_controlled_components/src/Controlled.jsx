@@ -4,10 +4,18 @@ function Controlled()
 {
 	const [value, setValue] = useState("");
 	const [tempStorage, setTempStorage] = useState("");
+	console.log("tempStorage in controlled: ",tempStorage);
 	function handlerChange(event)
 	{
-		setTempStorage(event.target.value);
-		console.log(tempStorage)
+		const longuer = event.target.value.length;
+		console.log(longuer);
+		console.log("Event: ", event.target.value);
+		if (longuer === 5)
+			setTempStorage("");
+		else
+			setTempStorage(event.target.value)
+		console.log("tempStorage: ", tempStorage);
+		
 	}
 
 	function hadlerSubmit(event)
