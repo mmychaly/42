@@ -1,9 +1,10 @@
 import { useState } from 'react'
+import SimpleUseEffect from './SimpleUseEffect.jsx'
 
-
-function App() {
+function App() 
+{
   return (<>
-  
+          <SimpleUseEffect />
   </>);
 }
 
