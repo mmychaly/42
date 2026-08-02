@@ -8,8 +8,6 @@ function SimpleUseEffect()
 
 	useEffect(() => {
 		console.log("Launch useEffect without []");
-		console.log("State values: ", values);
-		console.log("State other: ", other);
 	});
 
 	useEffect(() => {
@@ -17,7 +15,7 @@ function SimpleUseEffect()
 	}, []);
 
 	useEffect(() => {
-		console.log("Launch useEffect with state");
+		console.log("Launch useEffect with [state]");
 		console.log("State values: ", values);
 	}, [values]);
 
