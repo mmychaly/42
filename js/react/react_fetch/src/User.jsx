@@ -4,17 +4,28 @@ import { Fragment } from 'react';
 function Users()
 {
 	const [user, setUser] = useState([]);
+	const [loading, setloading] = useState(true);
 
 	useEffect(() => { 
 		async function usersFetch()
-		{
-			const respond = await fetch("https://jsonplaceholder.typicode.com/users");
-			const data = await respond.json();
-			setUser(data);
+		{ 
+			try{
+				const respond = await fetch("https://jsonplaceholder.typicode.com/users");
+				const data = await respond.json();
+				setUser(data);
+			}
+			catch (err){
+
+			}
+			finally{
+				setloading(false);
+			}
+
 		}
 
 		usersFetch();
 	}, []);
+	if(loading) return <p>Loading...</p>;
 
 	return (<> 
 		{user.map((item) => (
