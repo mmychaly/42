@@ -7,17 +7,20 @@ function Users()
 	const [error, setError] = useState(false);
 
 	useEffect(() => {
+		const controller = new AbortController();
+
 		async function usersFetch()
 		{   
 			try{
-				const respond = await fetch("https://httpstat.us/404");
+				const respond = await fetch("https://httpstat.us/404", {signal: controller.signal});
 				if (!respond.ok)
 					throw new Error(`HTTP ${respond.status}`);
 				const data = await respond.json();
 				setUsers(data);
 			}
 			catch (err){
-				setError(err.message);
+				if (err.name !== "AbortError")
+					setError(err.message);
 			}
 			finally {
 				setLoading(false);
@@ -25,6 +28,7 @@ function Users()
 		}
 
 		usersFetch();
+		return () => controller.abort();
 	}, []);
 
 	if (loading) return <p>Loading...</p>;
