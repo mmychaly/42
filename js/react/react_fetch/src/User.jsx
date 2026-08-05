@@ -12,10 +12,11 @@ function Users()
 		async function usersFetch()
 		{   
 			try{
-				const respond = await fetch("https://httpstat.us/404", {signal: controller.signal});
+				const respond = await fetch("https://jsonplaceholder.typicode.com/users", {signal: controller.signal});
 				if (!respond.ok)
 					throw new Error(`HTTP ${respond.status}`);
 				const data = await respond.json();
+				console.log(data);
 				setUsers(data);
 			}
 			catch (err){

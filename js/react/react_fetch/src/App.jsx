@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import Users from './User';
+import RequestPost from './RequestPost';
+
 function App() {
     return ( <>
-              <Users />
+              <RequestPost />
     </>);
 }
 
