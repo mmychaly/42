@@ -15,7 +15,7 @@ function RequestPost()
 				const respond = await fetch("https://jsonplaceholder.typicode.com/posts", {
 					method: "POST",
 					headers: {"Content-Type":"application/json"},
-					body: JSON.stringify({title:"Test", body:"Hello from POST request!", userId:1}),
+					body: JSON.stringify({title:"Test POST", body:"Hello from POST request!", userId:1}),
 					signal: controller.signal}, 
 				);
 				if (!respond.ok)

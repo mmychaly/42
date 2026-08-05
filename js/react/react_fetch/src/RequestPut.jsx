@@ -15,7 +15,7 @@ function RequestPut()
 				const respond = await fetch("https://jsonplaceholder.typicode.com/posts/1", {
 					method: "PUT",
 					headers: {"Content-Type": "application/json"},
-					body: JSON.stringify({title:"test2", body:"Hello from PUT request", userId: 1}),
+					body: JSON.stringify({title:"Test PUT", body:"Hello from PUT request", userId: 1}),
 					signal: controller.signal
 				});
 				if (!respond.ok)
