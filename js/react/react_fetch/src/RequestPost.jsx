@@ -2,7 +2,7 @@ import {useState, useEffect} from "react"
 
 function RequestPost()
 {
-	const [obj, setObj] = useState({});
+	const [obj, setObj] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
@@ -40,6 +40,7 @@ function RequestPost()
 
 	if (loading) return <p>Loading...</p>
 	if (error) return <p>Error {error}</p>
+	if (!obj) return null;
 
 	return (
 		<>
