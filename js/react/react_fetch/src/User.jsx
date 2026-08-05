@@ -1,39 +1,46 @@
 import {useEffect, useState} from 'react'
-import { Fragment } from 'react';
 
 function Users()
 {
-	const [user, setUser] = useState([]);
-	const [loading, setloading] = useState(true);
+	const [users, setUsers] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(false);
 
-	useEffect(() => { 
+	useEffect(() => {
 		async function usersFetch()
-		{ 
+		{   
 			try{
-				const respond = await fetch("https://jsonplaceholder.typicode.com/users");
+				const respond = await fetch("https://httpstat.us/404");
+				if (!respond.ok)
+					throw new Error(`HTTP ${respond.status}`);
 				const data = await respond.json();
-				setUser(data);
+				setUsers(data);
 			}
 			catch (err){
-
+				setError(err.message);
 			}
-			finally{
-				setloading(false);
+			finally {
+				setLoading(false);
 			}
-
 		}
 
 		usersFetch();
 	}, []);
-	if(loading) return <p>Loading...</p>;
 
-	return (<> 
-		{user.map((item) => (
-			<div key={item.id} style={{marginBottom: '16px'}}>
-				<p>User: {item.name}.</p>
-				<p>Email: {item.email}.</p>
-			</div>))}
-	</>);
+	if (loading) return <p>Loading...</p>;
+	if (error) return <p>Error: {error}</p>;
+
+	return (<>
+				{users.map((item) => 
+					(<div key={item.id} style={{marginBottom: "16px" }}>
+						<p>User: {item.name}</p>
+						<p>Email: {item.email}</p>
+					</div>))};
+			</>)
 }
 
 export default Users;
+
+//https://jsonplaceholder.typicode.com/users
+
+//https://httpstat.us/404
