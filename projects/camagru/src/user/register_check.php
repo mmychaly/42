@@ -1,6 +1,7 @@
 <?php
 
-require_once __DIR__  . '/../data/database.php'; //recuperer 
+require_once __DIR__  . '/../data/database.php'; //recuperer pdo, connection avec db
+require_once __DIR__  . '/../common/mail.php'; //recuper envirenement de SMTP
 //
 $username = trim($_POST['username'] ?? '');
 $email = trim($_POST['email'] ?? '');
@@ -106,12 +107,17 @@ $stmt->execute([
 	'token_verif' => $verifTokenHash
 ]);
 
-$verificationLink = '/verify-email?token=' . urlencode($verifToken);
+$appUrl = rtrim(getenv('APP_URL'), '/');
 
-echo 'Lien de verification : ';
-echo '<a href="' . htmlspecialchars($verificationLink) . '">';
-echo 'Verifier mon email';
-echo '</a>';
 
-//header('Location: /login?registered=1');
+$verifLink = $appUrl . '/verify-email?token=' . urlencode($verifToken);
+
+$emailRes = sendVerifEmail($username, $email, $verifLink);
+if (!$emailRes)
+{
+	echo "Impossible d'envoyer l'email de verification!";
+	exit;
+}
+
+header('Location: /login?registered=1');
 exit;
