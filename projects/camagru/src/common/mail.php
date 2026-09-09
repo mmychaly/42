@@ -36,8 +36,6 @@ function sendVerifEmail(string $username, string $email, string $verifLink): boo
 		return false;
 	}
 
-	// echo htmlspecialchars($responseSMTP);
-	// fclose($socket);
 	fwrite($socket, "EHLO localhost\r\n"); //Say at server Smpt name of client
 	$responseSMTP = readFullResponse($socket);
 	if (substr($responseSMTP, 0, 3) !== '250') //For seconde and next 250 , if smtp dont return 250 we have the problem.
@@ -127,7 +125,7 @@ function sendVerifEmail(string $username, string $email, string $verifLink): boo
 			. "L'equipe Camagru.\r\n";
 
 	$headers =
-		"From: <$smtpFrom>\r\n"
+		"From: Camagru <$smtpFrom>\r\n"
 		. "To: <$email>\r\n"
 		. "Subject: $subject\r\n"
 		. "MIME-Version: 1.0\r\n"

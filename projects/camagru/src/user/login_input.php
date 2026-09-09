@@ -7,7 +7,7 @@
 </head>
 <body>
 	<?php if (isset($_GET['registered'])): ?>
-		<p>Compte créé avec succès. Vous pouvez vous connecter.</p>
+		<p>Compte créé avec succès. Avant vous connecter, consultez votre email pour valider le compte.</p>
 	<?php endif; ?>
 	
 	<h1>Connexion</h1>
@@ -21,7 +21,11 @@
 		<p></p>
 		<button type="submit">Se connecter</button>
 	</form>
-
+	<!-- add p here? -->
+	<p>
+		<a href="/password_forgot">Mot de passe oublié?</a>
+	</p>
+	<!-- add p here? -->
 	<?php if (isset($_GET['verified'])): ?>
 		<p>L'email a été vérifié. Vous pouvez vous connecter.</p>
 	<?php endif; ?>

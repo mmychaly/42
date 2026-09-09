@@ -81,5 +81,33 @@ if ($path === '/verify-email' && $method === 'GET')
 	exit;
 }
 
+//Bloc for forgot password
+
+//Layout of request of email
+if ($path === '/password_forgot' && $method === 'GET')
+{
+	require __DIR__  . '/../src/user/password_forgot_input.php';
+	exit;
+}
+
+if ($path === '/password_forgot' && $method === 'POST')
+{
+	require __DIR__  . '/../src/user/password_forgot_check.php';
+	exit;
+}
+
+if ($path === '/password_reset' && $method === 'GET')
+{
+	require __DIR__  . '/../src/user/password_reset_input.php';
+	exit;
+}
+
+if ($path === '/password_reset' && $method === 'POST')
+{
+	require __DIR__  . '/../src/user/password_reset_check.php';
+	exit;
+}
+
+
 http_response_code(404);
 echo '404 - Page not found';
