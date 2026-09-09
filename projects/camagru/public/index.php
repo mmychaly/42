@@ -84,25 +84,25 @@ if ($path === '/verify-email' && $method === 'GET')
 //Bloc for forgot password
 
 //Layout of request of email
-if ($path === '/password_forgot' && $method === 'GET')
+if ($path === '/password-forgot' && $method === 'GET')
 {
 	require __DIR__  . '/../src/user/password_forgot_input.php';
 	exit;
 }
 
-if ($path === '/password_forgot' && $method === 'POST')
+if ($path === '/password-forgot' && $method === 'POST')
 {
 	require __DIR__  . '/../src/user/password_forgot_check.php';
 	exit;
 }
 
-if ($path === '/password_reset' && $method === 'GET')
+if ($path === '/password-reset' && $method === 'GET')
 {
 	require __DIR__  . '/../src/user/password_reset_input.php';
 	exit;
 }
 
-if ($path === '/password_reset' && $method === 'POST')
+if ($path === '/password-reset' && $method === 'POST')
 {
 	require __DIR__  . '/../src/user/password_reset_check.php';
 	exit;

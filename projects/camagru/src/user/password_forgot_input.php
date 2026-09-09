@@ -7,9 +7,10 @@
 </head>
 <body>
 	<h1>Mot de passe oublié</h1>
-	<form action="/password_forgot" method="POST">
-		<label for="email">Email</label>
+	<form action="/password-forgot" method="POST">
+		<label for="email">Votre email</label>
 		<input type="email" id="email" name="email" required>
+		<p></p>
 		<button type="submit">Réinitialiser mot de passe</button>
 	</form>
 </body>

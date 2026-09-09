@@ -14,7 +14,7 @@ function readFullResponse($socket): string
 	return $response;
 }
 
-function sendVerifEmail(string $username, string $email, string $verifLink): bool
+function sendEmail(string $email, string $subject, string $body): bool
 {
 
 	//on recuper les variable d'envirenement de SMTP dans les variable
@@ -117,13 +117,6 @@ function sendVerifEmail(string $username, string $email, string $verifLink): boo
 		return false;
 	}
 
-	$subject = 'Verification Camagru';
-	$body = "Bonjour $username, \r\n"
-			. "Vous devez confirmer votre email, pour finaliser votre inscription sur Camagru.\r\n"
-			. "Cliquez sur le lien: $verifLink\r\n"
-			. "Cordialement.\r\n\r\n"
-			. "L'equipe Camagru.\r\n";
-
 	$headers =
 		"From: Camagru <$smtpFrom>\r\n"
 		. "To: <$email>\r\n"
@@ -145,4 +138,30 @@ function sendVerifEmail(string $username, string $email, string $verifLink): boo
 	readFullResponse($socket);
 	fclose($socket);
 	return true;
+}
+
+function sendVerifEmail(string $username, string $email, string $verifLink): bool
+{
+	$subject = 'Verification Camagru';
+	
+	$body = "Bonjour $username, \r\n"
+			. "Vous devez confirmer votre email, pour finaliser votre inscription sur Camagru.\r\n"
+			. "Cliquez sur le lien: $verifLink\r\n\r\n"
+			. "Cordialement.\r\n\r\n"
+			. "L'equipe Camagru.\r\n";
+
+	return sendEmail($email, $subject, $body);
+}
+
+function sendResetPasswordEmail(string $username, string $email, string $resetLink): bool
+{
+	$subject = 'Reinitialisation du mot de passe Camagru';
+	
+	$body = "Bonjour $username, \r\n"
+			. "Vous avez demandé la reinitialisation de votre mot de passe.\r\n"
+			. "Cliquez sur le lien: $resetLink\r\n\r\n"
+			. "Cordialement.\r\n\r\n"
+			. "L'equipe Camagru.\r\n";
+
+	return sendEmail($email, $subject, $body);
 }
