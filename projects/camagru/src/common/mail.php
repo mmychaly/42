@@ -145,7 +145,7 @@ function sendVerifEmail(string $username, string $email, string $verifLink): boo
 	$subject = 'Verification Camagru';
 	
 	$body = "Bonjour $username, \r\n"
-			. "Vous devez confirmer votre email, pour finaliser votre inscription sur Camagru.\r\n"
+			. "Vous devez confirmer votre email.\r\n"
 			. "Cliquez sur le lien: $verifLink\r\n\r\n"
 			. "Cordialement.\r\n\r\n"
 			. "L'equipe Camagru.\r\n";

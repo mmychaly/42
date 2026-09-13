@@ -96,6 +96,7 @@ if ($path === '/password-forgot' && $method === 'POST')
 	exit;
 }
 
+//Routes pour modification de mot de passe
 if ($path === '/password-reset' && $method === 'GET')
 {
 	require __DIR__  . '/../src/user/password_reset_input.php';
@@ -108,6 +109,36 @@ if ($path === '/password-reset' && $method === 'POST')
 	exit;
 }
 
+//Changement du profil
+
+if ($path === '/profile' && $method === 'GET')
+{
+	checkSession();
+	require __DIR__  . '/../src/user/profile_input.php';
+	exit;
+}
+
+if ($path === '/profile' && $method === 'POST')
+{
+	checkSession();
+	require __DIR__  . '/../src/user/profile_check.php';
+	exit;
+}
+
+if ($path === '/profile/password' && $method === 'POST')
+{
+	checkSession();
+	require __DIR__  . '/../src/user/profile_password_check.php';
+	exit;
+}
+
+//editor
+if ($path === '/editor' && $method === 'GET')
+{
+	checkSession();
+	require __DIR__  . '/../src/image/editor_input.php';
+	exit;
+}
 
 http_response_code(404);
 echo '404 - Page not found';

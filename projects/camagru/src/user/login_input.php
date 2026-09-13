@@ -23,11 +23,14 @@
 	</form>
 	<!-- add p here? -->
 	<p>
-		<a href="/password_forgot">Mot de passe oublié?</a>
+		<a href="/password-forgot">Mot de passe oublié?</a>
 	</p>
 	<!-- add p here? -->
 	<?php if (isset($_GET['verified'])): ?>
 		<p>L'email a été vérifié. Vous pouvez vous connecter.</p>
+	<?php endif; ?>
+	<?php if (isset($_GET['password-reset'])): ?>
+		<p>Votre mot de pass a été modifié. Vous pouvez vous connecter.</p>
 	<?php endif; ?>
 </body>
 </html>
