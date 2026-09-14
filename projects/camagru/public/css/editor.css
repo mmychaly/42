@@ -1,0 +1,13 @@
+.overlay.selected {
+	outline: 2px solid rgb(35, 9, 119);
+}
+
+#captureButton:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
+
+#captureButton:not(:disabled) {
+	opacity: 1;
+	cursor: pointer;
+}
