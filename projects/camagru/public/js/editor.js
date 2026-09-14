@@ -1,3 +1,5 @@
+
+
 const overlays = document.querySelectorAll('.overlay');
 const captureButton = document.querySelector('#capture-button');
 const displayImg = document.querySelector('#preview-overlay');
@@ -62,4 +64,25 @@ imageLoaded.addEventListener('change', () => {
 
 	updateButtonCapture();
 
+});
+
+captureButton.addEventListener('click', async () => {
+	const file = imageLoaded.files[0];
+
+	if (!file || !selectedOverlay)
+		return;
+
+	const formData = new FormData();
+
+	formData.append('image', file);
+	formData.append('overlay', selectedOverlay);
+
+	const res = await fetch('/image/create', {
+		method: 'POST',
+		body: formData
+	});
+
+	const data = await res.json();
+
+	console.log(data);
 });

@@ -140,5 +140,12 @@ if ($path === '/editor' && $method === 'GET')
 	exit;
 }
 
+if ($path === '/image/create' && $method === 'POST')
+{
+	checkSession();
+	require __DIR__  . '/../src/image/create_image.php';
+	exit;
+}
+
 http_response_code(404);
 echo '404 - Page not found';
