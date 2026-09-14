@@ -20,9 +20,12 @@ require_once __DIR__  . '/../data/database.php';
 			<h2>Zone de prévisualisation</h2>
 
 			<div id="preview">
-				<p>La camera ou l'image sera ici</p>
-				<img id = "preview-overlay" src="" alt="" hidden>
+				<p id="preview-text">La camera ou l'image sera ici</p>
+				<img id = "preview-image" src="" alt="Image chargée" hidden>
+				<img id = "preview-overlay" src="" alt="Overlay ajouté" hidden>
 			</div>
+			<label for="image-load">Choisir une image :</label>
+			<input type="file" id="image-load" accept="image/png, image/jpeg">
 
 			<!-- overlay -->
 			<div id="overlay-list">

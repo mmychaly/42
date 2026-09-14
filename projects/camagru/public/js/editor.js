@@ -1,6 +1,6 @@
 const overlays = document.querySelectorAll('.overlay');
 const captureButton = document.querySelector('#capture-button');
-let displayImg = document.querySelector('#preview-overlay');
+const displayImg = document.querySelector('#preview-overlay');
 
 let selectedOverlay = null;
 
@@ -34,3 +34,20 @@ overlays.forEach((overlay) => {
 	});
 });
 
+//Add image from computer in div preview
+const imageLoaded = document.querySelector('#image-load');//Element with image loaded
+const previewImg = document.querySelector('#preview-image'); //Element where we display image-load
+const previewText = document.querySelector('#preview-text');
+
+imageLoaded.addEventListener('change', () => {
+	const file = imageLoaded.files[0];
+
+	if (!file)
+		return;
+
+	previewImg.src = URL.createObjectURL(file);
+	previewImg.hidden = false;
+	
+	previewText.hidden = true;
+
+});
