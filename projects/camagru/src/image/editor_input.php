@@ -21,6 +21,7 @@ require_once __DIR__  . '/../data/database.php';
 
 			<div id="preview">
 				<p>La camera ou l'image sera ici</p>
+				<img id = "preview-overlay" src="" alt="" hidden>
 			</div>
 
 			<!-- overlay -->

@@ -11,3 +11,21 @@
 	opacity: 1;
 	cursor: pointer;
 }
+
+#preview {
+	position: relative;
+	width: 500px;
+	height: 300px;
+	border: 1px solid black;
+}
+
+#preview-overlay{
+	max-width: 200px;
+	max-height: 200px;
+
+	position: absolute;
+	top: 50%;
+	left: 50%;
+
+	transform: translate(-50%, -50%)
+}

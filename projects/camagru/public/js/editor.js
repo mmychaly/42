@@ -1,5 +1,6 @@
 const overlays = document.querySelectorAll('.overlay');
 const captureButton = document.querySelector('#capture-button');
+let displayImg = document.querySelector('#preview-overlay');
 
 let selectedOverlay = null;
 
@@ -10,6 +11,10 @@ overlays.forEach((overlay) => {
 		{
 			overlay.classList.remove('selected');//on retire le class
 			selectedOverlay = null;
+
+			displayImg.src = "";
+			displayImg.hidden = true;
+
 			captureButton.disabled = true;//on desactive le botton
 
 			return;
@@ -20,8 +25,12 @@ overlays.forEach((overlay) => {
 		});
 		overlay.classList.add('selected');//on ajoute le class dans overlay sélectionné
 		selectedOverlay = overlay.dataset.overlay;//On prends le nom de fichier
+		
 		captureButton.disabled = false;//on active le botton
-
-		console.log(selectedOverlay);//retirer plutard
+		
+		displayImg.src = `/asset/image-def/${selectedOverlay}`;//Add path of img in html element
+		displayImg.hidden = false; //Toggle hidden
+		
 	});
 });
+
