@@ -2,6 +2,16 @@
 
 require_once __DIR__  . '/../data/database.php';
 
+$stmt = $pdo->prepare(
+	'SELECT id, filename, created_at
+	FROM images
+	WHERE user_id = ?
+	ORDER BY created_at  DESC
+	LIMIT 5'
+);
+
+$stmt->execute([$_SESSION['user_id']]);
+$userImages = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -51,7 +61,13 @@ require_once __DIR__  . '/../data/database.php';
 			<h2>Dernières photos crées</h2>
 
 			<div id="user-images">
-				<p>Aucune image.</p>
+				<?php if (empty($userImages)): ?>
+					<p>Aucune image.</p>
+				<?php else: ?>
+					<?php foreach ($userImages as $image): ?>
+						<img src="/uploads/<?=htmlspecialchars($image['filename'])?>" width="150">
+					<?php endforeach; ?>
+				<?php endif; ?>
 			</div>
 		</aside>
 	</main>

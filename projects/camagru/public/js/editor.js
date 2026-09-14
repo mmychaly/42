@@ -1,8 +1,20 @@
 const overlays = document.querySelectorAll('.overlay');
 const captureButton = document.querySelector('#capture-button');
 const displayImg = document.querySelector('#preview-overlay');
+const imageLoaded = document.querySelector('#image-load');//Element with image loaded
+const previewImg = document.querySelector('#preview-image'); //Element where we display image-load
+const previewText = document.querySelector('#preview-text');
 
 let selectedOverlay = null;
+let imageUrl = null;
+
+function updateButtonCapture() 
+{
+	const hasImg = imageUrl !== null;
+	const hasOverlay = selectedOverlay !== null;
+
+	captureButton.disabled = !(hasImg && hasOverlay)
+}
 
 overlays.forEach((overlay) => {
 	overlay.addEventListener('click', () => {
@@ -15,7 +27,7 @@ overlays.forEach((overlay) => {
 			displayImg.src = "";
 			displayImg.hidden = true;
 
-			captureButton.disabled = true;//on desactive le botton
+			updateButtonCapture();
 
 			return;
 		}
@@ -24,30 +36,30 @@ overlays.forEach((overlay) => {
 			item.classList.remove('selected'); // on retire tout les class selected d'autres overlay
 		});
 		overlay.classList.add('selected');//on ajoute le class dans overlay sélectionné
-		selectedOverlay = overlay.dataset.overlay;//On prends le nom de fichier
-		
-		captureButton.disabled = false;//on active le botton
-		
+		selectedOverlay = overlay.dataset.overlay;//On prends le nom de fichier		
 		displayImg.src = `/asset/image-def/${selectedOverlay}`;//Add path of img in html element
 		displayImg.hidden = false; //Toggle hidden
-		
+		updateButtonCapture();
 	});
 });
 
 //Add image from computer in div preview
-const imageLoaded = document.querySelector('#image-load');//Element with image loaded
-const previewImg = document.querySelector('#preview-image'); //Element where we display image-load
-const previewText = document.querySelector('#preview-text');
+
+
 
 imageLoaded.addEventListener('change', () => {
 	const file = imageLoaded.files[0];
 
 	if (!file)
 		return;
+	if (imageUrl)
+		URL.revokeObjectURL(imageUrl);
 
-	previewImg.src = URL.createObjectURL(file);
+	imageUrl = URL.createObjectURL(file);
+	previewImg.src = imageUrl;
 	previewImg.hidden = false;
-	
 	previewText.hidden = true;
+
+	updateButtonCapture();
 
 });
