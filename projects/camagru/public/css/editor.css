@@ -14,23 +14,21 @@
 
 #preview {
 	position: relative;
-	width: 500px;
-	height: 300px;
+	width: 600px;
+	height: 450px;
 	overflow: hidden;
 	border: 1px solid black;
 }
 
 #preview-overlay{
 	position: absolute;
-	top: 50%;
-	left: 50%;
-	max-width: 200px;
-	max-height: 200px;
-	transform: translate(-50%, -50%)
+	z-index: 2;
 }
 
 #preview-image {
 	width: 100%;
 	height: 100%;
-	object-fit: contain;
+	object-fit: cover;
+	position: relative;
+	z-index: 1;
 }

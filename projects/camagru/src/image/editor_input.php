@@ -43,11 +43,17 @@ $userImages = $stmt->fetchAll();
 				<button type="button" class="overlay" data-overlay="cat.png">
 					<img src="/asset/image-def/cat.png" width="100" height="100">		
 				</button>
-				<button type="button" class="overlay" data-overlay="crown.png">
-					<img src="/asset/image-def/crown.png"  width="100">
-				</button>
 				<button type="button" class="overlay" data-overlay="glasses.png">
-					<img src="/asset/image-def/glasses.png" alt="Lunettes" width="100">		
+					<img src="/asset/image-def/glasses.png"  alt="Lunettes" width="100">
+				</button>
+				<button type="button" class="overlay" data-overlay="celebration.png">
+					<img src="/asset/image-def/celebration.png" alt="Fête" width="100">		
+				</button>
+				<button type="button" class="overlay" data-overlay="stars.png">
+					<img src="/asset/image-def/stars.png" alt="Etoiles" width="100">		
+				</button>
+				<button type="button" class="overlay" data-overlay="frame.png">
+					<img src="/asset/image-def/frame.png" alt="Cadre" width="100">		
 				</button>
 			</div>
 

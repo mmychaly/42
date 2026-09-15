@@ -61,7 +61,10 @@ if ($infoImg['mime']  !== 'image/jpeg' && $infoImg['mime']  !== 'image/png')
 $overlayAllowed = [
 	'cat.png',
 	'crown.png',
-	'glasses.png'
+	'glasses.png',
+	'frame.png',
+	'stars.png',
+	'celebration.png'
 ];
 
 if (!in_array($overlay, $overlayAllowed, true))
