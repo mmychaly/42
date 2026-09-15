@@ -11,6 +11,42 @@ const messageReponse = document.querySelector('#msg-capture');
 let selectedOverlay = null;
 let imageUrl = null;
 
+//Positionement de overlay
+
+const overlayParam = {
+	'cat.png': {
+		x: 150,
+		y: 300,
+		width: 200,
+		height: 150
+	},
+	'glasses.png': {
+		x: 200,
+		y: 170,
+		width: 200,
+		height: 120
+	},
+	'frame.png': {
+		x: 0,
+		y: 0,
+		width: 600,
+		height: 450		
+	},
+	'stars.png': {
+		x: 0,
+		y: 0,
+		width: 600,
+		height: 450		
+	},
+	'celebration.png': {
+		x: 0,
+		y: 0,
+		width: 600,
+		height: 450		
+	}
+}
+
+
 function updateButtonCapture() 
 {
 	const hasImg = imageUrl !== null;
@@ -40,8 +76,14 @@ overlays.forEach((overlay) => {
 		});
 		overlay.classList.add('selected');//on ajoute le class dans overlay sélectionné
 		selectedOverlay = overlay.dataset.overlay;//On prends le nom de fichier		
+		const params =overlayParam[selectedOverlay];
 		displayImg.src = `/asset/image-def/${selectedOverlay}`;//Add path of img in html element
 		displayImg.hidden = false; //Toggle hidden
+		displayImg.style.left = `${params.x}px`;
+		displayImg.style.top = `${params.y}px`;
+		displayImg.style.width = `${params.width}px`;
+		displayImg.style.height = `${params.height}px`;
+		previewText.hidden = true;
 		updateButtonCapture();
 	});
 });
@@ -74,9 +116,14 @@ captureButton.addEventListener('click', async () => {
 		return;
 
 	const formData = new FormData();
+	const param = overlayParam[selectedOverlay];
 
 	formData.append('image', file);
 	formData.append('overlay', selectedOverlay);
+	formData.append('x', param.x);
+	formData.append('y', param.y);
+	formData.append('width', param.width);
+	formData.append('height', param.height);
 
 	try {
 		const res = await fetch('/image/create', {
@@ -99,3 +146,4 @@ captureButton.addEventListener('click', async () => {
 	}
 
 });
+

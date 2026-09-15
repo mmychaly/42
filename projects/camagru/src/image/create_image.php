@@ -2,17 +2,69 @@
 
 header('Content-Type: application/json');
 
-if (!isset($_FILES['image']) || !isset($_POST['overlay']))
+if (
+	!isset($_FILES['image']) ||
+	!isset($_POST['overlay']) ||
+	!isset($_POST['x']) ||
+	!isset($_POST['y']) ||
+	!isset($_POST['width']) ||
+	!isset($_POST['height'])
+	)
 {
 	echo json_encode([
 		'success' => false,
-		'message' => 'Image ou overlay absent'
+		'message' => 'Info manquants'
 	]);
 	exit;
 }
 
 $file = $_FILES['image'];
 $overlay = $_POST['overlay'];
+$x = $_POST['x'];
+$y = $_POST['y'];
+$width = $_POST['width'];
+$height = $_POST['height'];
+
+//Verification de parametres overlay
+//Verifier est ce que on a reçu que les chiffres
+if (
+	filter_var($x, FILTER_VALIDATE_INT) === false ||
+	filter_var($y, FILTER_VALIDATE_INT) === false ||
+	filter_var($width, FILTER_VALIDATE_INT) === false ||
+	filter_var($height, FILTER_VALIDATE_INT) === false
+)
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Parametres de overlay invalides.'
+	]);
+	exit;
+}
+
+//Convertir de string vers int
+$x = (int) $x;
+$y = (int) $y;
+$width = (int) $width;
+$height = (int) $height;
+
+
+//Verifier les domensions
+if (
+	$x < 0 ||
+	$y < 0 ||
+	$width <= 0 ||
+	$height <= 0 ||
+	$x + $width > 600 ||
+	$y + $height > 450
+	
+)
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Position ou taille de overlay invalide.'
+	]);
+	exit;
+}
 
 if ($file['error'] !== UPLOAD_ERR_OK)
 {
@@ -60,7 +112,6 @@ if ($infoImg['mime']  !== 'image/jpeg' && $infoImg['mime']  !== 'image/png')
 //Verification de overlay
 $overlayAllowed = [
 	'cat.png',
-	'crown.png',
 	'glasses.png',
 	'frame.png',
 	'stars.png',

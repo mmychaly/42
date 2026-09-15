@@ -2,12 +2,12 @@
 	outline: 2px solid rgb(35, 9, 119);
 }
 
-#captureButton:disabled {
+#capture-button:disabled {
 	opacity: 0.4;
 	cursor: not-allowed;
 }
 
-#captureButton:not(:disabled) {
+#capture-button:not(:disabled) {
 	opacity: 1;
 	cursor: pointer;
 }
