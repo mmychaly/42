@@ -55,6 +55,7 @@ $userImages = $stmt->fetchAll();
 			<button type="button" id="capture-button" disabled>
 				Prendre la photo
 			</button>
+			<p id="msg-capture"></p>
 		</section>
 
 		<aside>

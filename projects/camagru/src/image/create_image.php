@@ -23,11 +23,59 @@ if ($file['error'] !== UPLOAD_ERR_OK)
 	exit;
 }
 
+//Interdiction de image trop lourde <5M
+$maxSize = 5 * 1024 * 1024;
 
+if ($file['size'] > $maxSize)
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Le fichier est trop volumineux!'
+	]);
+	exit;	
+}
+
+
+//Verification de type d'image
+$infoImg = getimagesize($file['tmp_name']);
+
+if ($infoImg === false)
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Le fichier non valide!'
+	]);
+	exit;	
+}
+
+if ($infoImg['mime']  !== 'image/jpeg' && $infoImg['mime']  !== 'image/png')
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Le type de fichier non autorisé!'
+	]);
+	exit;	
+}
+
+//Verification de overlay
+$overlayAllowed = [
+	'cat.png',
+	'crown.png',
+	'glasses.png'
+];
+
+if (!in_array($overlay, $overlayAllowed, true))
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Overaly non autorisé!'
+	]);
+	exit;	
+}
 
 echo json_encode([
 	'success' => true,
-	'message' => 'Fichier est bien chargé',
+	'message' => 'Fichier et overlay sont bien chargé',
 	'overlay' => $overlay,
 	'file_size' => $file['size']
 ]);

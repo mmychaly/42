@@ -6,6 +6,7 @@ const displayImg = document.querySelector('#preview-overlay');
 const imageLoaded = document.querySelector('#image-load');//Element with image loaded
 const previewImg = document.querySelector('#preview-image'); //Element where we display image-load
 const previewText = document.querySelector('#preview-text');
+const messageReponse = document.querySelector('#msg-capture');
 
 let selectedOverlay = null;
 let imageUrl = null;
@@ -77,12 +78,24 @@ captureButton.addEventListener('click', async () => {
 	formData.append('image', file);
 	formData.append('overlay', selectedOverlay);
 
-	const res = await fetch('/image/create', {
-		method: 'POST',
-		body: formData
-	});
+	try {
+		const res = await fetch('/image/create', {
+			method: 'POST',
+			body: formData
+		});
 
-	const data = await res.json();
+		if (!res.ok)
+		{
+			messageReponse.textContent = 'Erreur pendant l\'envoi de l\'image';
+			return;
+		}
 
-	console.log(data);
+		const data = await res.json();
+		
+		messageReponse.textContent = data.message;
+	}
+	catch {
+		messageReponse.textContent = 'Serveur ne reponde pas!';
+	}
+
 });
