@@ -131,5 +131,9 @@ echo json_encode([
 	'success' => true,
 	'message' => 'Fichier et overlay sont bien chargé',
 	'overlay' => $overlay,
-	'file_size' => $file['size']
+	'file_size' => $file['size'],
+	'x' => $x,
+	'y' => $y,
+	'width' => $width,
+	'height' => $height
 ]);
