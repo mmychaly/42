@@ -140,6 +140,22 @@ captureButton.addEventListener('click', async () => {
 		const data = await res.json();
 		
 		messageReponse.textContent = data.message;
+
+		if (data.success)
+		{
+			const userImg = document.querySelector('#user-images');
+			const noImgMessage = document.querySelector('#no-img-message');
+			
+			if (noImgMessage)
+				noImgMessage.remove();
+			
+			const newImg = document.createElement('img');
+
+			newImg.src = data.imageUrl;
+			newImg.width = 150;
+
+			userImg.prepend(newImg);
+		}
 	}
 	catch {
 		messageReponse.textContent = 'Serveur ne reponde pas!';

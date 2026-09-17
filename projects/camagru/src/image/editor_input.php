@@ -69,7 +69,7 @@ $userImages = $stmt->fetchAll();
 
 			<div id="user-images">
 				<?php if (empty($userImages)): ?>
-					<p>Aucune image.</p>
+					<p id="no-img-message">Aucune image.</p>
 				<?php else: ?>
 					<?php foreach ($userImages as $image): ?>
 						<img src="/uploads/<?=htmlspecialchars($image['filename'])?>" width="150">
