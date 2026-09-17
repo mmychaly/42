@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__  . '/../data/database.php';
+
 header('Content-Type: application/json');
 
 if (
@@ -56,7 +58,6 @@ if (
 	$height <= 0 ||
 	$x + $width > 600 ||
 	$y + $height > 450
-	
 )
 {
 	echo json_encode([
@@ -109,7 +110,75 @@ if ($infoImg['mime']  !== 'image/jpeg' && $infoImg['mime']  !== 'image/png')
 	exit;	
 }
 
-//Verification de overlay
+
+//Créer un source pour DG
+//imageSourceDg est Handle interne qui pointe vers les données image chargées en mémoire par l'extension GD , type GDImage
+if ($infoImg['mime'] === 'image/jpeg')
+{
+	$imageSourceDg = imagecreatefromjpeg($file['tmp_name']);
+}
+else
+{
+	$imageSourceDg = imagecreatefrompng($file['tmp_name']);
+}
+//Verification est ce que c'est bien chargé on non
+if ($imageSourceDg === false)
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Probleme avec chargement de l\'image!'
+	]);
+	exit;	
+}
+
+//Créer une image vide, dans laquelle on va fusionner image transformé avec overlay
+
+$finalWidth = 600;
+$finalHeight = 450;
+$finalImage = imagecreatetruecolor($finalWidth, $finalHeight);//Image vide sans rien
+
+if ($finalImage === false)
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Impossible de  créer l\'image final!'
+	]);
+	exit;		
+}
+
+$imageSourceWidth = imagesx($imageSourceDg);//largeur de l'image en pixels
+$imageSourceHeight = imagesy($imageSourceDg);//hauteur de l'image en pixels
+
+$imageSourceRatio = $imageSourceWidth / $imageSourceHeight;//Ratio pour l'image source DG
+$finalImageRatio = $finalWidth / $finalHeight; //Ratio pour l'image final
+
+if ($imageSourceRatio > $finalImageRatio) //Source trop large : couper gauche/droite
+{
+	$cutHeight = $imageSourceHeight;//On garde hauteur
+	$cutWidth = (int) round($imageSourceHeight * $finalImageRatio);//Largeur final a copier
+	$sourceX = ($imageSourceWidth - $cutWidth) / 2;//Combien il faut decouper de 2 coté
+	$sourceY = 0;	
+}
+else //image de source trop haute : couper haut/bas
+{
+	$cutWidth = $imageSourceWidth;//On garde largeur
+	$cutHeight = (int) round($imageSourceWidth / $finalImageRatio);//Heauteur final a copier
+	$sourceX = 0;
+	$sourceY = ($imageSourceHeight - $cutHeight) / 2; //combien px il faut couper en bas / haut
+}
+
+//On copie les px de image source vers image final
+if (!imagecopyresampled($finalImage, $imageSourceDg, 0, 0, $sourceX, $sourceY, $finalWidth, $finalHeight, $cutWidth, $cutHeight))
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Impossible de  redimesionner l\'image !'
+	]);
+	exit;	
+} 
+
+
+//Verification de overlay , est ce que ils sont notres ou non
 $overlayAllowed = [
 	'cat.png',
 	'glasses.png',
@@ -127,13 +196,99 @@ if (!in_array($overlay, $overlayAllowed, true))
 	exit;	
 }
 
+//Overaly
+$overlayPath = __DIR__  . '/../../public/asset/image-def/'. $overlay;
+$overlayImage = imagecreatefrompng($overlayPath);
+if ($imageOverlay === false)
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Imposible de charger l\'overlay!'
+	]);
+	exit;	
+}
+
+$overlayFinal = imagecreatetruecolor($width, $height);
+if ($overlayFinal === false)
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Impossible de créer l\'overlay final!'
+	]);
+	exit;		
+}
+
+imagealphablending($overlayFinal, false);
+imagesavealpha($overlayFinal, true);
+
+$overlayWidth = imagesx($overlayFinal);
+$overlayHeight = imagesy($overlayImage);
+
+if (!imagecopyresampled($overlayFinal, $overlayImage, 0, 0, 0, 0, $width, $height, $overlayWidth, $overlayHeight))
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Impossible de  redimesionner l\'overlay !'
+	]);
+	exit;	
+} 
+
+//Copier l'overlay dans image final.
+imagealphablending($finalImage, true);
+
+if (!imagecopy($finalImage, $overlayFinal, $x, $y, 0, 0, $width, $height))
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Impossible d\'ajouter l\'overlay !'
+	]);
+	exit;	
+}
+
+//Créer vraie l'image
+$newFilename = bin2hex(random_bytes(16)) . 'png';//Créer le nom de fichier;
+$ulpoadPath = __DIR__ . '/../../upload/' . $newFilename; //Le chemin ou il faut enregistrer
+
+if (!imagepng($finalImage, $ulpoadPath))
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Impossible d\'enregister l\'image !'
+	]);
+	exit;	
+}
+
+try {
+	$stmt = $pdo->prepare(
+		'INSERT INTO images (user_id, filename)
+		VALUES (?, ?)'
+	);
+
+	$stmt->execute([
+		$_SESSION['user_id'],
+		$newFilename
+	]);
+} catch (PDOException $e)
+{
+	unlink($ulpoadPath);
+	echo json_encode([
+		'success' => false,
+		'message' => 'Impossible d\'enregister l\'image!'
+	]);
+	exit;	
+}
+
+//liberer le memoire
+imagedestroy($imageSourceDg);
+imagedestroy($overlayImage);
+imagedestroy($overlayFinal);
+imagedestroy($finalImage);
+
 echo json_encode([
 	'success' => true,
-	'message' => 'Fichier et overlay sont bien chargé',
-	'overlay' => $overlay,
-	'file_size' => $file['size'],
-	'x' => $x,
-	'y' => $y,
-	'width' => $width,
-	'height' => $height
+	'message' => 'Image crée avec le succès',
+	'filename' => $newFilename,
+	'image_url' => '/uploads/' . $newFilename
 ]);
+
+exit;
