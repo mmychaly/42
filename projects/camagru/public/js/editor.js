@@ -143,7 +143,7 @@ captureButton.addEventListener('click', async () => {
 
 		if (data.success)
 		{
-			const userImg = document.querySelector('#user-images');
+			const userImgs = document.querySelector('#user-images');
 			const noImgMessage = document.querySelector('#no-img-message');
 			
 			if (noImgMessage)
@@ -154,7 +154,12 @@ captureButton.addEventListener('click', async () => {
 			newImg.src = data.imageUrl;
 			newImg.width = 150;
 
-			userImg.prepend(newImg);
+			userImgs.prepend(newImg);
+
+			const totalImgs = userImgs.querySelectorAll('img');
+
+			if (totalImgs.length > 5)
+				totalImgs[totalImgs.length - 1].remove();
 		}
 	}
 	catch {

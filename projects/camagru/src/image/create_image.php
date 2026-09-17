@@ -88,6 +88,15 @@ if ($file['size'] > $maxSize)
 	exit;	
 }
 
+if (!is_uploaded_file($file['tmp_name']))
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Fichier uploadé invalide!'
+	]);
+	exit;	
+}
+
 
 //Verification de type d'image
 $infoImg = getimagesize($file['tmp_name']);
@@ -110,6 +119,17 @@ if ($infoImg['mime']  !== 'image/jpeg' && $infoImg['mime']  !== 'image/png')
 	exit;	
 }
 
+//Verification de la taille réelle
+$maxPixels = 20000000;
+
+if ($infoImg[0] <= 0 || $infoImg[1] <= 0 || $infoImg[0] * $infoImg[1] > $maxPixels)
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Les dimmensions de l\'image sont trop grandes!'
+	]);
+	exit;	
+}
 
 //Créer un source pour DG
 //imageSourceDg est Handle interne qui pointe vers les données image chargées en mémoire par l'extension GD , type GDImage
@@ -156,7 +176,7 @@ if ($imageSourceRatio > $finalImageRatio) //Source trop large : couper gauche/dr
 {
 	$cutHeight = $imageSourceHeight;//On garde hauteur
 	$cutWidth = (int) round($imageSourceHeight * $finalImageRatio);//Largeur final a copier
-	$sourceX = ($imageSourceWidth - $cutWidth) / 2;//Combien il faut decouper de 2 coté
+	$sourceX = (int) round(($imageSourceWidth - $cutWidth) / 2);//Combien il faut decouper de 2 coté
 	$sourceY = 0;	
 }
 else //image de source trop haute : couper haut/bas
@@ -164,7 +184,7 @@ else //image de source trop haute : couper haut/bas
 	$cutWidth = $imageSourceWidth;//On garde largeur
 	$cutHeight = (int) round($imageSourceWidth / $finalImageRatio);//Heauteur final a copier
 	$sourceX = 0;
-	$sourceY = ($imageSourceHeight - $cutHeight) / 2; //combien px il faut couper en bas / haut
+	$sourceY = (int) round(($imageSourceHeight - $cutHeight) / 2); //combien px il faut couper en bas / haut
 }
 
 //On copie les px de image source vers image final
@@ -199,7 +219,7 @@ if (!in_array($overlay, $overlayAllowed, true))
 //Overaly
 $overlayPath = __DIR__  . '/../../public/asset/image-def/'. $overlay;
 $overlayImage = imagecreatefrompng($overlayPath);
-if ($imageOverlay === false)
+if ($overlayImage === false)
 {
 	echo json_encode([
 		'success' => false,
@@ -221,7 +241,7 @@ if ($overlayFinal === false)
 imagealphablending($overlayFinal, false);
 imagesavealpha($overlayFinal, true);
 
-$overlayWidth = imagesx($overlayFinal);
+$overlayWidth = imagesx($overlayImage);
 $overlayHeight = imagesy($overlayImage);
 
 if (!imagecopyresampled($overlayFinal, $overlayImage, 0, 0, 0, 0, $width, $height, $overlayWidth, $overlayHeight))
@@ -246,10 +266,10 @@ if (!imagecopy($finalImage, $overlayFinal, $x, $y, 0, 0, $width, $height))
 }
 
 //Créer vraie l'image
-$newFilename = bin2hex(random_bytes(16)) . 'png';//Créer le nom de fichier;
-$ulpoadPath = __DIR__ . '/../../upload/' . $newFilename; //Le chemin ou il faut enregistrer
+$newFilename = bin2hex(random_bytes(16)) . '.png';//Créer le nom de fichier;
+$uploadPath = __DIR__ . '/../../uploads/' . $newFilename; //Le chemin ou il faut enregistrer
 
-if (!imagepng($finalImage, $ulpoadPath))
+if (!imagepng($finalImage, $uploadPath))
 {
 	echo json_encode([
 		'success' => false,
@@ -270,7 +290,7 @@ try {
 	]);
 } catch (PDOException $e)
 {
-	unlink($ulpoadPath);
+	unlink($uploadPath);
 	echo json_encode([
 		'success' => false,
 		'message' => 'Impossible d\'enregister l\'image!'
@@ -288,7 +308,7 @@ echo json_encode([
 	'success' => true,
 	'message' => 'Image crée avec le succès',
 	'filename' => $newFilename,
-	'image_url' => '/uploads/' . $newFilename
+	'imageUrl' => '/uploads/' . $newFilename
 ]);
 
 exit;
