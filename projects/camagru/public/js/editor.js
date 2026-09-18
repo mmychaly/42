@@ -7,6 +7,7 @@ const imageLoaded = document.querySelector('#image-load');//Element with image l
 const previewImg = document.querySelector('#preview-image'); //Element where we display image-load
 const previewText = document.querySelector('#preview-text');
 const messageReponse = document.querySelector('#msg-capture');
+const userImages = document.querySelector('#user-images');
 
 let selectedOverlay = null;
 let imageUrl = null;
@@ -152,7 +153,6 @@ captureButton.addEventListener('click', async () => {
 
 		if (data.success)
 		{
-			const userImgs = document.querySelector('#user-images');
 			const noImgMessage = document.querySelector('#no-img-message');
 			
 			if (noImgMessage)
@@ -176,9 +176,9 @@ captureButton.addEventListener('click', async () => {
 			deleteButton.textContent='Supprimer';
 
 			container.append(newImg, deleteButton);
-			userImgs.prepend(container);
+			userImages.prepend(container);
 
-			const totalImgs = userImgs.querySelectorAll('.user-image');
+			const totalImgs = userImages.querySelectorAll('.user-image');
 
 			if (totalImgs.length > 5)
 				totalImgs[totalImgs.length - 1].remove();
@@ -190,3 +190,45 @@ captureButton.addEventListener('click', async () => {
 
 });
 
+userImages.addEventListener('click', async (event) => {
+	if (!event.target.classList.contains('delete-image'))
+		return;
+	
+	const parentDiv = event.target.closest('.user-image');
+	const imageId = parentDiv.dataset.imageId;
+
+	const formData = new FormData();
+	formData.append('image_id', imageId);
+
+	try{
+		const res = await fetch("/image/delete", {
+			method: "POST",
+			body: formData
+		});
+
+		if (!res.ok)
+		{
+			messageReponse.textContent = "Erreur de suppression."
+			return;
+		}
+
+		const data = await res.json();
+		messageReponse.textContent = data.message;
+
+		if (data.success)
+		{
+			parentDiv.remove();
+
+			if (userImages.querySelectorAll('.user-image').length === 0)
+			{
+				const message = document.createElement('p');
+				message.id = 'no-img-message';
+				message.textContent = 'Aucune image.';
+				userImages.append(message);
+			}
+		}
+	}catch {
+		messageReponse.textContent = 'Serveur ne répond pas!';
+	}
+
+});
