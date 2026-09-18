@@ -115,6 +115,15 @@ captureButton.addEventListener('click', async () => {
 	if (!file || !selectedOverlay)
 		return;
 
+	const maxSize = 5 * 1024 * 1024;
+
+	if (file.size > maxSize)
+	{
+		messageReponse.textContent = "La taille de l'image est trop grande, max 5 Mo";
+		return;
+	}
+
+
 	const formData = new FormData();
 	const param = overlayParam[selectedOverlay];
 

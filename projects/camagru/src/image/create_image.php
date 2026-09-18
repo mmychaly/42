@@ -88,6 +88,7 @@ if ($file['size'] > $maxSize)
 	exit;	
 }
 
+//On verifie que le fichier est arrivé avec un http request
 if (!is_uploaded_file($file['tmp_name']))
 {
 	echo json_encode([
