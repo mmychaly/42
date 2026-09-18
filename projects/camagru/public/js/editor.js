@@ -158,14 +158,27 @@ captureButton.addEventListener('click', async () => {
 			if (noImgMessage)
 				noImgMessage.remove();
 			
-			const newImg = document.createElement('img');
+			//creation de div user-image
+			const container = document.createElement('div');
+			container.classList.add('user-image');
+			container.dataset.imageId = data.imageId;
 
+			//creation de image
+			const newImg = document.createElement('img');
 			newImg.src = data.imageUrl;
+			newImg.alt = 'Image crée';
 			newImg.width = 150;
 
-			userImgs.prepend(newImg);
+			//Creation de bouton delete
+			const deleteButton = document.createElement('button');
+			deleteButton.type = 'button';
+			deleteButton.classList.add('delete-image');
+			deleteButton.textContent='Supprimer';
 
-			const totalImgs = userImgs.querySelectorAll('img');
+			container.append(newImg, deleteButton);
+			userImgs.prepend(container);
+
+			const totalImgs = userImgs.querySelectorAll('.user-image');
 
 			if (totalImgs.length > 5)
 				totalImgs[totalImgs.length - 1].remove();

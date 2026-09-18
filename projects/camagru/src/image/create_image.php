@@ -289,6 +289,7 @@ try {
 		$_SESSION['user_id'],
 		$newFilename
 	]);
+	$imageId = (int) $pdo->lastInsertId();
 } catch (PDOException $e)
 {
 	unlink($uploadPath);
@@ -309,7 +310,8 @@ echo json_encode([
 	'success' => true,
 	'message' => 'Image crée avec le succès',
 	'filename' => $newFilename,
-	'imageUrl' => '/uploads/' . $newFilename
+	'imageUrl' => '/uploads/' . $newFilename,
+	'imageId' => $imageId
 ]);
 
 exit;

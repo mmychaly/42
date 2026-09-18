@@ -72,7 +72,10 @@ $userImages = $stmt->fetchAll();
 					<p id="no-img-message">Aucune image.</p>
 				<?php else: ?>
 					<?php foreach ($userImages as $image): ?>
-						<img src="/uploads/<?=htmlspecialchars($image['filename'])?>" width="150">
+						<div class="user-image" data-image-id="<?= (int) $image['id'] ?>">
+							<img src="/uploads/<?=htmlspecialchars($image['filename'])?>" alt="Image crée" width="150">
+							<button type="button" class="delete-image">Supprimer</button>
+						</div>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</div>

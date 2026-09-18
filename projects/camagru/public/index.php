@@ -147,5 +147,12 @@ if ($path === '/image/create' && $method === 'POST')
 	exit;
 }
 
+if ($path === '/image/delete' && $method === 'POST')
+{
+	checkSession();
+	require __DIR__  . '/../src/image/delete_image.php';
+	exit;
+}
+
 http_response_code(404);
 echo '404 - Page not found';
