@@ -56,6 +56,29 @@ function updateButtonCapture()
 	captureButton.disabled = !(hasImg && hasOverlay)
 }
 
+function createUserImage(imageId, imageUrl)
+{
+	const container = document.createElement('div');
+	container.classList.add('user-image');
+	container.dataset.imageId = imageId;
+
+	//creation de image
+	const newImg = document.createElement('img');
+	newImg.src = imageUrl;
+	newImg.alt = 'Image crée';
+	newImg.width = 150;
+
+	//Creation de bouton delete
+	const deleteButton = document.createElement('button');
+	deleteButton.type = 'button';
+	deleteButton.classList.add('delete-image');
+	deleteButton.textContent='Supprimer';
+
+	container.append(newImg, deleteButton);
+
+	return container;
+}
+
 overlays.forEach((overlay) => {
 	overlay.addEventListener('click', () => {
 
@@ -157,25 +180,8 @@ captureButton.addEventListener('click', async () => {
 			
 			if (noImgMessage)
 				noImgMessage.remove();
-			
-			//creation de div user-image
-			const container = document.createElement('div');
-			container.classList.add('user-image');
-			container.dataset.imageId = data.imageId;
 
-			//creation de image
-			const newImg = document.createElement('img');
-			newImg.src = data.imageUrl;
-			newImg.alt = 'Image crée';
-			newImg.width = 150;
-
-			//Creation de bouton delete
-			const deleteButton = document.createElement('button');
-			deleteButton.type = 'button';
-			deleteButton.classList.add('delete-image');
-			deleteButton.textContent='Supprimer';
-
-			container.append(newImg, deleteButton);
+			const container = createUserImage(data.imageId, data.imageUrl);
 			userImages.prepend(container);
 
 			const totalImgs = userImages.querySelectorAll('.user-image');
@@ -190,16 +196,18 @@ captureButton.addEventListener('click', async () => {
 
 });
 
+//Si user click sur le bouton supprimer
 userImages.addEventListener('click', async (event) => {
 	if (!event.target.classList.contains('delete-image'))
 		return;
 	
-	const parentDiv = event.target.closest('.user-image');
+	const parentDiv = event.target.closest('.user-image');//On trouver le parent de bouton, dans ce parent nous avons id de l'image
 	const imageId = parentDiv.dataset.imageId;
 
-	const formData = new FormData();
+	const formData = new FormData();//On ajout information sur id de l'image 
 	formData.append('image_id', imageId);
 
+	//On fait request pour supprimer l'image 
 	try{
 		const res = await fetch("/image/delete", {
 			method: "POST",
@@ -213,13 +221,19 @@ userImages.addEventListener('click', async (event) => {
 		}
 
 		const data = await res.json();
-		messageReponse.textContent = data.message;
+		messageReponse.textContent = data.message;//On afficher le message
 
 		if (data.success)
 		{
-			parentDiv.remove();
+			parentDiv.remove();//On retire div avec l'image et bouton
 
-			if (userImages.querySelectorAll('.user-image').length === 0)
+			if (data.displayImage)//Puis si dans db nous avons + que 4 images on va afficher 5eme 
+			{
+				const container = createUserImage(data.displayImage.id, data.displayImage.imageUrl);
+				userImages.append(container);
+			}
+
+			if (userImages.querySelectorAll('.user-image').length === 0)//Si on a supprimé tout les images on affiche que il n'a plus de images
 			{
 				const message = document.createElement('p');
 				message.id = 'no-img-message';

@@ -63,8 +63,26 @@ $stmt->execute([
 	$_SESSION['user_id']
 ]);
 
+//On demande est ce que il ya 5 eme l'image 
+$stmt = $pdo->prepare(
+	'SELECT id, filename
+	FROM images
+	WHERE user_id = ?
+	ORDER BY created_at DESC
+	LIMIT 1 OFFSET 4'
+);
+
+$stmt->execute([
+	$_SESSION['user_id']
+]);
+
+$displayImage = $stmt->fetch();
 
 echo json_encode([
 	'success' => true,
-	'message' => 'Fichier supprimé'
+	'message' => 'Fichier supprimé',
+	'displayImage' => $displayImage ? [
+		'id' => (int) $displayImage['id'],
+		'imageUrl' => '/uploads/' . $displayImage['filename']
+	] : null
 ]);
