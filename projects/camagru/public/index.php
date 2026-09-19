@@ -154,5 +154,11 @@ if ($path === '/image/delete' && $method === 'POST')
 	exit;
 }
 
+if ($path === '/image/gallery' && $method === 'GET')
+{
+	require __DIR__  . '/../src/gallery/gallery_input.php';
+	exit;
+}
+
 http_response_code(404);
 echo '404 - Page not found';
