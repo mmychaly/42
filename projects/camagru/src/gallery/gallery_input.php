@@ -78,8 +78,26 @@ $allImages = $stmt->fetchAll();
 					</article>
 				<?php endforeach; ?>
  			<?php endif; ?>
-			<p>Page <?= $page?> / <?=$totalPages ?>
+			<?php if ($totalPages > 1): ?>
+				<nav class="pagination">
+
+					<?php if ($page > 1): ?>
+						<a href="/image/gallery?page=<?= $page - 1 ?>">
+							Précédent
+						</a>
+					<?php endif; ?>
+
+					<span>
+						Page <?=$page ?> / <?= $totalPages ?>
+					</span>
+
+					<?php if ($page < $totalPages): ?>
+						<a href="/image/gallery?page=<?= $page + 1 ?>">
+							Suivant
+						</a>
+					<?php endif; ?>
+				</nav>
+			<?php endif; ?>
 		</main>
 	</body>
-
 </html>
