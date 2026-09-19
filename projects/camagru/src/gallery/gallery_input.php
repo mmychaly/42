@@ -9,9 +9,6 @@ if ($page === false ||$page === null ||$page < 1)
 
 $numImgPage = 5;
 
-$calcPage =($page - 1) * $numImgPage; //On calcule sur que contité de image il faut passer à une l'autre
-
-
 //Bloc pour conter nombre de pages de galerie
 // 1)Request for the db , to count all images in the db
 $stmt = $pdo->prepare(
@@ -25,7 +22,13 @@ $res = $stmt->fetch();
 $totalImages = (int) $res['quantity'];// 2)Number of images in db, type int
 $totalPages = (int) ceil($totalImages / $numImgPage);// 3)Total number of pages
 
-//4)Request for recive all data of each image, limited with 5 images and how match images we need to omit in request
+//Protection against request to  page non-existent
+if ($totalPages > 0 && $page > $totalPages)
+	$page = $totalPage;
+
+$calcPage =($page - 1) * $numImgPage; //On calcule sur que contité de image il faut passer à une l'autre
+
+//4)Request to recive all data for each image, with a limit 5 images and an offset for pagination
 $stmt = $pdo->prepare(
 	'SELECT 
 		images.id,
@@ -75,6 +78,7 @@ $allImages = $stmt->fetchAll();
 					</article>
 				<?php endforeach; ?>
  			<?php endif; ?>
+			<p>Page <?= $page?> / <?=$totalPages ?>
 		</main>
 	</body>
 
