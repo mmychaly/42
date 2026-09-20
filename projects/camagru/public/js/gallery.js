@@ -4,37 +4,58 @@ const likeButton = document.querySelectorAll('.like-button');
 likeButton.forEach((button) => {
 	button.addEventListener('click', async () => {
 			
+			const article = button.closest('.gallery-image');
+			const errorMessage = article.querySelector('.error-massage');
+			const likeNumber = article.querySelector('.like-number');
+
 			const formData = new FormData();
 			const imageId = button.dataset.imageId;
 			formData.append('image_id', imageId);
 
 			try {
+				button.disabled = true;
+
 				const res = await fetch("/image/like", {
 					method: "POST",
 					body: formData
 				});
 
 				if (!res.ok)
+				{
+					errorMessage.textContent = "Une erreur est survenue!";
+					errorMessage.hidden = false;
 					return;
+				}
+
 			
 				const data = await res.json();
+				
 
 				if (data.success)
 				{
-					const article = button.closest('.gallery-image');
-					const likeNumber = article.querySelector('.like-number');
-
 					likeNumber.textContent = data.likeNumber;
 
 					if (data.like)
 						button.textContent = 'Retirer le like';
 					else
 						button.textContent = 'Like';
+
+					errorMessage.textContent = '';
+					errorMessage.hidden = true;
+				}
+				else
+				{
+					errorMessage.textContent = data.message;
+					errorMessage.hidden = false;
 				}
 
 			} catch 
 			{
-				console.log('Erreur serveur!');
+				errorMessage.textContent = "Erreur est survenue!";
+				errorMessage.hidden = false;
+			}
+			finally{
+				button.disabled = false;
 			}
 	});
 });

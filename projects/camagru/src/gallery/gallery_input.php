@@ -120,6 +120,7 @@ if (isset($_SESSION['user_id']) && !empty($allImages))
 							<button type="button" class='like-button' data-image-id="<?= (int) $image['id'] ?>">
 								<?= $hasLiked ? 'Retirer le like' : 'Like' ?>
 							</button>
+							<span class="error-massage" hidden></span>
 						<?php endif; ?>
 					</article>
 				<?php endforeach; ?>
