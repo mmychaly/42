@@ -34,3 +34,54 @@ if (!$image)
 	exit;
 }
 
+$stmt = $pdo->prepare(
+	'SELECT id
+	FROM likes
+	WHERE user_id =?
+	AND image_id = ?'
+);
+
+$stmt->execute([$_SESSION['user_id'], $imageId]);
+
+$like = $stmt->fetch();
+
+if ($like)
+{
+	$stmt = $pdo->prepare(
+	'DELETE FROM likes
+	WHERE id =?'
+	);
+
+	$stmt->execute([$like['id']]);
+
+	$isLiked = false;
+}
+else
+{
+	$stmt = $pdo->prepare(
+	'INSERT INTO likes (user_id, image_id)
+	VALUES (?,?)'
+	);
+
+	$stmt->execute([$_SESSION['user_id'], $imageId]);
+
+	$isLiked = true;
+}
+
+$stmt = $pdo->prepare(
+	'SELECT COUNT(*) as quantity
+		FROM likes
+		WHERE image_id = ?'
+	);
+
+$stmt->execute([$imageId]);
+
+$res = $stmt->fetch();
+
+$likeNumber = (int) $res['quantity']; 
+
+echo json_encode([
+	'success' => true,
+	'like' => $isLiked,
+	'likeNumber' => $likeNumber
+]);
