@@ -24,7 +24,7 @@ $totalPages = (int) ceil($totalImages / $numImgPage);// 3)Total number of pages
 
 //Protection against request to  page non-existent
 if ($totalPages > 0 && $page > $totalPages)
-	$page = $totalPage;
+	$page = $totalPages;
 
 $calcPage =($page - 1) * $numImgPage; //On calcule sur que contité de image il faut passer à une l'autre
 
@@ -35,9 +35,14 @@ $stmt = $pdo->prepare(
 		images.filename,
 		images.created_at,
 		users.username
+		(
+			SELECT COUNT(*)
+			FROM likes
+			WHERE likes.image_id = images.id
+		) AS like_number
 	FROM images
 	INNER JOIN users ON images.user_id = users.id 
-	ORDER BY images.created_at DESC
+	ORDER BY images.created_at DESC, images.id DESC
 	LIMIT ? OFFSET ?'
 );
 
@@ -87,10 +92,18 @@ $allImages = $stmt->fetchAll();
 						</a>
 					<?php endif; ?>
 
-					<span>
-						Page <?=$page ?> / <?= $totalPages ?>
-					</span>
-
+					<?php for ($i = 1; $i <= $totalPages; $i++): ?>
+						<?php if ($i === $page): ?>
+							<span class="current-page">
+								<?= $i ?>
+							</span>
+						<?php else: ?>
+							<a href="/image/gallery?page=<?= $i ?>">
+								<?= $i ?>
+							</a>
+						<?php endif;?>
+					<?php endfor; ?>
+					
 					<?php if ($page < $totalPages): ?>
 						<a href="/image/gallery?page=<?= $page + 1 ?>">
 							Suivant
