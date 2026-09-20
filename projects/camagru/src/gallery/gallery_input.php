@@ -112,10 +112,12 @@ if (isset($_SESSION['user_id']) && !empty($allImages))
 								width="400">
 						<p> Crée par <?=htmlspecialchars($image['username'])?> </p>
 						<p> Date: <?=htmlspecialchars($image['created_at'])?> </p>
-						<p> Likes: <?= (int) $image['like_number'] ?> </p>
+						<p> Likes: 
+							<span class="like-number"><?= (int) $image['like_number'] ?></span>
+						</p>
 						<?php if (isset($_SESSION['user_id'])): ?>
 							<?php $hasLiked = in_array((int) $image['id'], $likedImages, true);?>
-							<button type="button" class='lika-button' date-image-id="<?= (int) $image['id'] ?>">
+							<button type="button" class='like-button' data-image-id="<?= (int) $image['id'] ?>">
 								<?= $hasLiked ? 'Retirer le like' : 'Like' ?>
 							</button>
 						<?php endif; ?>
@@ -151,5 +153,6 @@ if (isset($_SESSION['user_id']) && !empty($allImages))
 				</nav>
 			<?php endif; ?>
 		</main>
+		<script src="/js/gallery.js"></script>
 	</body>
 </html>
