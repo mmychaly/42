@@ -34,7 +34,7 @@ $stmt = $pdo->prepare(
 		images.id,
 		images.filename,
 		images.created_at,
-		users.username
+		users.username,
 		(
 			SELECT COUNT(*)
 			FROM likes
@@ -54,6 +54,38 @@ $stmt->bindValue(2, $calcPage, PDO::PARAM_INT);
 $stmt->execute();
 
 $allImages = $stmt->fetchAll();
+
+//likes
+//On va chercher les id de l'images likes par utilisateur
+$likedImages = [];
+
+if (isset($_SESSION['user_id']) && !empty($allImages))
+{
+	$imgIds = [];
+
+	foreach ($allImages as $image)//On va prendre tout les images de la page une par une
+	{
+		$imgIds[] = (int) $image['id'];//On recuper les id de images
+	}
+
+	$preparePlaceholder = implode(',', array_fill(0, count($imgIds), '?'));
+
+	$stmt = $pdo->prepare(
+		"SELECT image_id
+		FROM likes
+		WHERE user_id = ?
+		AND image_id IN ($preparePlaceholder)"
+	);
+	$args = [$_SESSION['user_id']];
+
+	foreach ($imgIds as $imgId)
+		$args[] = $imgId;
+
+		$stmt->execute($args);
+
+		$likedImages = $stmt->fetchAll();
+		$likedImages = array_map('intval', array_column($likedImages, 'image_id'));
+}
 
 ?>
 
@@ -80,6 +112,13 @@ $allImages = $stmt->fetchAll();
 								width="400">
 						<p> Crée par <?=htmlspecialchars($image['username'])?> </p>
 						<p> Date: <?=htmlspecialchars($image['created_at'])?> </p>
+						<p> Likes: <?= (int) $image['like_number'] ?> </p>
+						<?php if (isset($_SESSION['user_id'])): ?>
+							<?php $hasLiked = in_array((int) $image['id'], $likedImages, true);?>
+							<button type="button" class='lika-button' date-image-id="<?= (int) $image['id'] ?>">
+								<?= $hasLiked ? 'Retirer le like' : 'Like' ?>
+							</button>
+						<?php endif; ?>
 					</article>
 				<?php endforeach; ?>
  			<?php endif; ?>
