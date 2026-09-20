@@ -160,5 +160,12 @@ if ($path === '/image/gallery' && $method === 'GET')
 	exit;
 }
 
+if ($path === '/image/like' && $method === 'POST')
+{
+	checkSession();
+	require __DIR__  . '/../src/gallery/like_image.php';
+	exit;
+}
+
 http_response_code(404);
 echo '404 - Page not found';
