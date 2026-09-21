@@ -82,6 +82,24 @@ function createUserImage(imageId, imageUrl)
 	return container;
 }
 
+function captureImage()
+{
+	const canvas = document.createElement('canvas');
+
+	canvas.width = 600;
+	canvas.height = 450;
+
+	const context = canvas.getContext('2d');
+
+	context.drawImage(previewCamera, 0,0,600,450);
+
+	return new Promise((resolve) => {
+		canvas.toBlob((blob) => {
+			resolve(blob); 
+		}, 'image/png');
+	});
+}
+
 overlays.forEach((overlay) => {
 	overlay.addEventListener('click', () => {
 
@@ -152,10 +170,33 @@ imageLoaded.addEventListener('change', () => {
 });
 
 captureButton.addEventListener('click', async () => {
-	const file = imageLoaded.files[0];
+	let file = null;
 
-	if (!file || !selectedOverlay)
+	if (!selectedOverlay)
 		return;
+
+	//const file = imageLoaded.files[0];
+
+	if (isSource === "upload")
+	{
+		file = imageLoaded.files[0];
+
+		if (!file)
+			return;
+	}
+	else if (isSource === "camera")
+	{
+		file = await captureImage();
+
+		if (!file)
+		{
+			messageReponse.textContent = "Imposible de prendre la photo."
+			return;
+		}
+	}
+	else 
+		return;
+
 
 	const maxSize = 5 * 1024 * 1024;
 
@@ -208,8 +249,7 @@ captureButton.addEventListener('click', async () => {
 				totalImgs[totalImgs.length - 1].remove();
 		}
 	}
-	catch (error){
-		console.error(error);
+	catch{
 		messageReponse.textContent = 'Serveur ne reponde pas!';
 	}
 

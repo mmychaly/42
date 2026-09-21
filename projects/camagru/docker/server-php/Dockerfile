@@ -7,7 +7,3 @@ RUN apt-get update && apt-get install -y \
 	&& rm -rf /var/lib/apt/lists/*
 	
 WORKDIR /var/www/html
-
-
-RUN mkdir -p /var/www/html/uploads \
-	&& chown -R www-data:www-data /var/www/html/uploads
