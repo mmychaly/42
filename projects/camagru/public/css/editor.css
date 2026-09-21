@@ -32,3 +32,9 @@
 	position: relative;
 	z-index: 1;
 }
+
+#camera {
+	width: 600px;
+	height: 450px;
+	object-fit: cover;
+}

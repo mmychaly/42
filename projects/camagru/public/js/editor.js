@@ -8,10 +8,13 @@ const previewImg = document.querySelector('#preview-image'); //Element where we 
 const previewText = document.querySelector('#preview-text');
 const messageReponse = document.querySelector('#msg-capture');
 const userImages = document.querySelector('#user-images');
+const previewCamera = document.querySelector('#camera');
+const cameraButton = document.querySelector('#button-camera');
 
 let selectedOverlay = null;
 let imageUrl = null;
-
+let cameraStream = null;
+let isSource = null;
 //Positionement de overlay
 
 const overlayParam = {
@@ -50,10 +53,10 @@ const overlayParam = {
 
 function updateButtonCapture() 
 {
-	const hasImg = imageUrl !== null;
+	const hasSource = isSource !== null;
 	const hasOverlay = selectedOverlay !== null;
 
-	captureButton.disabled = !(hasImg && hasOverlay)
+	captureButton.disabled = !(hasSource && hasOverlay)
 }
 
 function createUserImage(imageId, imageUrl)
@@ -121,6 +124,21 @@ imageLoaded.addEventListener('change', () => {
 
 	if (!file)
 		return;
+
+	if (cameraStream)
+	{
+		cameraStream.getTracks().forEach((track) => {
+			track.stop();
+		});
+
+		cameraStream = null;
+		previewCamera.srcObject = null;
+		previewCamera.hidden = true;
+	}
+
+	isSource = 'upload';
+
+
 	if (imageUrl)
 		URL.revokeObjectURL(imageUrl);
 
@@ -190,7 +208,8 @@ captureButton.addEventListener('click', async () => {
 				totalImgs[totalImgs.length - 1].remove();
 		}
 	}
-	catch {
+	catch (error){
+		console.error(error);
 		messageReponse.textContent = 'Serveur ne reponde pas!';
 	}
 
@@ -243,6 +262,26 @@ userImages.addEventListener('click', async (event) => {
 		}
 	}catch {
 		messageReponse.textContent = 'Serveur ne répond pas!';
+	}
+
+});
+
+
+//Fonctionement de camera
+cameraButton.addEventListener('click', async () => {
+	try{
+		cameraStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+		previewCamera.srcObject = cameraStream;
+		isSource = 'camera';
+
+		previewCamera.hidden = false;
+		previewImg.hidden = true;
+		previewText.hidden = true;
+
+		updateButtonCapture();
+	}
+	catch {
+		messageReponse.textContent = 'Impossible acceder a la camera.';
 	}
 
 });

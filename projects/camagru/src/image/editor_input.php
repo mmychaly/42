@@ -31,9 +31,14 @@ $userImages = $stmt->fetchAll();
 
 			<div id="preview">
 				<p id="preview-text">La camera ou l'image sera ici</p>
+				
+				<video id="camera" autoplay playsinline hidden></video>
+
 				<img id = "preview-image" src="" alt="Image chargée" hidden>
 				<img id = "preview-overlay" src="" alt="Overlay ajouté" hidden>
 			</div>
+			<button type="button" id="button-camera">Prendre la photo avec camera</button>
+
 			<label for="image-load">Choisir une image :</label>
 			<input type="file" id="image-load" accept="image/png, image/jpeg">
 
@@ -59,7 +64,7 @@ $userImages = $stmt->fetchAll();
 
 			<!-- Capture -->
 			<button type="button" id="capture-button" disabled>
-				Prendre la photo
+				Cree l'image
 			</button>
 			<p id="msg-capture"></p>
 		</section>
