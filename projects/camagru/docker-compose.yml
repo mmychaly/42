@@ -1,7 +1,7 @@
 services:
 
   nginx:
-    image: nginx:alpine
+    image: docker.io/library/nginx:alpine
     ports:
       - "8080:80"
 # :ro read only , on peux lire mais on peux pas modifier les fichier
@@ -42,7 +42,7 @@ services:
       - db
 
   db:
-    image: mariadb:11
+    image: docker.io/library/mariadb:11
 
     environment:
       MARIADB_DATABASE: ${DB_NAME}
