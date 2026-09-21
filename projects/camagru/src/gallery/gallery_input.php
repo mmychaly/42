@@ -55,6 +55,40 @@ $stmt->execute();
 
 $allImages = $stmt->fetchAll();
 
+
+//comments
+$comments = [];
+if (!empty($allImages))
+{
+	$imageIds = [];
+
+	foreach ($allImages as $image)
+		$imageIds[] = (int) $image['id'];
+
+	$preparePlaceholder = implode(',', array_fill(0, count($imageIds), '?'));
+
+	$stmt = $pdo->prepare(
+		"SELECT
+			comments.id,
+			comments.image_id,
+			comments.message,
+			comments.created_at,
+			users.username
+		FROM comments
+		INNER JOIN users ON comments.user_id = users.id 
+		WHERE comments.image_id IN ($preparePlaceholder)
+		ORDER BY comments.created_at ASC, comments.id ASC"
+	);
+
+	$stmt->execute($imageIds);
+
+	$comments = $stmt->fetchAll();
+}
+
+
+
+
+
 //likes
 //On va chercher les id de l'images likes par utilisateur
 $likedImages = [];
