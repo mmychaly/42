@@ -1,6 +1,28 @@
 const likeButton = document.querySelectorAll('.like-button');
 const commentButton = document.querySelectorAll('.button-comment');
+const cancelCommentButton = document.querySelector('.cancel-comment');
 
+
+commentButton.forEach((button) => {
+	button.addEventListener('click', () => {
+		const article = button.closest('.gallery-image');
+		const form = article.querySelector('.form-comment');
+
+		form.hidden = false;
+		button.hidden = true;
+	});
+});
+
+cancelCommentButton.forEach((button) => {
+	button.addEventListener('click', () => {
+		const article = button.closest('.gallery-image');
+		const form = article.querySelector('.form-comment');
+		const commentButton = article.querySelector('.button-comment');
+		
+		form.hidden = true;
+		commentButton.hidden = false;
+	});
+});
 
 likeButton.forEach((button) => {
 	button.addEventListener('click', async () => {
