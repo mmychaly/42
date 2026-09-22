@@ -1,4 +1,5 @@
 const likeButton = document.querySelectorAll('.like-button');
+const commentButton = document.querySelectorAll('.button-comment');
 
 
 likeButton.forEach((button) => {

@@ -156,6 +156,43 @@ if (isset($_SESSION['user_id']) && !empty($allImages))
 							</button>
 							<span class="error-massage" hidden></span>
 						<?php endif; ?>
+						<div class= "comments">
+							<h2>Commentaires</h2>
+							<?php foreach ($comments as $comment): ?>
+								<?php if ((int) $comment['image_id'] === (int) $image['id']): ?>
+									<div class="comment">
+										<p>
+											<strong><?= htmlspecialchars($comment['username']) ?></strong>
+											:
+											<?= htmlspecialchars($comment['message']) ?>
+										</p>
+
+										<small>
+											<?= htmlspecialchars($comment['created_at']) ?>
+										</small>
+									</div>
+								<?php endif;?>
+							<?php endforeach; ?>
+							<?php if (isset($_SESSION['user_id'])): ?>
+								<button type="button" class="button-comment">
+									Ajouter un commentaire:
+								</button>
+
+								<form class="form-comment" data-image-id="<?= (int) $image['id'] ?>" hidden>
+									<label>
+										Commentaire:
+										<input type="text" name="message" class="comment-input" maxlength="400" required>
+									</label>
+									<button type="submit">
+										Envoyer
+									</button>
+									<button type="button" class="cancel-comment">
+										Annuler
+									</button>
+									<span class="msg-error-comment" hidden></span>
+								</form>
+							<?php endif; ?>
+						</div>
 					</article>
 				<?php endforeach; ?>
  			<?php endif; ?>
