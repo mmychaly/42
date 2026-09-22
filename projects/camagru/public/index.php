@@ -167,5 +167,12 @@ if ($path === '/image/like' && $method === 'POST')
 	exit;
 }
 
+if ($path === '/image/comment' && $method === 'POST')
+{
+	checkSession();
+	require __DIR__  . '/../src/gallery/comment_image.php';
+	exit;
+}
+
 http_response_code(404);
 echo '404 - Page not found';
