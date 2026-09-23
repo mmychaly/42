@@ -27,25 +27,28 @@ function createComment(comment)
 	return container;
 
 }
-
+//Bouton pour afficher le champ de commentaire
 commentButton.forEach((button) => {
 	button.addEventListener('click', () => {
 		const article = button.closest('.gallery-image');
 		const form = article.querySelector('.form-comment');
 
-		form.hidden = false;
-		button.hidden = true;
+		form.hidden = false;//form devient visible
+		button.hidden = true;//Bouton dispares
 	});
 });
 
+//Bouton pour annuler commantaire
 cancelCommentButton.forEach((button) => {
 	button.addEventListener('click', () => {
 		const article = button.closest('.gallery-image');
 		const form = article.querySelector('.form-comment');
 		const commentButton = article.querySelector('.button-comment');
-		
-		form.hidden = true;
-		commentButton.hidden = false;
+		const inputCans = form.querySelector('.comment-input');
+
+		inputCans.value = "";//on supprime le contenu de input
+		form.hidden = true;//on cache le input de form
+		commentButton.hidden = false;//Bouton pour ajouter commantaire devient visible
 	});
 });
 
@@ -129,6 +132,10 @@ commentForm.forEach((form) => {
 			formData.append('image_id', imageId);
 			formData.append('message', message);
 
+		const submitButton = form.querySelector('button[type="submit"]');
+
+		submitButton.disabled = true;//on a besoin de desactive le bouton de submit de formulare pour n'est pas pouvoir envoier plusieurs
+
 			try {
 				const res = await fetch("/image/comment", {
 					method: "POST",
@@ -171,6 +178,10 @@ commentForm.forEach((form) => {
 			{
 				erroMessage.textContent = "Probleme de serveur!";
 				erroMessage.hidden = false;
+			}
+			finally
+			{
+				submitButton.disabled = false; //reactiver a la fin de request
 			}
 	});
 });

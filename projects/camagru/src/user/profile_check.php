@@ -28,7 +28,7 @@ if (!$currentUser) {
 
 $usernameChanged = $username !== $currentUser['username'];
 $emailChanged = $email !== $currentUser['email'];
-$emailNotifChanged = $emailNotif !== $currentUser['email_notif'];
+$emailNotifChanged = $emailNotif !== (int) $currentUser['email_notif'];
 
 if (!$usernameChanged && !$emailChanged && !$emailNotifChanged)
 {

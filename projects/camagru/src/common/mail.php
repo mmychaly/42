@@ -165,3 +165,15 @@ function sendResetPasswordEmail(string $username, string $email, string $resetLi
 
 	return sendEmail($email, $subject, $body);
 }
+
+function sendCommentEmail(string $username, string $email): bool
+{
+	$subject = 'Nouveau commentaire Camagru';
+	
+	$body = "Bonjour $username, \r\n"
+			. "Une personne a commenté l'une de vos images.\r\n\r\n"
+			. "Cordialement.\r\n\r\n"
+			. "Team Camagru.\r\n";
+
+	return sendEmail($email, $subject, $body);
+}

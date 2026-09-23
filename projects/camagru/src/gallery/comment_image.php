@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__  . '/../data/database.php';
+require_once __DIR__  . '/../common/mail.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -35,9 +36,14 @@ if (strlen($message) > 400)
 }
 
 $stmt = $pdo->prepare(
-	'SELECT id
+	'SELECT 
+		images.id,
+		users.username,
+		users.email,
+		users.email_notif
 	FROM images
-	WHERE id =?'
+	INNER JOIN users ON images.user_id = users.id
+	WHERE images.id = ?'
 );
 
 $stmt->execute([$imageId]);
@@ -61,6 +67,13 @@ $stmt = $pdo->prepare(
 $stmt->execute([$imageId, $_SESSION['user_id'], $message]);
 
 $commentId = (int) $pdo->lastInsertId();
+
+if ((int) $image['email_notif'] === 1)
+{
+	sendCommentEmail($image['username'], $image['email']);
+}
+
+
 
 //On fait request pour recuperer information complete de commentaire
 $stmt = $pdo->prepare(
