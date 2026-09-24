@@ -11,6 +11,8 @@ const userImages = document.querySelector('#user-images');
 const previewCamera = document.querySelector('#camera');
 const cameraButton = document.querySelector('#button-camera');
 
+const tokenCsrf = document.getElementById('csrf-token').value;
+
 let selectedOverlay = null;
 let imageUrl = null;
 let cameraStream = null;
@@ -216,6 +218,7 @@ captureButton.addEventListener('click', async () => {
 	formData.append('y', param.y);
 	formData.append('width', param.width);
 	formData.append('height', param.height);
+	formData.append('csrf_token', tokenCsrf);
 
 	try {
 		const res = await fetch('/image/create', {
@@ -265,6 +268,7 @@ userImages.addEventListener('click', async (event) => {
 
 	const formData = new FormData();//On ajout information sur id de l'image 
 	formData.append('image_id', imageId);
+	formData.append('csrf_token', tokenCsrf);
 
 	//On fait request pour supprimer l'image 
 	try{

@@ -33,6 +33,7 @@ if (!$user) {
 	<h1>Mon profil</h1>
 
 	<form action="/profile" method="POST">
+		<input type="hidden" name="csrf_token" value="<?=htmlspecialchars(tokenCsrf()) ?>">	
 		<label for="username">Nom d'utilisatateur</label>
 		<input type="text" 
 				id="username" 
@@ -64,6 +65,7 @@ if (!$user) {
 
 	<h2>Modifier le mot de passe</h2>
 	<form action="/profile/password" method="POST">
+		<input type="hidden" name="csrf_token" value="<?=htmlspecialchars(tokenCsrf()) ?>">
 		<label for="current_password">Mot de passe actuel</label>
 		<input type="password" id="current_password" name="current_password" required>
 		<br>

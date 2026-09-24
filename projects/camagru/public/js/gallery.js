@@ -111,9 +111,10 @@ likeButton.forEach((button) => {
 	});
 });
 
+//On insltale event listener pour chaque form. On lance si bouton submit a cliqué
 commentForm.forEach((form) => {
 	form.addEventListener('submit', async (event) => {
-		event.preventDefault();
+		event.preventDefault();//On 
 
 		const imageId = form.dataset.imageId;
 		const input = form.querySelector('.comment-input');

@@ -24,6 +24,7 @@ $userImages = $stmt->fetchAll();
 	<title>Créer une image</title>
 </head>
 <body>
+	<input type="hidden" id="csrf-token" value="<?=htmlspecialchars(tokenCsrf()) ?>">
 	<h1>Créer une image</h1>
 	<main>
 		<section>

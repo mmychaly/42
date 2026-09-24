@@ -91,6 +91,7 @@ $stmt = $pdo->prepare(
 $stmt->execute([$commentId]);
 $comment = $stmt->fetch();
 
+//on va retourner le data vers js pour afficher les données
 echo json_encode([
 	'success' => true,
 	'message' => "Commentaire ajouté",
