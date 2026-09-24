@@ -6,9 +6,16 @@ require_once __DIR__  . '/../data/database.php';
 $token = $_POST['token'] ?? '';
 $password = $_POST['password'] ?? '';
 
-if ($token === '') {
-	echo 'Token de réinitialisation absent!';
-	exit;
+if (!is_string($token) || strlen($token) !== 64 || !ctype_xdigit($token))
+{
+	http_response_code(400);
+	exit('Token de réinitialisation invalide');
+}
+
+if (!is_string($password))
+{
+	http_response_code(400);
+	exit('Mot de passe invalide');
 }
 
 $error = [];
@@ -39,30 +46,6 @@ if (!empty($error))
 }
 
 $tokenHash = hash('sha256', $token);
-
-$stmt = $pdo->prepare(
-	'SELECT id, token_reset_expir_at
-	FROM users
-	WHERE token_reset = :token_reset'
-);
-
-$stmt->execute([
-	'token_reset' => $tokenHash
-]);
-
-$user = $stmt->fetch();
-
-if (!$user) {
-	echo 'Lien de réinitialisation invalide.';
-	exit;
-}
-
-if (strtotime($user['token_reset_expir_at']) < time())
-{
-	echo 'Le lien de réinitialisation a expiré!';
-	exit;
-}
-
 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
 $stmt = $pdo->prepare(
@@ -70,13 +53,20 @@ $stmt = $pdo->prepare(
 	SET password = :password,
 			token_reset = NULL,
 			token_reset_expir_at = NULL
-	WHERE id = :id'
+	WHERE token_reset = :token_reset
+	AND token_reset_expir_at > NOW()'
 );
 
 $stmt->execute([
 	'password' => $passwordHash,
-	'id' => $user["id"]
+	'token_reset' => $tokenHash
 ]);
+
+if ($stmt->rowCount() !== 1)
+{
+	http_response_code(400);
+	exit('Lien de réinitialisation invalide ou expiré!');
+}
 
 header('Location: /login?password-reset=1');
 exit;

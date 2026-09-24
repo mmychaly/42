@@ -4,9 +4,10 @@ require_once __DIR__  . '/../data/database.php';
 
 $token = $_GET['token'] ?? '';
 
-if ($token === '') {
-	echo 'Token de réinitialisation est absent!';
-	exit;
+if (!is_string($token) || strlen($token) !== 64 || !ctype_xdigit($token))
+{
+	http_response_code(400);
+	exit('Token de réinitialisation invalide');
 }
 
 $tokenHash = hash('sha256', $token);

@@ -3,7 +3,15 @@
 require_once __DIR__  . '/../data/database.php';
 require_once __DIR__  . '/../common/mail.php';
 
-$email = trim($_POST['email'] ?? '');
+$email = $_POST['email'] ?? '';
+
+if (!is_string($email))
+{
+	http_response_code(400);
+	exit('Email invalide');
+}
+
+$email = trim($email);
 
 if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL))
 {
@@ -25,7 +33,7 @@ $user = $stmt->fetch();
 
 if (!$user)
 {
-	echo "Ce utilisteur n'a pas trouvé";
+	echo "Si il y a un compte associé à cette adresse, un email de réinitialisation sera envoyé!";
 	exit;
 }
 
@@ -53,8 +61,8 @@ $emailSent = sendResetPasswordEmail($user["username"], $user["email"], $resetLin
 
 if (!$emailSent)
 {
-	echo "Impossible d'envoyer l'email de reinitialisation!";
+	echo "Si il y a un compte associé à cette adresse, un email de réinitialisation sera envoyé!";
 	exit;
 }
 
-echo "L'email de reinitialisation a été envoyé.";
+echo "Si il y a un compte associé à cette adresse, un email de réinitialisation sera envoyé!";

@@ -121,7 +121,7 @@ if ($infoImg['mime']  !== 'image/jpeg' && $infoImg['mime']  !== 'image/png')
 }
 
 //Verification de la taille réelle
-$maxPixels = 6000000;
+$maxPixels = 16000000;
 
 if ($infoImg[0] <= 0 || $infoImg[1] <= 0 || $infoImg[0] * $infoImg[1] > $maxPixels)
 {
