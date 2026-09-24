@@ -1,7 +1,9 @@
 const likeButton = document.querySelectorAll('.like-button');
 const commentButton = document.querySelectorAll('.button-comment');
 const cancelCommentButton = document.querySelectorAll('.cancel-comment');
-const commentForm = document.querySelectorAll('.form-comment')
+const commentForm = document.querySelectorAll('.form-comment');
+
+const tokenCsrf = document.getElementById('csrf-token')?.value;
 
 function createComment(comment)
 {
@@ -62,6 +64,7 @@ likeButton.forEach((button) => {
 			const formData = new FormData();
 			const imageId = button.dataset.imageId;
 			formData.append('image_id', imageId);
+			formData.append('csrf_token', tokenCsrf);
 
 			try {
 				button.disabled = true;
@@ -111,6 +114,7 @@ likeButton.forEach((button) => {
 	});
 });
 
+//Commentaires
 //On insltale event listener pour chaque form. On lance si bouton submit a cliqué
 commentForm.forEach((form) => {
 	form.addEventListener('submit', async (event) => {
@@ -132,6 +136,7 @@ commentForm.forEach((form) => {
 			const formData = new FormData();
 			formData.append('image_id', imageId);
 			formData.append('message', message);
+			formData.append('csrf_token', tokenCsrf);
 
 		const submitButton = form.querySelector('button[type="submit"]');
 

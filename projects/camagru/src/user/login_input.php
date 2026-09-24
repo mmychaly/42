@@ -13,6 +13,7 @@
 	<h1>Connexion</h1>
 
 	<form action="/login" method="POST">
+		<input type="hidden" name="csrf_token" value="<?=htmlspecialchars(tokenCsrf()) ?>">
 		<label for="username">Nom d'utilisateur</label>
 		<input type="text" id="username" name="username" required>
 		<p></p>

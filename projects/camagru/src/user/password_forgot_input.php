@@ -8,6 +8,7 @@
 <body>
 	<h1>Mot de passe oublié</h1>
 	<form action="/password-forgot" method="POST">
+		<input type="hidden" name="csrf_token" value="<?=htmlspecialchars(tokenCsrf()) ?>">
 		<label for="email">Votre email</label>
 		<input type="email" id="email" name="email" required>
 		<p></p>

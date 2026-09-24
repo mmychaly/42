@@ -46,6 +46,7 @@ if (strtotime($user['token_reset_expir_at']) < time())
 	<h1>Nouveau mot de passe</h1>
 	<form action="/password-reset" method="POST">
 		<input type="hidden" name="token" value="<?= htmlspecialchars($token)?>">
+		<input type="hidden" name="csrf_token" value="<?=htmlspecialchars(tokenCsrf()) ?>">
 		<p></p>
 		<label for="password">Nouveau mot de passe</label>
 		<input type="password" id="password" name="password" required>

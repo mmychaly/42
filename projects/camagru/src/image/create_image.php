@@ -100,7 +100,7 @@ if (!is_uploaded_file($file['tmp_name']))
 
 
 //Verification de type d'image
-$infoImg = getimagesize($file['tmp_name']);
+$infoImg = @getimagesize($file['tmp_name']);
 
 if ($infoImg === false)
 {
@@ -121,7 +121,7 @@ if ($infoImg['mime']  !== 'image/jpeg' && $infoImg['mime']  !== 'image/png')
 }
 
 //Verification de la taille réelle
-$maxPixels = 20000000;
+$maxPixels = 6000000;
 
 if ($infoImg[0] <= 0 || $infoImg[1] <= 0 || $infoImg[0] * $infoImg[1] > $maxPixels)
 {
@@ -136,11 +136,11 @@ if ($infoImg[0] <= 0 || $infoImg[1] <= 0 || $infoImg[0] * $infoImg[1] > $maxPixe
 //imageSourceDg est Handle interne qui pointe vers les données image chargées en mémoire par l'extension GD , type GDImage
 if ($infoImg['mime'] === 'image/jpeg')
 {
-	$imageSourceDg = imagecreatefromjpeg($file['tmp_name']);
+	$imageSourceDg = @imagecreatefromjpeg($file['tmp_name']);
 }
 else
 {
-	$imageSourceDg = imagecreatefrompng($file['tmp_name']);
+	$imageSourceDg = @imagecreatefrompng($file['tmp_name']);
 }
 //Verification est ce que c'est bien chargé on non
 if ($imageSourceDg === false)

@@ -132,6 +132,10 @@ if (isset($_SESSION['user_id']) && !empty($allImages))
 	</head>
 
 	<body>
+		<?php if (isUserSession()): ?>
+			<input type="hidden" id="csrf-token" value="<?=htmlspecialchars(tokenCsrf()) ?>">
+		<?php endif; ?>
+		
 		<h1>Galerie</h1>
 
 		<main>

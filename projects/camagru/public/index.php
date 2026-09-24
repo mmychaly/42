@@ -46,6 +46,8 @@ if ($path === '/login' && $method === 'POST')
 		exit;
 	}
 
+	ckeckCsrf();
+
 	require __DIR__  . '/../src/user/login_check.php';
 	exit;
 }
@@ -66,6 +68,7 @@ if ($path === '/register' && $method === 'POST')
 		header('Location: /');
 		exit;
 	}
+	ckeckCsrf();
 
 	require __DIR__  . '/../src/user/register_check.php';
 	exit;
@@ -91,12 +94,15 @@ if ($path === '/verify-email' && $method === 'GET')
 //Layout of request of email
 if ($path === '/password-forgot' && $method === 'GET')
 {
+	
 	require __DIR__  . '/../src/user/password_forgot_input.php';
 	exit;
 }
 
 if ($path === '/password-forgot' && $method === 'POST')
 {
+	ckeckCsrf();
+
 	require __DIR__  . '/../src/user/password_forgot_check.php';
 	exit;
 }
@@ -110,6 +116,8 @@ if ($path === '/password-reset' && $method === 'GET')
 
 if ($path === '/password-reset' && $method === 'POST')
 {
+	ckeckCsrf();
+	
 	require __DIR__  . '/../src/user/password_reset_check.php';
 	exit;
 }
@@ -185,7 +193,7 @@ if ($path === '/image/comment' && $method === 'POST')
 {
 	checkSession();
 	ckeckCsrf();
-	
+
 	require __DIR__  . '/../src/gallery/comment_image.php';
 	exit;
 }

@@ -6,7 +6,7 @@ require_once __DIR__  . '/../common/mail.php';
 header('Content-Type: application/json; charset=utf-8');
 
 $imageId = filter_input(INPUT_POST, 'image_id', FILTER_VALIDATE_INT);//Recuperer le id de image depuis body de post
-$message = trim($_POST['message'] ?? '');
+
 
 if ($imageId === false || $imageId === null || $imageId < 1)//verification
 {
@@ -16,6 +16,20 @@ if ($imageId === false || $imageId === null || $imageId < 1)//verification
 	]);
 	exit;
 }
+
+$message = $_POST['message'] ?? '';
+
+if (!is_string($message))
+{
+	http_response_code(400);
+	echo json_encode([
+		'success' => false,
+		'message' => 'Commentaire invalide!'
+	]);
+	exit;
+}
+
+$message = trim($message);
 
 if ($message === '')
 {

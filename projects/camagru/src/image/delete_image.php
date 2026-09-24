@@ -6,7 +6,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 $imageId = filter_input(INPUT_POST, 'image_id', FILTER_VALIDATE_INT);//Recuperer le id de image depuis body de post
 
-if ($imageId === false || $imageId === null)//verification
+if ($imageId === false || $imageId === null || $imageId < 1)//verification
 {
 		echo json_encode([
 		'success' => false,
@@ -40,28 +40,54 @@ if (!$image)
 
 $imgPath = __DIR__ . '/../../uploads/' . $image['filename']; //on utilise le filename pour faire le path jusqu'a fichier
 
+try{
+//On faire request vers db pour supprimer image 
+	$stmt = $pdo->prepare(
+		'DELETE FROM images
+		WHERE id = ? AND user_id =?'
+	);
+
+	$stmt->execute([
+		$imageId,
+		$_SESSION['user_id']
+	]);	
+}
+catch(PDOException $e)
+{
+	http_response_code(500);
+
+	echo json_encode([
+		'success' => false,
+		'message' => 'Impossible de supprimer image!'
+	]);
+	exit;
+}
+
+//Si aucune ligne n'a été pas supprimé
+if ($stmt->rowCount() !== 1)
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Image intouvable!'
+	]);
+	exit;
+}
+
 if (file_exists($imgPath))//Verification est ce que fichier existe
 {
-	if (!unlink($imgPath))//SI oui avec unlick on supprime le fichier
+	if (!@unlink($imgPath))//SI oui avec unlick on supprime le fichier
 	{
+		http_response_code(500);
+
 		echo json_encode([
 			'success' => false,
-			'message' => 'Impossible de supprimer le fichier!'
+			'message' => 'Impossible de supprimer le fichier, mais image retirée de la galerie!'
 		]);
 		exit;
 	}
 }
 
-//On faire request vers db pour supprimer image 
-$stmt = $pdo->prepare(
-	'DELETE FROM images
-	WHERE id = ? AND user_id =?'
-);
 
-$stmt->execute([
-	$imageId,
-	$_SESSION['user_id']
-]);
 
 //On demande est ce que il ya 5 eme l'image 
 $stmt = $pdo->prepare(
