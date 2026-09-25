@@ -1,5 +1,14 @@
 services:
 
+
+  init-uploads:
+    image: docker.io/library/alpine:3.20
+    user: "0:0"
+    volumes:
+      - uploads_data:/uploads
+    command: ["sh", "-ec", "chown -R 33:33 /uploads"]
+
+
   nginx:
     image: docker.io/library/nginx:alpine
     ports:
@@ -23,9 +32,6 @@ services:
       - .:/var/www/html
       - uploads_data:/var/www/html/uploads
 
-    command: >
-      sh -c "chown -R www-data:www-data /var/www/html/uploads && php-fpm"
-      
     environment:
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
@@ -42,7 +48,10 @@ services:
       
 
     depends_on:
-      - db
+      db:
+        condition: service_started
+      init-uploads:
+        condition: service_completed_successfully
 
   db:
     image: docker.io/library/mariadb:11
