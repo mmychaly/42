@@ -19,14 +19,20 @@ $userImages = $stmt->fetchAll();
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/css/site.css">
 	<link rel="stylesheet" href="/css/editor.css">
-
 	<title>Créer une image</title>
 </head>
 <body>
+	<?php
+		$headerPage = 'editor';
+		require __DIR__  . '/../common/header.php';
+	?>
+
 	<input type="hidden" id="csrf-token" value="<?=htmlspecialchars(tokenCsrf()) ?>">
-	<h1>Créer une image</h1>
-	<main>
+	
+	<main class="site-main editor-layout">
+		<h1>Créer une image</h1>
 		<section>
 			<h2>Zone de prévisualisation</h2>
 
@@ -87,6 +93,7 @@ $userImages = $stmt->fetchAll();
 			</div>
 		</aside>
 	</main>
+	<?php require __DIR__  . '/../common/footer.php'; ?>
 	<script src="/js/editor.js"></script>
 </body>
 

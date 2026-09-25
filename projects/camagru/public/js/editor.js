@@ -10,7 +10,7 @@ const messageReponse = document.querySelector('#msg-capture');
 const userImages = document.querySelector('#user-images');
 const previewCamera = document.querySelector('#camera');
 const cameraButton = document.querySelector('#button-camera');
-
+const preview = document.querySelector('#preview');
 const tokenCsrf = document.getElementById('csrf-token').value;
 
 let selectedOverlay = null;
@@ -52,6 +52,20 @@ const overlayParam = {
 	}
 }
 
+function updateOverlayDisplay()
+{
+	if (!selectedOverlay)
+		return;
+
+	const params = overlayParam[selectedOverlay];
+
+	const scale = preview.clientWidth / 600;
+
+	displayImg.style.left = `${params.x * scale}px`;
+	displayImg.style.top = `${params.y * scale}px`;
+	displayImg.style.width = `${params.width * scale}px`;
+	displayImg.style.height = `${params.height * scale}px`;
+}
 
 function updateButtonCapture() 
 {
@@ -102,6 +116,8 @@ function captureImage()
 	});
 }
 
+window.addEventListener('resize', updateOverlayDisplay);
+
 overlays.forEach((overlay) => {
 	overlay.addEventListener('click', () => {
 
@@ -123,13 +139,9 @@ overlays.forEach((overlay) => {
 		});
 		overlay.classList.add('selected');//on ajoute le class dans overlay sélectionné
 		selectedOverlay = overlay.dataset.overlay;//On prends le nom de fichier		
-		const params =overlayParam[selectedOverlay];
 		displayImg.src = `/asset/image-def/${selectedOverlay}`;//Add path of img in html element
 		displayImg.hidden = false; //Toggle hidden
-		displayImg.style.left = `${params.x}px`;
-		displayImg.style.top = `${params.y}px`;
-		displayImg.style.width = `${params.width}px`;
-		displayImg.style.height = `${params.height}px`;
+		updateOverlayDisplay();
 		previewText.hidden = true;
 		updateButtonCapture();
 	});

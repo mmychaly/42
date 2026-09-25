@@ -7,7 +7,6 @@ $username = trim($_POST['username'] ?? '');
 $email = trim($_POST['email'] ?? '');
 $password = trim($_POST['password'] ?? '');
 
-
 $error = [];
 
 if ($username === '') //Verification de username 
@@ -47,9 +46,9 @@ if ($password === '')
 
 if (!empty($error))
 {
-	foreach ($error as $erro) {
-		echo htmlspecialchars($erro) . '<br>';
-	}
+	$_SESSION['register_errors'] = $error;
+
+	header('Location: /register', true, 303);
 	exit;
 }
 
@@ -73,9 +72,8 @@ if ($data)
 
 if (!empty($error))
 {
-	foreach ($error as $erro) {
-		echo htmlspecialchars($erro) . '<br>';
-	}
+	$_SESSION['register_errors'] = $error;
+	header('Location: /register', true, 303);
 	exit;
 }
 
@@ -115,7 +113,8 @@ $verifLink = $appUrl . '/verify-email?token=' . urlencode($verifToken);
 $emailRes = sendVerifEmail($username, $email, $verifLink);
 if (!$emailRes)
 {
-	echo "Impossible d'envoyer l'email de verification!";
+	$_SESSION['login_error'] = "Vontre compte a été crée, mais l'email de confirmation n'a pas pu etre envoyé!";
+	header('Location: /login', true, 303);
 	exit;
 }
 

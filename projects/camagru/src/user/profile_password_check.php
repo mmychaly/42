@@ -8,6 +8,13 @@ $confirmPassword = $_POST['confirm_password'] ?? '';
 
 $error = [];
 
+if (!is_string($currentPassword) || !is_string($newPassword) || !is_string($confirmPassword))
+{
+	$_SESSION['profile_password_errors'] = ['Données invalides!'];
+	header('Location: /profile', true, 303);
+	exit;
+}
+
 
 if ($currentPassword === '')
 {
@@ -16,7 +23,7 @@ if ($currentPassword === '')
 
 if ($newPassword === '')
 {
-	$error[] = "Le mot de passe actuel est obligatoire!";
+	$error[] = "Le nouveau mot de passe est obligatoire!";
 } elseif (strlen($newPassword) < 8) 
 {
 	$error[] = "Le mot de passe doit contenir minimum 8 symboles!";
@@ -37,9 +44,8 @@ if ($newPassword !== $confirmPassword) {
 
 if (!empty($error))
 {
-	foreach ($error as $erro) {
-		echo htmlspecialchars($erro) . '<br>';
-	}
+	$_SESSION['profile_password_errors'] = $error;
+	header('Location: /profile', true, 303);
 	exit;
 }
 
@@ -56,17 +62,21 @@ $stmt->execute([
 $user = $stmt->fetch();
 
 if (!$user) {
-	echo 'Utilisateur introuvable';
+	unset($_SESSION['user_id'], $_SESSION['username']);
+	$_SESSION['login_error'] = "Votre compte est introuvable.Veuillez vous recconnecter.";
+	header('Location: /login', true, 303);
 	exit;
 }
 
 if (!password_verify($currentPassword, $user['password'])) {
-	echo 'Le mot de passe actuel est incorrect!';
+	$_SESSION['profile_password_errors'] = ['Le mot de passe actuel est incorrect!'];
+	header('Location: /profile', true, 303);
 	exit;
 }
 
 if (password_verify($newPassword, $user['password'])) {
-	echo 'Le nouveau mot de passe doit etre différent du mot de passe actuel!';
+	$_SESSION['profile_password_errors'] = ['Le nouveau mot de passe doit etre différent du mot de passe actuel!'];
+	header('Location: /profile', true, 303);
 	exit;
 }
 
@@ -77,10 +87,10 @@ $stmt = $pdo->prepare(
 		WHERE id = :id'
 	);
 
-	$stmt->execute([
-		'password' => $passwordHash,
-		'id' => $_SESSION['user_id']
-	]);
+$stmt->execute([
+	'password' => $passwordHash,
+	'id' => $_SESSION['user_id']
+]);
 
-	header('Location: /profile?password-updated=1');
-	exit;
+header('Location: /profile?password-updated=1');
+exit;

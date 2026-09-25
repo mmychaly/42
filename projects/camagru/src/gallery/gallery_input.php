@@ -128,17 +128,23 @@ if (isset($_SESSION['user_id']) && !empty($allImages))
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="/css/site.css">
 		<title>Galerie</title>
 	</head>
 
 	<body>
+		<?php
+			$headerPage = 'gallery';
+			require __DIR__  . '/../common/header.php';
+		?>
+
+		
 		<?php if (isUserSession()): ?>
 			<input type="hidden" id="csrf-token" value="<?=htmlspecialchars(tokenCsrf()) ?>">
 		<?php endif; ?>
-		
-		<h1>Galerie</h1>
 
-		<main>
+		<main class="site-main gallery-layout">
+			<h1>Galerie</h1>
 			<?php if (empty($allImages)): ?>
 				<p>Aucune image dans la galerie</p>
 			<?php else: ?>
@@ -161,7 +167,7 @@ if (isset($_SESSION['user_id']) && !empty($allImages))
 							<span class="error-massage" hidden></span>
 						<?php endif; ?>
 						<div class= "comments">
-							<h2>Commentaires</h2>
+							<h3>Commentaires</h3>
 							<?php foreach ($comments as $comment): ?>
 								<?php if ((int) $comment['image_id'] === (int) $image['id']): ?>
 									<div class="comment">
@@ -229,6 +235,7 @@ if (isset($_SESSION['user_id']) && !empty($allImages))
 				</nav>
 			<?php endif; ?>
 		</main>
+		<?php require __DIR__  . '/../common/footer.php'; ?>
 		<script src="/js/gallery.js"></script>
 	</body>
 </html>

@@ -13,20 +13,12 @@ $method = $_SERVER['REQUEST_METHOD'];
 require_once __DIR__ . '/../src/common/auth.php';
 require_once __DIR__ . '/../src/common/csrf.php';
 
-if ($path === '/') {
-    if (isUserSession()) {
-        echo 'Bonjour ' . htmlspecialchars($_SESSION['username']);
-		?>
-        <form action="/logout" method="POST">
-			<input type="hidden" name="csrf_token" value="<?=htmlspecialchars(tokenCsrf()) ?>">
-            <button type="submit">Se déconnecter</button>
-        </form>
-        <?php
-    } else {
-        echo 'Vous n\'êtes pas connecté.';
-    }
+if (($path === '/' || $path === '/image/gallery') && $method === 'GET') {
+ 
+	require __DIR__  . '/../src/gallery/gallery_input.php';
 	exit;
 }
+
 
 if ($path === '/login' && $method === 'GET')
 {
@@ -174,11 +166,6 @@ if ($path === '/image/delete' && $method === 'POST')
 	exit;
 }
 
-if ($path === '/image/gallery' && $method === 'GET')
-{
-	require __DIR__  . '/../src/gallery/gallery_input.php';
-	exit;
-}
 
 if ($path === '/image/like' && $method === 'POST')
 {

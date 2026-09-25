@@ -22,7 +22,9 @@ $stmt->execute([
 $currentUser = $stmt->fetch();
 
 if (!$currentUser) {
-	echo 'Utilisateur introuvable';
+	unset($_SESSION['user_id'], $_SESSION['username']);
+	$_SESSION['login_error'] = "Votre compte est introuvable.Veuillez vous recconnecter.";
+	header('Location: /login', true, 303);
 	exit;
 }
 
@@ -96,9 +98,8 @@ if($emailChanged && empty($error)) {
 
 if (!empty($error))
 {
-	foreach ($error as $erro) {
-		echo htmlspecialchars($erro) . '<br>';
-	}
+	$_SESSION['profile_errors'] = $error;
+	header('Location: /profile', true, 303);
 	exit;
 }
 
@@ -125,39 +126,50 @@ if (!$emailChanged) {
 //Changment d'email.
 $verifToken = bin2hex(random_bytes(32)); //token pour verifier l'email
 $verifTokenHash = hash('sha256', $verifToken); //on hash le token
-
-$stmt = $pdo->prepare(
-	'UPDATE users
-	SET  username = :username,
-		email = :email,
-		email_notif = :email_notif,
-		email_check = FALSE,
-		token_verif = :token_verif,
-		token_verif_expir_at = DATE_ADD(NOW(), INTERVAL 24 HOUR)
-	WHERE id = :id'
-);
-
-$stmt->execute([
-	'username' => $username,
-	'email' => $email,
-	'email_notif' => $emailNotif,
-	'token_verif' => $verifTokenHash,
-	'id' => $_SESSION['user_id']
-]);
-
 $appUrl = rtrim(getenv('APP_URL'), '/');
-
-
 $verifLink = $appUrl . '/verify-email?token=' . urlencode($verifToken);
 
-$emailRes = sendVerifEmail($username, $email, $verifLink);
-if (!$emailRes)
+try{
+	$pdo->beginTransaction();
+	$stmt = $pdo->prepare(
+		'UPDATE users
+		SET  username = :username,
+			email = :email,
+			email_notif = :email_notif,
+			email_check = FALSE,
+			token_verif = :token_verif,
+			token_verif_expir_at = DATE_ADD(NOW(), INTERVAL 24 HOUR)
+		WHERE id = :id'
+	);
+	$stmt->execute([
+		'username' => $username,
+		'email' => $email,
+		'email_notif' => $emailNotif,
+		'token_verif' => $verifTokenHash,
+		'id' => $_SESSION['user_id']
+	]);	
+	$emailRes = sendVerifEmail($username, $email, $verifLink);
+	if (!$emailRes)
+	{
+		$pdo->rollBack();
+
+		$_SESSION['profile_errors'] = ["Impossible d'envoyer l'email de verification, votre ancienne adresse email a été conservée!"];
+		header('Location: /profile', true, 303);
+		exit;
+	}
+	$pdo->commit();
+}catch (Throwable $e)
 {
-	echo "Impossible d'envoyer l'email de verification!";
+	if ($pdo->inTransaction())
+		$pdo->rollBack();
+
+	$_SESSION['profile_errors'] = ["L'adresse email n'a pas été modifiée!"];
+	header('Location: /profile', true, 303);
 	exit;
 }
 
+
 $_SESSION['username'] = $username;
 
-header('Location: /profile?email-changed=1');
+header('Location: /profile?email-changed=1', true, 303);
 exit;

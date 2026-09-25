@@ -2,26 +2,22 @@
 
 require_once __DIR__  . '/../data/database.php'; //recuperer PDO
 
-$username = trim($_POST['username'] ?? '');
-$password = trim($_POST['password'] ?? '');
+$username = $_POST['username'] ?? '';
+$password = $_POST['password'] ?? '';
 
-$error = [];
+if (!is_string($username) || !is_string($password))
+{
+	$_SESSION['login_error'] = 'Identifiants invalide.';
+	header('Location: /login', true, 303);
+	exit;
+}
+
+$username = trim($username);
 
 //Verification de username 
-if ($username === '') {
-	$error[] = "Le nom d'utilisateur est obligatoire!";
-}
-
-if ($password === '')
-{
-	$error[] = "Le mot de passe est obligatoire!";
-}
-
-if (!empty($error))
-{
-	foreach ($error as $erro) {
-		echo htmlspecialchars($erro) . '<br>';
-	}
+if ($username === '' || $password === '') {
+	$_SESSION['login_error'] = 'Tout les champs sont obligatoires.';
+	header('Location: /login', true, 303);
 	exit;
 }
 
@@ -37,20 +33,18 @@ $stmt->execute([
 
 $user = $stmt->fetch();
 
-if (!$user) {
-	echo "Nom d'utilisateur ou mot de passe incorrect!";
+if (!$user || !password_verify($password, $user['password'])) 
+{
+	$_SESSION['login_error'] = "Nom d'utilisateur ou mot de passe incorrect!";
+	header('Location: /login', true, 303);
 	exit;
 }
 
-if (!password_verify($password, $user['password']))
-{
-	echo "Nom d'utilisateur ou mot de passe incorrect!";
-	exit;
-}
 
 if(!$user['email_check'])
 {
-	echo "Vous devez confirmer votre email avant de vous connecter!";
+	$_SESSION['login_error'] = "Vous devez confirmer votre email avant de vous connecter!";
+	header('Location: /login', true, 303);
 	exit;
 }
 

@@ -14,10 +14,23 @@
 
 #preview {
 	position: relative;
-	width: 600px;
-	height: 450px;
+	width: min(100%, 600px);
+	aspect-ratio: 4 / 3;
 	overflow: hidden;
-	border: 1px solid black;
+	outline: 1px solid black;
+}
+
+#preview-image,
+#camera {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+#preview-image {
+	z-index: 1;
 }
 
 #preview-overlay{
@@ -25,16 +38,34 @@
 	z-index: 2;
 }
 
-#preview-image {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	position: relative;
-	z-index: 1;
+.editor-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 280px;
+	gap: 24px;
 }
 
-#camera {
-	width: 600px;
-	height: 450px;
-	object-fit: cover;
+.editor-layout > section,
+.editor-layout > aside {
+	min-width: 0;
+}
+
+@media (max-width: 768px) {
+	.editor-layout {
+		grid-template-columns: 1fr;
+	}
+}
+
+.editor-layout > h1 {
+	grid-column: 1 / -1;
+	text-align: center;
+	margin: 0;
+}
+
+#image-load {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }

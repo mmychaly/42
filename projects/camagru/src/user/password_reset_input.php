@@ -41,17 +41,25 @@ if (strtotime($user['token_reset_expir_at']) < time())
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/css/site.css">
 	<title>Mot de passe</title>
 </head>
 <body>
-	<h1>Nouveau mot de passe</h1>
-	<form action="/password-reset" method="POST">
-		<input type="hidden" name="token" value="<?= htmlspecialchars($token)?>">
-		<input type="hidden" name="csrf_token" value="<?=htmlspecialchars(tokenCsrf()) ?>">
-		<p></p>
-		<label for="password">Nouveau mot de passe</label>
-		<input type="password" id="password" name="password" required>
-		<button type="submit">Modifier le mot de passe</button>
-	</form>
+	<?php
+		$headerPage = 'reset';
+		require __DIR__  . '/../common/header.php';
+	?>
+	<main class="site-main auth-main">		
+		<h1>Nouveau mot de passe</h1>
+		<form action="/password-reset" method="POST">
+			<input type="hidden" name="token" value="<?= htmlspecialchars($token)?>">
+			<input type="hidden" name="csrf_token" value="<?=htmlspecialchars(tokenCsrf()) ?>">
+			<p></p>
+			<label for="password">Nouveau mot de passe</label>
+			<input type="password" id="password" name="password" required>
+			<button type="submit">Modifier le mot de passe</button>
+		</form>
+	</main>
+	<?php require __DIR__  . '/../common/footer.php'; ?>
 </body>
 </html>
