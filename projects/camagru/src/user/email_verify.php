@@ -6,8 +6,18 @@ $token = $_GET['token'] ?? '';
 
 if (!is_string($token) || strlen($token) !== 64 || !ctype_xdigit($token))
 {
-	http_response_code(400);
-	exit('Token de vérification invalide');
+	if (isset($_SESSION['user_id']))
+	{
+		$_SESSION['profile_errors'] = ['Lien de vérification invalide ou expiré!'];
+		header('Location: /profile', true, 303);
+		exit;
+	}
+	else
+	{
+		$_SESSION['login_error'] = 'Lien de vérification invalide ou expiré!';
+		header('Location: /login', true, 303);
+		exit;
+	}
 }
 
 $tokenHash = hash('sha256', $token);
@@ -28,9 +38,27 @@ $stmt->execute([
 
 if ($stmt->rowCount() !== 1)
 {
-	http_response_code(400);
-	exit('Lien de vérification invalide ou expiré!');
+	if (isset($_SESSION['user_id']))
+	{
+		$_SESSION['profile_errors'] = ['Lien de vérification invalide ou expiré!'];
+		header('Location: /profile', true, 303);
+		exit;
+	}
+	else
+	{
+		$_SESSION['login_error'] = 'Lien de vérification invalide ou expiré!';
+		header('Location: /login', true, 303);
+		exit;
+	}
 }
 
-header('Location: /login?verified=1');
-exit;
+if (isset($_SESSION['user_id']))
+{
+	header('Location: /profile?email-verified=1', true, 303);
+	exit;
+}
+else
+{
+	header('Location: /login?verified=1', true, 303);
+	exit;
+}

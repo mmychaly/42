@@ -47,6 +47,10 @@ if (!$user) {
 	<main class="site-main profile-main">
 		<h1>Mon profil</h1>
 
+		<?php if (isset($_GET['email-verified'])): ?>
+			<p role='status'>L'email a été vérifié avec succes.</p>
+		<?php endif; ?>
+
 		<?php if (!empty($profileErrors)): ?>
 			<div class="form-error" role="alert">
 				<?php foreach ($profileErrors as $error): ?>
