@@ -3,23 +3,26 @@
 require_once __DIR__  . '/../data/database.php';
 
 
-$token = $_POST['token'] ?? '';
-$password = $_POST['password'] ?? '';
+$token = $_POST['token'] ?? ''; //Token de lien de la réinitialisation
+$password = $_POST['password'] ?? '';//New password
 
+//Check token if not compliant request without token == linkError
 if (!is_string($token) || strlen($token) !== 64 || !ctype_xdigit($token))
 {
-	http_response_code(400);
-	exit('Token de réinitialisation invalide');
+	header('Location: /password-reset', true, 303);
+	exit;
 }
 
+//If password != string , add error to variable and launch new request to display error
 if (!is_string($password))
 {
-	http_response_code(400);
-	exit('Mot de passe invalide');
+	$_SESSION['reset_errors'] = ['Mot de passe invalide'];
+	header('Location: /password-reset?token=' . urlencode($token), true, 303);
+	exit;
 }
 
 $error = [];
-
+//Check compliant for password
 if ($password === '')
 {
 	$error[] = "Le mot de passe est obligatoire!";
@@ -37,17 +40,18 @@ if ($password === '')
 	$error[] = "Le mot de passe doit contenir au moins un chiffre!";
 }
 
+//If password not comlpliant add error to variable and launch new request to display error
 if (!empty($error))
 {
-	foreach ($error as $erro) {
-		echo htmlspecialchars($erro) . '<br>';
-	}
+	$_SESSION['reset_errors'] = $error;
+	header('Location: /password-reset?token=' . urlencode($token), true, 303);
 	exit;
 }
 
-$tokenHash = hash('sha256', $token);
-$passwordHash = password_hash($password, PASSWORD_DEFAULT);
+$tokenHash = hash('sha256', $token);//On hash pour avoir meme quedans db
+$passwordHash = password_hash($password, PASSWORD_DEFAULT);//We hash new password to stock in db 
 
+//If token exists in db we aset new password in db and put token in NULL
 $stmt = $pdo->prepare(
 	'UPDATE users 
 	SET password = :password,
@@ -62,11 +66,13 @@ $stmt->execute([
 	'token_reset' => $tokenHash
 ]);
 
+//If db not  upload add error to variable and launch new request to display error
 if ($stmt->rowCount() !== 1)
 {
-	http_response_code(400);
-	exit('Lien de réinitialisation invalide ou expiré!');
+	header('Location: /password-reset', true, 303);
+	exit;
 }
 
-header('Location: /login?password-reset=1');
+//If it's ok, display /login
+header('Location: /login?password-reset=1', true, 303);
 exit;

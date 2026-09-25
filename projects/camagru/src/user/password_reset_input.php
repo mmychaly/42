@@ -2,7 +2,7 @@
 
 require_once __DIR__  . '/../data/database.php';
 
-$token = $_GET['token'] ?? '';
+$token = $_GET['token'] ?? '';//Token de lien de la réinitialisation
 $linkError=null;//Variable dans laquelle on stock les erreur de lien transmit
 
 
