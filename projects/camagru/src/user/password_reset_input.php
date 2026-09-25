@@ -55,7 +55,8 @@ else
 	<main class="site-main auth-main">		
 		<h1>Nouveau mot de passe</h1>
 
-		<!-- Si le lien de réinitialisation n'est pas correct on affiche error sur la page -->
+		<!-- Si le lien de réinitialisation n'est pas correct on affiche error sur la page et on n'affiche pas le form-->
+		<!-- On donne un lien pour demander reset un nouveau-->
 		<?php if($linkError !== null): ?>
 			<p class="form-error" role="alert">
 				<?= htmlspecialchars($linkError) ?>
@@ -64,6 +65,7 @@ else
 				<a href="/password-forgot">Demander un nouveau lien</a>
 			</p>
 		<?php else:?>
+			<!-- Si les erreurs provient de reset_check on affiche ici -->
 			<?php if (!empty($resetErrors)): ?>
 				<div class="form-error" role="alert">
 					<?php foreach ($resetErrors as $error): ?>
@@ -71,7 +73,7 @@ else
 					<?php endforeach; ?>
 				</div>
 			<?php endif; ?>
-
+			<!-- Dans form nous avons protection de csrf , token pour pouvoir verifier cote serveur nouveau mot de passe -->
 			<form action="/password-reset" method="POST">
 				<input type="hidden" name="token" value="<?= htmlspecialchars($token)?>">
 				<input type="hidden" name="csrf_token" value="<?=htmlspecialchars(tokenCsrf()) ?>">
