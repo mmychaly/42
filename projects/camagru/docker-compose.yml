@@ -1,14 +1,5 @@
 services:
 
-
-  init-uploads:
-    image: docker.io/library/alpine:3.20
-    user: "0:0"
-    volumes:
-      - uploads_data:/uploads
-    command: ["sh", "-ec", "chown -R 33:33 /uploads"]
-
-
   nginx:
     image: docker.io/library/nginx:alpine
     ports:
@@ -50,8 +41,6 @@ services:
     depends_on:
       db:
         condition: service_started
-      init-uploads:
-        condition: service_completed_successfully
 
   db:
     image: docker.io/library/mariadb:11
@@ -68,6 +57,8 @@ services:
 
 volumes:
   db_data:
+    driver: local
   uploads_data:
+    driver: local
       
     

@@ -2,6 +2,7 @@ all: up
 
 up:
 	docker compose up -d --build
+	docker compose exec -u 0 server-php chown -R www-data:www-data /var/www/html/uploads
 
 down:
 	docker compose down
