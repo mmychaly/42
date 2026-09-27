@@ -4,14 +4,33 @@ function readFullResponse($socket): string
 {
 	$response = '';
 	
-	while (($line = fgets($socket, 515)) !== false)
+	while (true)
 	{
+		$line = @fgets($socket, 515);
+		if ($line === false)
+			return '';
 		$response .= $line;
 		if(strlen($line) >= 4 && $line[3] === ' ')
-			break;
+			return $response;
+	}
+}
+
+function smtpWrite($socket, string $message): bool
+{
+	$len = strlen($message);
+	$offset = 0;
+
+	while ($offset < $len)
+	{
+		$res = @fwrite($socket, substr($message, $offset));
+
+		if ($res === false  || $res === 0)
+			return false;
+
+		$offset += $res;
 	}
 
-	return $response;
+	return true;
 }
 
 function sendEmail(string $email, string $subject, string $body): bool
@@ -25,7 +44,7 @@ function sendEmail(string $email, string $subject, string $body): bool
 	$smtpFrom = getenv('SMTP_FROM');
 
 	////Create connection with SMTP serveur
-	$socket = stream_socket_client("tcp://$smtpHost:$smtpPort", $errorNumber, $errorMessage, 30);
+	$socket = @stream_socket_client("tcp://$smtpHost:$smtpPort", $errorNumber, $errorMessage, 30);
 	if ($socket === false)
 		return false;
 
@@ -36,7 +55,13 @@ function sendEmail(string $email, string $subject, string $body): bool
 		return false;
 	}
 
-	fwrite($socket, "EHLO localhost\r\n"); //Say at server Smpt name of client
+	//Say at server Smpt name of client
+	if (!smtpWrite($socket, "EHLO localhost\r\n"))
+	{
+		fclose($socket);
+		return false;
+	}
+
 	$responseSMTP = readFullResponse($socket);
 	if (substr($responseSMTP, 0, 3) !== '250') //For seconde and next 250 , if smtp dont return 250 we have the problem.
 	{
@@ -44,7 +69,13 @@ function sendEmail(string $email, string $subject, string $body): bool
 		return false;
 	}
 
-	fwrite($socket, "STARTTLS\r\n"); //Launch TLS protocol for transmition name and password
+	//Launch TLS protocol for transmition name and password
+	if (!smtpWrite($socket, "STARTTLS\r\n"))
+	{
+		fclose($socket);
+		return false;
+	}
+
 	$responseSMTP = readFullResponse($socket);
 	if (substr($responseSMTP, 0, 3) !== '220')
 	{
@@ -53,14 +84,19 @@ function sendEmail(string $email, string $subject, string $body): bool
 	}
 
 	//We need trasform socket of TCP protocol towards TLS protocol 
-	$tlsEnabled = stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+	$tlsEnabled = @stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
 	if ($tlsEnabled !== true)
 	{
 		fclose($socket);
 		return false;
 	}
 
-	fwrite($socket, "EHLO localhost\r\n");//After TLS , we need send second time
+	//After TLS , we need send second time
+	if (!smtpWrite($socket, "EHLO localhost\r\n"))
+	{
+		fclose($socket);
+		return false;
+	}
 	$responseSMTP = readFullResponse($socket);
 	if (substr($responseSMTP, 0, 3) !== '250')
 	{
@@ -69,7 +105,12 @@ function sendEmail(string $email, string $subject, string $body): bool
 	}
 
 	//AUTH LOGIN, send email and pasword
-	fwrite($socket, "AUTH LOGIN\r\n"); //We want use autification in SMTP server
+	if (!smtpWrite($socket, "AUTH LOGIN\r\n"))//We want use autification in SMTP server
+	{
+		fclose($socket);
+		return false;
+	}
+	
 	$responseSMTP = readFullResponse($socket);
 	if (substr($responseSMTP, 0, 3) !== '334') //334 Server SMTP wait next part
 	{
@@ -77,7 +118,13 @@ function sendEmail(string $email, string $subject, string $body): bool
 		return false;
 	}
 
-	fwrite($socket, base64_encode($smtpUser) . "\r\n"); //Send email en base64
+	//Send email en base64
+	if (!smtpWrite($socket, base64_encode($smtpUser) . "\r\n"))
+	{
+		fclose($socket);
+		return false;
+	}
+
 	$responseSMTP = readFullResponse($socket);
 	if (substr($responseSMTP, 0, 3) !== '334')
 	{
@@ -85,7 +132,13 @@ function sendEmail(string $email, string $subject, string $body): bool
 		return false;
 	}
 
-	fwrite($socket, base64_encode($smtpPassword) . "\r\n"); //Send password at server SMTP en base64
+	//Send password at server SMTP en base64
+	if (!smtpWrite($socket, base64_encode($smtpPassword) . "\r\n"))
+	{
+		fclose($socket);
+		return false;
+	}
+	 
 	$responseSMTP = readFullResponse($socket);
 	if (substr($responseSMTP, 0, 3) !== '235') //235 mean Auth succes
 	{
@@ -93,7 +146,13 @@ function sendEmail(string $email, string $subject, string $body): bool
 		return false;
 	}
 
-	fwrite($socket, "MAIL FROM:<$smtpFrom>\r\n"); //We say who send email.
+	//We say who send email
+	if (!smtpWrite($socket, "MAIL FROM:<$smtpFrom>\r\n"))
+	{
+		fclose($socket);
+		return false;
+	}
+
 	$responseSMTP = readFullResponse($socket);
 	if (substr($responseSMTP, 0, 3) !== '250') 
 	{
@@ -101,7 +160,13 @@ function sendEmail(string $email, string $subject, string $body): bool
 		return false;
 	}
 
-	fwrite($socket, "RCPT TO:<$email>\r\n"); //We define who recive the email.
+	//We define who recive the email.
+	if (!smtpWrite($socket, "RCPT TO:<$email>\r\n"))
+	{
+		fclose($socket);
+		return false;
+	}
+	 
 	$responseSMTP = readFullResponse($socket);
 	if (substr($responseSMTP, 0, 3) !== '250' && substr($responseSMTP, 0, 3) !== '251') 
 	{
@@ -109,7 +174,13 @@ function sendEmail(string $email, string $subject, string $body): bool
 		return false;
 	}
 
-	fwrite($socket, "DATA\r\n"); //Send the mail
+	//Send the mail
+	if (!smtpWrite($socket, "DATA\r\n"))
+	{
+		fclose($socket);
+		return false;
+	}
+	
 	$responseSMTP = readFullResponse($socket);
 	if (substr($responseSMTP, 0, 3) !== '354') //Start input
 	{
@@ -126,7 +197,13 @@ function sendEmail(string $email, string $subject, string $body): bool
 	
 	$message = $headers . "\r\n" . $body;
 
-	fwrite($socket, $message . "\r\n.\r\n"); // Send message
+	// Send message
+	if (!smtpWrite($socket, $message . "\r\n.\r\n"))
+	{
+		fclose($socket);
+		return false;
+	}
+
 	$responseSMTP = readFullResponse($socket);
 	if (substr($responseSMTP, 0, 3) !== '250') 
 	{
@@ -134,8 +211,7 @@ function sendEmail(string $email, string $subject, string $body): bool
 		return false;
 	}
 
-	fwrite($socket, "QUIT\r\n");
-	readFullResponse($socket);
+	smtpWrite($socket, "QUIT\r\n");	
 	fclose($socket);
 	return true;
 }
