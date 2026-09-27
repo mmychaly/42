@@ -25,8 +25,12 @@ function ckeckCsrf(string $redirTo = '/', bool $isAjax = false): void
 
 		echo json_encode([
 			'success' => false,
-			'message' => 'Image invalide'
+			'message' => 'Requete invalide ou session expirée!'
 		]);
 		exit;
 	}
+
+	$_SESSION['csrf_error'] = 'Requete invalide ou session expirée!';
+	header('Location: ' . $redirTo , true, 303);
+	exit;
 }

@@ -38,7 +38,7 @@ if ($path === '/login' && $method === 'POST')
 		exit;
 	}
 
-	ckeckCsrf();
+	ckeckCsrf('/login');
 
 	require __DIR__  . '/../src/user/login_check.php';
 	exit;
@@ -60,7 +60,7 @@ if ($path === '/register' && $method === 'POST')
 		header('Location: /');
 		exit;
 	}
-	ckeckCsrf();
+	ckeckCsrf('/register');
 
 	require __DIR__  . '/../src/user/register_check.php';
 	exit;
@@ -93,7 +93,7 @@ if ($path === '/password-forgot' && $method === 'GET')
 
 if ($path === '/password-forgot' && $method === 'POST')
 {
-	ckeckCsrf();
+	ckeckCsrf('/password-forgot');
 
 	require __DIR__  . '/../src/user/password_forgot_check.php';
 	exit;
@@ -108,7 +108,12 @@ if ($path === '/password-reset' && $method === 'GET')
 
 if ($path === '/password-reset' && $method === 'POST')
 {
-	ckeckCsrf();
+	$resetToken = $_POST['token'] ?? '';
+	$redirReset = '/password-forgot';
+
+	if (is_string($resetToken) && strlen($resetToken) === 64 && ctype_xdigit($resetToken))
+		$redirReset = '/password-reset?token=' . rawurlencode($resetToken);
+	ckeckCsrf($redirReset);
 	
 	require __DIR__  . '/../src/user/password_reset_check.php';
 	exit;
@@ -126,7 +131,7 @@ if ($path === '/profile' && $method === 'GET')
 if ($path === '/profile' && $method === 'POST')
 {
 	checkSession();
-	ckeckCsrf();
+	ckeckCsrf('/profile');
 	require __DIR__  . '/../src/user/profile_check.php';
 	exit;
 }
@@ -134,7 +139,7 @@ if ($path === '/profile' && $method === 'POST')
 if ($path === '/profile/password' && $method === 'POST')
 {
 	checkSession();
-	ckeckCsrf();
+	ckeckCsrf('/profile');
 
 	require __DIR__  . '/../src/user/profile_password_check.php';
 	exit;
@@ -150,8 +155,8 @@ if ($path === '/editor' && $method === 'GET')
 
 if ($path === '/image/create' && $method === 'POST')
 {
-	checkSession();
-	ckeckCsrf();
+	checkSession(true);
+	ckeckCsrf('/', true);
 
 	require __DIR__  . '/../src/image/create_image.php';
 	exit;
@@ -159,8 +164,8 @@ if ($path === '/image/create' && $method === 'POST')
 
 if ($path === '/image/delete' && $method === 'POST')
 {
-	checkSession();
-	ckeckCsrf();
+	checkSession(true);
+	ckeckCsrf('/', true);
 
 	require __DIR__  . '/../src/image/delete_image.php';
 	exit;
@@ -169,8 +174,8 @@ if ($path === '/image/delete' && $method === 'POST')
 
 if ($path === '/image/like' && $method === 'POST')
 {
-	checkSession();
-	ckeckCsrf();
+	checkSession(true);
+	ckeckCsrf('/', true);
 
 	require __DIR__  . '/../src/gallery/like_image.php';
 	exit;
@@ -178,8 +183,8 @@ if ($path === '/image/like' && $method === 'POST')
 
 if ($path === '/image/comment' && $method === 'POST')
 {
-	checkSession();
-	ckeckCsrf();
+	checkSession(true);
+	ckeckCsrf('/', true);
 
 	require __DIR__  . '/../src/gallery/comment_image.php';
 	exit;

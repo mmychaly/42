@@ -35,3 +35,9 @@ $headerPage = $headerPage ?? 'gallery';
 		<?php endif; ?>
 	</nav>
 </header>
+<?php if (isset($_SESSION['csrf_error'])): ?>
+	<p class="form-error" role="alert">
+		<?= htmlspecialchars($_SESSION['csrf_error']) ?>
+	</p>
+	<?php unset($_SESSION['csrf_error']); ?>
+<?php endif; ?>
