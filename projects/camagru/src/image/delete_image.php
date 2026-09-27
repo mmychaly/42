@@ -42,6 +42,8 @@ $imgPath = __DIR__ . '/../../uploads/' . $image['filename']; //on utilise le fil
 
 try{
 //On faire request vers db pour supprimer image 
+	$pdo->beginTransaction();
+
 	$stmt = $pdo->prepare(
 		'DELETE FROM images
 		WHERE id = ? AND user_id =?'
@@ -51,10 +53,35 @@ try{
 		$imageId,
 		$_SESSION['user_id']
 	]);	
+
+	if ($stmt->rowCount() !== 1)//Si aucune ligne n'a été pas supprimé
+	{
+		$pdo->rollBack();
+
+		echo json_encode([
+			'success' => false,
+			'message' => 'Impossible de trouver l\'image!'
+		]);
+		exit;
+	}
+
+	if (file_exists($imgPath) && !@unlink($imgPath))//Verification est ce que fichier existe, unlick on supprime le fichier et error si il n'arrive pas	{
+	{
+		$pdo->rollBack();
+
+		echo json_encode([
+			'success' => false,
+			'message' => 'Impossible de supprimer le fichier, mais image retirée de la galerie!'
+		]);
+		exit;
+	}
+
+	$pdo->commit();
 }
 catch(PDOException $e)
 {
-	http_response_code(500);
+	if ($pdo->inTransaction())
+		$pdo->rollBack();
 
 	echo json_encode([
 		'success' => false,
@@ -63,29 +90,7 @@ catch(PDOException $e)
 	exit;
 }
 
-//Si aucune ligne n'a été pas supprimé
-if ($stmt->rowCount() !== 1)
-{
-	echo json_encode([
-		'success' => false,
-		'message' => 'Image intouvable!'
-	]);
-	exit;
-}
 
-if (file_exists($imgPath))//Verification est ce que fichier existe
-{
-	if (!@unlink($imgPath))//SI oui avec unlick on supprime le fichier
-	{
-		http_response_code(500);
-
-		echo json_encode([
-			'success' => false,
-			'message' => 'Impossible de supprimer le fichier, mais image retirée de la galerie!'
-		]);
-		exit;
-	}
-}
 
 
 

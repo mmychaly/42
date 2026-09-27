@@ -4,18 +4,30 @@ require_once __DIR__  . '/../data/database.php';
 
 header('Content-Type: application/json');
 
-if (
-	!isset($_FILES['image']) ||
-	!isset($_POST['overlay']) ||
-	!isset($_POST['x']) ||
-	!isset($_POST['y']) ||
-	!isset($_POST['width']) ||
-	!isset($_POST['height'])
+if ( !isset(
+		$_FILES['image']['error'],
+		$_FILES['image']['size'],
+		$_FILES['image']['tmp_name'],
+		$_POST['overlay'],
+		$_POST['x'],
+		$_POST['y'],
+		$_POST['width'],
+		$_POST['height']
+
+    ) ||
+	!is_int($_FILES['image']['error']) ||
+	!is_int($_FILES['image']['size']) ||
+	!is_string($_FILES['image']['tmp_name']) ||
+	!is_string($_POST['overlay']) ||
+	!is_string($_POST['x']) ||
+	!is_string($_POST['y']) ||
+	!is_string($_POST['width']) ||
+	!is_string($_POST['height'])
 	)
 {
 	echo json_encode([
 		'success' => false,
-		'message' => 'Info manquants'
+		'message' => 'Info manquants ou invalides'
 	]);
 	exit;
 }
@@ -219,7 +231,7 @@ if (!in_array($overlay, $overlayAllowed, true))
 
 //Overaly
 $overlayPath = __DIR__  . '/../../public/asset/image-def/'. $overlay;
-$overlayImage = imagecreatefrompng($overlayPath);
+$overlayImage = @imagecreatefrompng($overlayPath);
 if ($overlayImage === false)
 {
 	echo json_encode([
@@ -270,7 +282,7 @@ if (!imagecopy($finalImage, $overlayFinal, $x, $y, 0, 0, $width, $height))
 $newFilename = bin2hex(random_bytes(16)) . '.png';//Créer le nom de fichier;
 $uploadPath = __DIR__ . '/../../uploads/' . $newFilename; //Le chemin ou il faut enregistrer
 
-if (!imagepng($finalImage, $uploadPath))
+if (!@imagepng($finalImage, $uploadPath))
 {
 	echo json_encode([
 		'success' => false,
@@ -292,7 +304,7 @@ try {
 	$imageId = (int) $pdo->lastInsertId();
 } catch (PDOException $e)
 {
-	unlink($uploadPath);
+	@unlink($uploadPath);
 	echo json_encode([
 		'success' => false,
 		'message' => 'Impossible d\'enregister l\'image!'
