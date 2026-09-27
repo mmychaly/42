@@ -68,7 +68,6 @@ try {
 {
 	if ($pdo->inTransaction())
 		$pdo->rollBack();
-	error_log('Password reset failed: ' . $e->getMessage());
 }
 
 

@@ -186,4 +186,23 @@ if ($path === '/image/comment' && $method === 'POST')
 }
 
 http_response_code(404);
-echo '404 - Page not found';
+?>
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/css/site.css">
+	<title>Page introuvable</title>
+</head>
+<body>
+	<?php require __DIR__  . '/../src/common/header.php'; ?>
+		<main class="site-main">
+			<h1>404-Page introuvable</h1>
+			<p>La page demandée n'existe pas</p>
+			<p><a href="/">Retour à l'accueil</a></p>
+		</main>
+	<?php require __DIR__  . '/../src/common/footer.php'; ?>
+</body>
+</html>
