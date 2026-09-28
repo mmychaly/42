@@ -52,6 +52,22 @@ if (!empty($error))
 	exit;
 }
 
+try {
+	$stmt = $pdo->prepare(
+		'DELETE FROM users
+		WHERE email_check = FALSE
+		AND email_check_once = FALSE
+		AND token_verif_expir_at <= NOW()'
+	);
+
+	$stmt->execute();
+} catch (PDOException $er)
+{
+	$_SESSION['register_errors'] = ["Impossible de verifier la disponibilite du comte."];
+	header('Location: /register', true, 303);
+	exit;
+}
+
 $res = $pdo->prepare('SELECT id, username, email
 						FROM users
 						WHERE username = :username

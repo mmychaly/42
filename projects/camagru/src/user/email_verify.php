@@ -26,6 +26,7 @@ $tokenHash = hash('sha256', $token);
 $stmt = $pdo->prepare(
 	'UPDATE users
 	SET email_check = TRUE,
+		email_check_once = TRUE,
 		token_verif = NULL,
 		token_verif_expir_at = NULL
 	WHERE token_verif = :token_verif
