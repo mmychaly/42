@@ -190,7 +190,7 @@ if ($path === '/image/comment' && $method === 'POST')
 	exit;
 }
 
-http_response_code(404);
+//http_response_code(404); //Le subject n'est pas trop clair pour 404
 ?>
 
 <!DOCTYPE html>

@@ -144,7 +144,9 @@ body {
 }
 
 .auth-main {
-	width: min(480px, 95%);
+	flex: 0 0 auto;
+	width: min(420px, 95%);
+	margin: auto;
 }
 
 .auth-main h1 {
