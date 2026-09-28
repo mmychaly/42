@@ -49,6 +49,9 @@ cancelCommentButton.forEach((button) => {
 		const inputCans = form.querySelector('.comment-input');
 
 		inputCans.value = "";//on supprime le contenu de input
+		const errorMessage = form.querySelector('.msg-error-comment');
+		errorMessage.textContent = '';
+		errorMessage.hidden = true;
 		form.hidden = true;//on cache le input de form
 		commentButton.hidden = false;//Bouton pour ajouter commantaire devient visible
 	});
@@ -173,6 +176,7 @@ commentForm.forEach((form) => {
 				parentComment.insertBefore(comment, showButton);
 
 				input.value = "";
+				erroMessage.textContent = '';
 				erroMessage.hidden = true;
 
 				form.hidden = true;

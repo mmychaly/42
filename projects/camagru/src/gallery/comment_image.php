@@ -21,7 +21,6 @@ $message = $_POST['message'] ?? '';
 
 if (!is_string($message))
 {
-	http_response_code(400);
 	echo json_encode([
 		'success' => false,
 		'message' => 'Commentaire invalide!'
@@ -49,7 +48,8 @@ if (strlen($message) > 400)
 	exit;	
 }
 
-$stmt = $pdo->prepare(
+try{
+	$stmt = $pdo->prepare(
 	'SELECT 
 		images.id,
 		users.username,
@@ -58,29 +58,49 @@ $stmt = $pdo->prepare(
 	FROM images
 	INNER JOIN users ON images.user_id = users.id
 	WHERE images.id = ?'
-);
+	);
 
-$stmt->execute([$imageId]);
+	$stmt->execute([$imageId]);
 
-$image = $stmt->fetch();
+	$image = $stmt->fetch();
 
-if (!$image)
+	if (!$image)
+	{
+		echo json_encode([
+				'success' => false,
+				'message' => 'Image introuvable'
+		]);
+		exit;
+	}
+}catch (PDOException $e)
 {
 	echo json_encode([
 			'success' => false,
-			'message' => 'Image introuvable'
+			'message' => 'Impossible traiter le commentaire'
 	]);
 	exit;
 }
 
-$stmt = $pdo->prepare(
-	'INSERT INTO comments (image_id, user_id, message)
-	VALUES (?,?,?)'
+
+try {
+	$stmt = $pdo->prepare(
+		'INSERT INTO comments (image_id, user_id, message)
+		VALUES (?,?,?)'
 	);
 
-$stmt->execute([$imageId, $_SESSION['user_id'], $message]);
+	$stmt->execute([$imageId, $_SESSION['user_id'], $message]);
 
-$commentId = (int) $pdo->lastInsertId();
+	$commentId = (int) $pdo->lastInsertId();
+}
+catch (PDOException $e)
+{
+	echo json_encode([
+			'success' => false,
+			'message' => 'Impossible de traiter le commentaire'
+	]);
+	exit;
+}
+
 
 if ((int) $image['email_notif'] === 1)
 {
@@ -90,20 +110,39 @@ if ((int) $image['email_notif'] === 1)
 
 
 //On fait request pour recuperer information complete de commentaire
-$stmt = $pdo->prepare(
-	'SELECT
-		comments.id,
-		comments.image_id,
-		comments.message,
-		comments.created_at,
-		users.username
-		FROM comments
-		INNER JOIN users ON comments.user_id = users.id
-		WHERE comments.id = ?'
-);
+try{
+ 	$stmt = $pdo->prepare(
+		'SELECT
+			comments.id,
+			comments.image_id,
+			comments.message,
+			comments.created_at,
+			users.username
+			FROM comments
+			INNER JOIN users ON comments.user_id = users.id
+			WHERE comments.id = ?'
+	);
 
-$stmt->execute([$commentId]);
-$comment = $stmt->fetch();
+	$stmt->execute([$commentId]);
+	$comment = $stmt->fetch();
+
+	if (!$comment)
+	{
+		echo json_encode([
+				'success' => false,
+				'message' => 'Impossible de récupérer le commentaire!'
+		]);
+		exit;
+}	
+}catch (PDOException $e)
+{
+	echo json_encode([
+			'success' => false,
+			'message' => 'Impossible traiter le commentaire'
+	]);
+	exit;
+}
+
 
 //on va retourner le data vers js pour afficher les données
 echo json_encode([

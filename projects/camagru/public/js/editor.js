@@ -1,5 +1,3 @@
-
-
 const overlays = document.querySelectorAll('.overlay');
 const captureButton = document.querySelector('#capture-button');
 const displayImg = document.querySelector('#preview-overlay');
@@ -200,6 +198,12 @@ captureButton.addEventListener('click', async () => {
 	}
 	else if (isSource === "camera")
 	{
+		if (previewCamera.readyState < 2)
+		{
+			messageReponse.textContent = "Caméra se prépare, réessayez plutard!"
+			return;
+		}
+
 		file = await captureImage();
 
 		if (!file)
@@ -326,7 +330,10 @@ userImages.addEventListener('click', async (event) => {
 //Fonctionement de camera
 cameraButton.addEventListener('click', async () => {
 	try{
+		if (cameraStream)
+			return;
 		cameraStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+
 		previewCamera.srcObject = cameraStream;
 		isSource = 'camera';
 
