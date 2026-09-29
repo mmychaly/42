@@ -64,6 +64,12 @@ function stopCamera()
 	previewCamera.hidden = true;
 }
 
+window.addEventListener('pagehide', () => {
+	cameraRequest++;
+	stopCamera();
+	isSource = null;
+});
+
 function updateOverlayDisplay()
 {
 	if (!selectedOverlay)
@@ -371,11 +377,33 @@ cameraButton.addEventListener('click', async () => {
 		}
 
 
+
 		cameraStream = stream;
+		stream.getVideoTracks().forEach(track => {
+			track.addEventListener('ended', () => {
+				if (request !== cameraRequest)
+					return;
+
+				cameraRequest++;
+				stopCamera();
+				isSource = null;
+
+				previewText.textContent = 'Camera deconnecte';
+				previewText.hidden = false;
+
+				updateButtonCapture();
+				cameraButton.disabled = false;
+			});
+		});
 		previewCamera.srcObject = stream;
 		previewCamera.hidden = false;
 
-		await previewCamera.play();
+		await Promise.race([
+			previewCamera.play(),
+			new Promise((_, reject) => {
+				setTimeout(() => reject(new Error('CameraTimeout')), 8000);
+			})
+		]);
 
 		if (request !== cameraRequest)
 			return;
@@ -406,7 +434,7 @@ cameraButton.addEventListener('click', async () => {
 		else if (error.name === 'NotReadableError')
 			messageReponse.textContent = 'Camera occupee ou indisponible!';
 		else 
-			messageReponse.textContent = 'Impossible de demarrer la cammera.Reessaie!';
+			messageReponse.textContent = 'Impossible de demarer la camera.Reessaie!';
 
 		updateButtonCapture();
 	} finally 
