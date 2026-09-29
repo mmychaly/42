@@ -39,7 +39,7 @@ $userImages = $stmt->fetchAll();
 			<div id="preview">
 				<p id="preview-text">La camera ou l'image sera ici</p>
 				
-				<video id="camera" autoplay playsinline hidden></video>
+				<video id="camera" autoplay muted playsinline hidden></video>
 
 				<img id = "preview-image" src="" alt="Image chargée" hidden>
 				<img id = "preview-overlay" src="" alt="Overlay ajouté" hidden>

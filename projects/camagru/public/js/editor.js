@@ -14,6 +14,7 @@ const tokenCsrf = document.getElementById('csrf-token').value;
 let selectedOverlay = null;
 let imageUrl = null;
 let cameraStream = null;
+let cameraRequest = 0;
 let isSource = null;
 //Positionement de overlay
 
@@ -48,6 +49,19 @@ const overlayParam = {
 		width: 600,
 		height: 450		
 	}
+}
+
+function stopCamera()
+{
+	if (cameraStream)
+	{
+		cameraStream.getTracks().forEach(track => track.stop());
+		cameraStream = null;
+	}
+
+	previewCamera.pause();
+	previewCamera.srcObject = null;
+	previewCamera.hidden = true;
 }
 
 function updateOverlayDisplay()
@@ -98,6 +112,15 @@ function createUserImage(imageId, imageUrl)
 
 function captureImage()
 {
+	if (!cameraStream || 
+		cameraStream.getVideoTracks().every(track => track.readyState !== 'live') ||
+		previewCamera.readyState < 2 ||
+		previewCamera.videoWidth === 0 ||
+		previewCamera.videoHeight === 0)
+	{
+		return Promise.resolve(null);
+	}
+
 	const canvas = document.createElement('canvas');
 
 	canvas.width = 600;
@@ -155,16 +178,9 @@ imageLoaded.addEventListener('change', () => {
 	if (!file)
 		return;
 
-	if (cameraStream)
-	{
-		cameraStream.getTracks().forEach((track) => {
-			track.stop();
-		});
-
-		cameraStream = null;
-		previewCamera.srcObject = null;
-		previewCamera.hidden = true;
-	}
+	cameraRequest++;
+	stopCamera();
+	cameraButton.disabled = false;
 
 	isSource = 'upload';
 
@@ -329,22 +345,74 @@ userImages.addEventListener('click', async (event) => {
 
 //Fonctionement de camera
 cameraButton.addEventListener('click', async () => {
+	
+	const request = ++cameraRequest;
+	cameraButton.disabled = true;
+
+	stopCamera();
+	isSource = null;
+	updateButtonCapture();
+
+	messageReponse.textContent = '';
+	previewImg.hidden = true;
+	previewText.textContent = 'Demarrage de camera...';
+	previewText.hidden = false;
+
+	let stream = null;
+
 	try{
-		if (cameraStream)
+
+		stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+
+		if (request !== cameraRequest)
+		{
+			stream.getTracks().forEach(track => track.stop());
 			return;
-		cameraStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+		}
 
-		previewCamera.srcObject = cameraStream;
-		isSource = 'camera';
 
+		cameraStream = stream;
+		previewCamera.srcObject = stream;
 		previewCamera.hidden = false;
+
+		await previewCamera.play();
+
+		if (request !== cameraRequest)
+			return;
+
+		if (previewCamera.videoWidth === 0|| previewCamera.videoHeight === 0)
+			throw new Error('Flux video vide');
+
+		isSource = 'camera';
 		previewImg.hidden = true;
 		previewText.hidden = true;
 
+		imageLoaded.value = '';
+
 		updateButtonCapture();
 	}
-	catch {
-		messageReponse.textContent = 'Impossible acceder a la camera.';
+	catch (error){
+		if (request !== cameraRequest)
+			return;
+
+		stopCamera();
+		isSource = null;
+
+		previewText.textContent = "Aucune image disponible";
+		previewText.hidden = false;
+
+		if (error.name === 'NotAllowedError')
+			messageReponse.textContent = 'Autorise la camera dans navigateur et reessaie!';
+		else if (error.name === 'NotReadableError')
+			messageReponse.textContent = 'Camera occupee ou indisponible!';
+		else 
+			messageReponse.textContent = 'Impossible de demarrer la cammera.Reessaie!';
+
+		updateButtonCapture();
+	} finally 
+	{
+		if (request === cameraRequest)
+			cameraButton.disabled = false;
 	}
 
 });
