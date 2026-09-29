@@ -56,6 +56,9 @@ services:
       - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
       - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
 
+    command: ["mariadbd", "--innodb-linux-aio=aio"]
+
+
 volumes:
   db_data:
     driver: local
