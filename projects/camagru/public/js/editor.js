@@ -1,6 +1,7 @@
-const overlays = document.querySelectorAll('.overlay');
+const overlays = document.querySelectorAll('.overlay[data-overlay]');
+const noStickerButton = document.querySelector('#no-sticker-button');
 const captureButton = document.querySelector('#capture-button');
-const displayImg = document.querySelector('#preview-overlay');
+const previewOverlays = document.querySelector('#preview-overlays');
 const imageLoaded = document.querySelector('#image-load');//Element with image loaded
 const previewImg = document.querySelector('#preview-image'); //Element where we display image-load
 const previewText = document.querySelector('#preview-text');
@@ -11,7 +12,8 @@ const cameraButton = document.querySelector('#button-camera');
 const preview = document.querySelector('#preview');
 const tokenCsrf = document.getElementById('csrf-token').value;
 
-let selectedOverlay = null;
+let selectedOverlays = [];
+let noStickerSelect = false;
 let imageUrl = null;
 let cameraStream = null;
 let cameraRequest = 0;
@@ -66,17 +68,26 @@ function stopCamera()
 
 function updateOverlayDisplay()
 {
-	if (!selectedOverlay)
-		return;
-
-	const params = overlayParam[selectedOverlay];
+	while (previewOverlays.firstChild)
+		previewOverlays.removeChild(previewOverlays.firstChild);
 
 	const scale = preview.clientWidth / 600;
 
-	displayImg.style.left = `${params.x * scale}px`;
-	displayImg.style.top = `${params.y * scale}px`;
-	displayImg.style.width = `${params.width * scale}px`;
-	displayImg.style.height = `${params.height * scale}px`;
+	selectedOverlays.forEach((overlayName) => {
+		const params = overlayParam[overlayName];
+
+		const img = document.createElement('img');
+		img.src = `/asset/image-def/${overlayName}`;
+		img.alt = "Overlay";
+		img.classList.add('preview-sticker');
+
+		img.style.left = `${params.x * scale}px`;
+		img.style.top = `${params.y * scale}px`;
+		img.style.width = `${params.width * scale}px`;
+		img.style.height = `${params.height * scale}px`;
+
+		previewOverlays.appendChild(img);
+	});
 }
 
 function updateButtonCapture() 

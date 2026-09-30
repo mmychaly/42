@@ -41,7 +41,8 @@ $userImages = $stmt->fetchAll();
 				<video id="camera" autoplay muted playsinline hidden></video>
 
 				<img id = "preview-image" src="" alt="Image chargée" hidden>
-				<img id = "preview-overlay" src="" alt="Overlay ajouté" hidden>
+				<div id="preview-overlays"></div>
+				<!-- <img id = "preview-overlay" src="" alt="Overlay ajouté" hidden> -->
 			</div>
 			<button type="button" id="button-camera">Prendre la photo avec camera</button>
 
@@ -51,6 +52,9 @@ $userImages = $stmt->fetchAll();
 			<!-- overlay -->
 			<div id="overlay-list">
 				<h2>Choisissez un overlay</h2>
+				<button type="button" class="overlay" id="no-sticker-button">
+					Sans sticker	
+				</button>
 				<button type="button" class="overlay" data-overlay="cat.png">
 					<img src="/asset/image-def/cat.png" width="100" height="100">		
 				</button>
