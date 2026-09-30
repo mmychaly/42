@@ -6,8 +6,7 @@ $stmt = $pdo->prepare(
 	'SELECT id, filename, created_at
 	FROM images
 	WHERE user_id = ?
-	ORDER BY created_at  DESC
-	LIMIT 5'
+	ORDER BY created_at  DESC'
 );
 
 $stmt->execute([$_SESSION['user_id']]);
@@ -77,7 +76,7 @@ $userImages = $stmt->fetchAll();
 		</section>
 
 		<aside>
-			<h2>Dernières photos crées</h2>
+			<h2>Mes photos</h2>
 
 			<div id="user-images">
 				<?php if (empty($userImages)): ?>

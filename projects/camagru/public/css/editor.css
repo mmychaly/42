@@ -49,10 +49,36 @@
 	min-width: 0;
 }
 
+#user-images{
+	max-height: min(650px, 65vh);
+	overflow-y: auto;
+}
+
 @media (max-width: 768px) {
 	.editor-layout {
 		grid-template-columns: 1fr;
 	}
+
+	#user-images {
+		display: flex;
+		gap: 12px;
+		width: 100%;
+		max-width: 100%;
+		box-sizing: border-box;
+		overflow-x: auto;
+		overflow-y: hidden;
+		padding-bottom: 8px;
+	}
+
+	.user-image {
+		flex: 0 0 150px;
+	}
+
+	.user-image img {
+		width: 100%;
+		height: auto;
+	}
+
 }
 
 .editor-layout > h1 {
@@ -69,3 +95,6 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
+
+
+

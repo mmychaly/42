@@ -277,11 +277,6 @@ captureButton.addEventListener('click', async () => {
 
 			const container = createUserImage(data.imageId, data.imageUrl);
 			userImages.prepend(container);
-
-			const totalImgs = userImages.querySelectorAll('.user-image');
-
-			if (totalImgs.length > 5)
-				totalImgs[totalImgs.length - 1].remove();
 		}
 	}
 	catch{
@@ -321,12 +316,6 @@ userImages.addEventListener('click', async (event) => {
 		if (data.success)
 		{
 			parentDiv.remove();//On retire div avec l'image et bouton
-
-			if (data.displayImage)//Puis si dans db nous avons + que 4 images on va afficher 5eme 
-			{
-				const container = createUserImage(data.displayImage.id, data.displayImage.imageUrl);
-				userImages.append(container);
-			}
 
 			if (userImages.querySelectorAll('.user-image').length === 0)//Si on a supprimé tout les images on affiche que il n'a plus de images
 			{
