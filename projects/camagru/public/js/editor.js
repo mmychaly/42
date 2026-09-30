@@ -1,6 +1,7 @@
-const overlays = document.querySelectorAll('.overlay');
+const overlays = document.querySelectorAll('.overlay[data-overlay]');
+const noStickerButton = document.querySelector('#no-sticker-button');
 const captureButton = document.querySelector('#capture-button');
-const displayImg = document.querySelector('#preview-overlay');
+const previewOverlays = document.querySelector('#preview-overlays');
 const imageLoaded = document.querySelector('#image-load');//Element with image loaded
 const previewImg = document.querySelector('#preview-image'); //Element where we display image-load
 const previewText = document.querySelector('#preview-text');
@@ -11,7 +12,9 @@ const cameraButton = document.querySelector('#button-camera');
 const preview = document.querySelector('#preview');
 const tokenCsrf = document.getElementById('csrf-token').value;
 
-let selectedOverlay = null;
+let selectedOverlays = [];
+let noStickerSelect = false;
+
 let imageUrl = null;
 let cameraStream = null;
 let cameraRequest = 0;
@@ -72,25 +75,34 @@ window.addEventListener('pagehide', () => {
 
 function updateOverlayDisplay()
 {
-	if (!selectedOverlay)
-		return;
-
-	const params = overlayParam[selectedOverlay];
+	while (previewOverlays.firstChild)
+		previewOverlays.removeChild(previewOverlays.firstChild);
 
 	const scale = preview.clientWidth / 600;
 
-	displayImg.style.left = `${params.x * scale}px`;
-	displayImg.style.top = `${params.y * scale}px`;
-	displayImg.style.width = `${params.width * scale}px`;
-	displayImg.style.height = `${params.height * scale}px`;
+	selectedOverlays.forEach((overlayName) => {
+		const params = overlayParam[overlayName];
+
+		const img = document.createElement('img');
+		img.src = `/asset/image-def/${overlayName}`;
+		img.alt = "Overlay";
+		img.classList.add('preview-sticker');
+
+		img.style.left = `${params.x * scale}px`;
+		img.style.top = `${params.y * scale}px`;
+		img.style.width = `${params.width * scale}px`;
+		img.style.height = `${params.height * scale}px`;
+
+		previewOverlays.appendChild(img);
+	});
 }
 
 function updateButtonCapture() 
 {
 	const hasSource = isSource !== null;
-	const hasOverlay = selectedOverlay !== null;
+	const isOverlayChoice = noStickerSelect || selectedOverlays.length > 0;
 
-	captureButton.disabled = !(hasSource && hasOverlay)
+	captureButton.disabled = !(hasSource && isOverlayChoice)
 }
 
 function createUserImage(imageId, imageUrl)
@@ -148,36 +160,50 @@ window.addEventListener('resize', updateOverlayDisplay);
 overlays.forEach((overlay) => {
 	overlay.addEventListener('click', () => {
 
+		const overlayName = overlay.dataset.overlay;
+
 		if (overlay.classList.contains('selected')) //Si on click sur le botton deja selected on pourra désélectionné
 		{
 			overlay.classList.remove('selected');//on retire le class
-			selectedOverlay = null;
 
-			displayImg.src = "";
-			displayImg.hidden = true;
-
-			updateButtonCapture();
-
-			return;
+			selectedOverlays = selectedOverlays.filter((item) => item !== overlayName);
 		}
-		//pour sélectionner un overlay
-		overlays.forEach((item) => {
-			item.classList.remove('selected'); // on retire tout les class selected d'autres overlay
-		});
-		overlay.classList.add('selected');//on ajoute le class dans overlay sélectionné
-		selectedOverlay = overlay.dataset.overlay;//On prends le nom de fichier		
-		displayImg.src = `/asset/image-def/${selectedOverlay}`;//Add path of img in html element
-		displayImg.hidden = false; //Toggle hidden
+		else
+		{
+			overlay.classList.add('selected');
+			selectedOverlays.push(overlayName);
+
+			noStickerSelect = false;
+			noStickerButton.classList.remove('selected');
+		}
+
 		updateOverlayDisplay();
-		previewText.hidden = true;
 		updateButtonCapture();
 	});
 });
 
+noStickerButton.addEventListener('click', () => {
+	noStickerSelect = !noStickerSelect;
+
+	if (noStickerSelect)
+	{
+		noStickerButton.classList.add('selected');
+
+		selectedOverlays = [];
+
+		overlays.forEach((overlay) => {
+			overlay.classList.remove('selected');
+		});
+	}
+	else
+		noStickerButton.classList.remove('selected');
+
+	updateOverlayDisplay();
+	updateButtonCapture();
+});
+
+
 //Add image from computer in div preview
-
-
-
 imageLoaded.addEventListener('change', () => {
 	const file = imageLoaded.files[0];
 
@@ -206,7 +232,7 @@ imageLoaded.addEventListener('change', () => {
 captureButton.addEventListener('click', async () => {
 	let file = null;
 
-	if (!selectedOverlay)
+	if (!noStickerSelect && selectedOverlays.length === 0)
 		return;
 
 	//const file = imageLoaded.files[0];
@@ -248,6 +274,11 @@ captureButton.addEventListener('click', async () => {
 
 
 	const formData = new FormData();
+	
+
+
+
+
 	const param = overlayParam[selectedOverlay];
 
 	formData.append('image', file);
@@ -283,11 +314,6 @@ captureButton.addEventListener('click', async () => {
 
 			const container = createUserImage(data.imageId, data.imageUrl);
 			userImages.prepend(container);
-
-			const totalImgs = userImages.querySelectorAll('.user-image');
-
-			if (totalImgs.length > 5)
-				totalImgs[totalImgs.length - 1].remove();
 		}
 	}
 	catch{
@@ -327,12 +353,6 @@ userImages.addEventListener('click', async (event) => {
 		if (data.success)
 		{
 			parentDiv.remove();//On retire div avec l'image et bouton
-
-			if (data.displayImage)//Puis si dans db nous avons + que 4 images on va afficher 5eme 
-			{
-				const container = createUserImage(data.displayImage.id, data.displayImage.imageUrl);
-				userImages.append(container);
-			}
 
 			if (userImages.querySelectorAll('.user-image').length === 0)//Si on a supprimé tout les images on affiche que il n'a plus de images
 			{

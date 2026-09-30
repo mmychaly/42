@@ -6,8 +6,7 @@ $stmt = $pdo->prepare(
 	'SELECT id, filename, created_at
 	FROM images
 	WHERE user_id = ?
-	ORDER BY created_at  DESC
-	LIMIT 5'
+	ORDER BY created_at  DESC'
 );
 
 $stmt->execute([$_SESSION['user_id']]);
@@ -42,7 +41,8 @@ $userImages = $stmt->fetchAll();
 				<video id="camera" autoplay muted playsinline hidden></video>
 
 				<img id = "preview-image" src="" alt="Image chargée" hidden>
-				<img id = "preview-overlay" src="" alt="Overlay ajouté" hidden>
+				<div id="preview-overlays"></div>
+				<!-- <img id = "preview-overlay" src="" alt="Overlay ajouté" hidden> -->
 			</div>
 			<button type="button" id="button-camera">Prendre la photo avec camera</button>
 
@@ -52,6 +52,9 @@ $userImages = $stmt->fetchAll();
 			<!-- overlay -->
 			<div id="overlay-list">
 				<h2>Choisissez un overlay</h2>
+				<button type="button" class="overlay" id="no-sticker-button">
+					Sans sticker	
+				</button>
 				<button type="button" class="overlay" data-overlay="cat.png">
 					<img src="/asset/image-def/cat.png" width="100" height="100">		
 				</button>
@@ -77,7 +80,7 @@ $userImages = $stmt->fetchAll();
 		</section>
 
 		<aside>
-			<h2>Dernières photos crées</h2>
+			<h2>Mes photos</h2>
 
 			<div id="user-images">
 				<?php if (empty($userImages)): ?>
