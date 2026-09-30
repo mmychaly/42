@@ -173,7 +173,7 @@ try {
 							<button type="button" class='like-button' data-image-id="<?= (int) $image['id'] ?>">
 								<?= $hasLiked ? 'Retirer le like' : 'Like' ?>
 							</button>
-							<span class="error-massage" hidden></span>
+							<span class="cd " hidden></span>
 						<?php endif; ?>
 						<div class= "comments">
 							<h3>Commentaires</h3>
