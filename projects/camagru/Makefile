@@ -19,6 +19,7 @@ clean:
 
 fclean:
 	docker compose down -v --remove-orphans
+	docker system prune -a --force
 
 re: down up
 
