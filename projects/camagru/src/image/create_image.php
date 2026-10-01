@@ -7,22 +7,11 @@ header('Content-Type: application/json');
 if ( !isset(
 		$_FILES['image']['error'],
 		$_FILES['image']['size'],
-		$_FILES['image']['tmp_name'],
-		$_POST['overlay'],
-		$_POST['x'],
-		$_POST['y'],
-		$_POST['width'],
-		$_POST['height']
-
+		$_FILES['image']['tmp_name']
     ) ||
 	!is_int($_FILES['image']['error']) ||
 	!is_int($_FILES['image']['size']) ||
-	!is_string($_FILES['image']['tmp_name']) ||
-	!is_string($_POST['overlay']) ||
-	!is_string($_POST['x']) ||
-	!is_string($_POST['y']) ||
-	!is_string($_POST['width']) ||
-	!is_string($_POST['height'])
+	!is_string($_FILES['image']['tmp_name'])
 	)
 {
 	echo json_encode([
@@ -33,48 +22,31 @@ if ( !isset(
 }
 
 $file = $_FILES['image'];
-$overlay = $_POST['overlay'];
-$x = $_POST['x'];
-$y = $_POST['y'];
-$width = $_POST['width'];
-$height = $_POST['height'];
+$noOverlay = ($_POST['no_sticker'] ?? '0') === '1';
+$overlays = $_POST['overlays'] ?? [];
 
-//Verification de parametres overlay
-//Verifier est ce que on a reçu que les chiffres
-if (
-	filter_var($x, FILTER_VALIDATE_INT) === false ||
-	filter_var($y, FILTER_VALIDATE_INT) === false ||
-	filter_var($width, FILTER_VALIDATE_INT) === false ||
-	filter_var($height, FILTER_VALIDATE_INT) === false
-)
+if(!is_array($overlays))
 {
 	echo json_encode([
 		'success' => false,
-		'message' => 'Parametres de overlay invalides.'
+		'message' => 'Liste de overlay invalide.'
+	]);
+	exit;
+}
+if ($noOverlay && !empty($overlays))
+{
+	echo json_encode([
+		'success' => false,
+		'message' => 'Choix de overlay invalide.'
 	]);
 	exit;
 }
 
-//Convertir de string vers int
-$x = (int) $x;
-$y = (int) $y;
-$width = (int) $width;
-$height = (int) $height;
-
-
-//Verifier les domensions
-if (
-	$x < 0 ||
-	$y < 0 ||
-	$width <= 0 ||
-	$height <= 0 ||
-	$x + $width > 600 ||
-	$y + $height > 450
-)
+if (!$noOverlay && empty($overlays))
 {
 	echo json_encode([
 		'success' => false,
-		'message' => 'Position ou taille de overlay invalide.'
+		'message' => 'Aucun overlay choisis.'
 	]);
 	exit;
 }
@@ -164,6 +136,40 @@ if ($imageSourceDg === false)
 	exit;	
 }
 
+
+$overlayParam = [
+	'cat.png' => [
+		'x' => 150,
+		'y' => 300,
+		'width' => 200,
+		'height' => 150
+	],
+	'glasses.png' => [
+		'x' => 200,
+		'y' => 170,
+		'width' => 200,
+		'height' => 120
+	],
+	'frame.png' => [
+		'x' => 0,
+		'y' => 0,
+		'width' => 600,
+		'height' => 450
+	],
+	'stars.png' => [
+		'x' => 0,
+		'y' => 0,
+		'width' => 600,
+		'height' => 450
+	],
+	'celebration.png' => [
+		'x' => 0,
+		'y' => 0,
+		'width' => 600,
+		'height' => 450
+	]
+];
+
 //Créer une image vide, dans laquelle on va fusionner image transformé avec overlay
 
 $finalWidth = 600;
@@ -210,72 +216,73 @@ if (!imagecopyresampled($finalImage, $imageSourceDg, 0, 0, $sourceX, $sourceY, $
 	exit;	
 } 
 
-
-//Verification de overlay , est ce que ils sont notres ou non
-$overlayAllowed = [
-	'cat.png',
-	'glasses.png',
-	'frame.png',
-	'stars.png',
-	'celebration.png'
-];
-
-if (!in_array($overlay, $overlayAllowed, true))
+foreach ($overlays as $overlay)
 {
-	echo json_encode([
-		'success' => false,
-		'message' => 'Overaly non autorisé!'
-	]);
-	exit;	
-}
+	if (!is_string($overlay) || !isset($overlayParam[$overlay]))
+	{
+		echo json_encode([
+			'success' => false,
+			'message' => 'Overlay non valide!'
+		]);
+		exit;	
+	}
 
-//Overaly
-$overlayPath = __DIR__  . '/../../public/asset/image-def/'. $overlay;
-$overlayImage = @imagecreatefrompng($overlayPath);
-if ($overlayImage === false)
-{
-	echo json_encode([
-		'success' => false,
-		'message' => 'Imposible de charger l\'overlay!'
-	]);
-	exit;	
-}
+	$params = $overlayParam[$overlay];
 
-$overlayFinal = imagecreatetruecolor($width, $height);
-if ($overlayFinal === false)
-{
-	echo json_encode([
-		'success' => false,
-		'message' => 'Impossible de créer l\'overlay final!'
-	]);
-	exit;		
-}
+	$x = $params['x'];
+	$y= $params['y'];
+	$width = $params['width'];
+	$height = $params['height'];
 
-imagealphablending($overlayFinal, false);
-imagesavealpha($overlayFinal, true);
+	$overlayPath = __DIR__  . '/../../public/asset/image-def/'. $overlay;
+	$overlayImage = @imagecreatefrompng($overlayPath);
+	
+	if ($overlayImage === false)
+	{
+		echo json_encode([
+			'success' => false,
+			'message' => 'Imposible de charger l\'overlay!'
+		]);
+		exit;	
+	}	
 
-$overlayWidth = imagesx($overlayImage);
-$overlayHeight = imagesy($overlayImage);
+	$overlayFinal = imagecreatetruecolor($width, $height);
+	if ($overlayFinal === false)
+	{
+		echo json_encode([
+			'success' => false,
+			'message' => 'Impossible de créer l\'overlay final!'
+		]);
+		exit;		
+	}
 
-if (!imagecopyresampled($overlayFinal, $overlayImage, 0, 0, 0, 0, $width, $height, $overlayWidth, $overlayHeight))
-{
-	echo json_encode([
-		'success' => false,
-		'message' => 'Impossible de  redimesionner l\'overlay !'
-	]);
-	exit;	
-} 
+	imagealphablending($overlayFinal, false);
+	imagesavealpha($overlayFinal, true);
 
-//Copier l'overlay dans image final.
-imagealphablending($finalImage, true);
+	$overlayWidth = imagesx($overlayImage);
+	$overlayHeight = imagesy($overlayImage);
 
-if (!imagecopy($finalImage, $overlayFinal, $x, $y, 0, 0, $width, $height))
-{
-	echo json_encode([
-		'success' => false,
-		'message' => 'Impossible d\'ajouter l\'overlay !'
-	]);
-	exit;	
+	if (!imagecopyresampled($overlayFinal, $overlayImage, 0, 0, 0, 0, $width, $height, $overlayWidth, $overlayHeight))
+	{
+		echo json_encode([
+			'success' => false,
+			'message' => 'Impossible de  redimesionner l\'overlay !'
+		]);
+		exit;	
+	} 
+
+	imagealphablending($finalImage, true);
+
+	if (!imagecopy($finalImage, $overlayFinal, $x, $y, 0, 0, $width, $height))
+	{
+		echo json_encode([
+			'success' => false,
+			'message' => 'Impossible d\'ajouter l\'overlay !'
+		]);
+		exit;	
+	}
+	imagedestroy($overlayImage);
+	imagedestroy($overlayFinal);
 }
 
 //Créer vraie l'image
@@ -314,8 +321,6 @@ try {
 
 //liberer le memoire
 imagedestroy($imageSourceDg);
-imagedestroy($overlayImage);
-imagedestroy($overlayFinal);
 imagedestroy($finalImage);
 
 echo json_encode([

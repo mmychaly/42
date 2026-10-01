@@ -275,18 +275,12 @@ captureButton.addEventListener('click', async () => {
 
 	const formData = new FormData();
 	
-
-
-
-
-	const param = overlayParam[selectedOverlay];
-
 	formData.append('image', file);
-	formData.append('overlay', selectedOverlay);
-	formData.append('x', param.x);
-	formData.append('y', param.y);
-	formData.append('width', param.width);
-	formData.append('height', param.height);
+	formData.append('no_sticker', noStickerSelect ? '1' : '0');
+	selectedOverlays.forEach((overlayName) => {
+		formData.append('overlays[]', overlayName);
+	});
+
 	formData.append('csrf_token', tokenCsrf);
 
 	try {
