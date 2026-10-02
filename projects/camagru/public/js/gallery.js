@@ -80,91 +80,90 @@ for (var i = 0; i < cancelCommentButton.length; i++)
 	eventCancelCommentButton(cancelCommentButton[i]);
 }
 
-cancelCommentButton.forEach((button) => {
-	button.addEventListener('click', () => {
 
+//Fonction qui ajoute un event pour le bouton like, ajouter ou retirer
 
-		inputCans.value = "";//on supprime le contenu de input
-		
-		errorMessage.textContent = '';
-		errorMessage.hidden = true;
-		form.hidden = true;//on cache le input de form
-		commentButton.hidden = false;//Bouton pour ajouter commantaire devient visible
-	});
-});
+function eventlikeButton(button)
+{
+	button.addEventListener('click', function () {
+		var article = button.closest('.gallery-image');
+		var errorMessage = article.querySelector('.error-massage');
+		var likeNumber = article.querySelector('.like-number');
 
-likeButton.forEach((button) => {
-	button.addEventListener('click', async () => {
-			
-			var article = button.closest('.gallery-image');
-			var errorMessage = article.querySelector('.error-massage');
-			var likeNumber = article.querySelector('.like-number');
+		var formData = new FormData();
+		var imageId = button.dataset.imageId;
 
-			var formData = new FormData();
-			var imageId = button.dataset.imageId;
-			formData.append('image_id', imageId);
-			formData.append('csrf_token', tokenCsrf);
+		formData.append('image_id', imageId);//On ajoute l'id de image liké
+		formData.append('csrf_token', tokenCsrf);//token de l'utilisateur
 
-			try {
-				button.disabled = true;
+		button.disabled = true;//On desactive pour le momement le bouton de like
 
-				var res = await fetch("/image/like", {
-					method: "POST",
-					body: formData
-				});
-
-				if (!res.ok)
-				{
-					errorMessage.textContent = "Une erreur est survenue!";
-					errorMessage.hidden = false;
-					return;
-				}
-
-			
-				var data = await res.json();
-				
-
-				if (data.success)
-				{
-					likeNumber.textContent = data.likeNumber;
-
-					if (data.like)
-						button.textContent = 'Retirer le like';
-					else
-						button.textContent = 'Like';
-
-					errorMessage.textContent = '';
-					errorMessage.hidden = true;
-				}
-				else
-				{
-					errorMessage.textContent = data.message;
-					errorMessage.hidden = false;
-				}
-
-			} catch 
+		//requete vers le serveur pour ajouter/retirer un like 
+		fetch("/image/like", {
+			method: "POST",
+			body: formData
+		})
+		.then(function (res) {
+			if (!res.ok)//Verification de connexion avec serveur avec affichage de l'erreur
 			{
-				errorMessage.textContent = "Erreur est survenue!";
+				errorMessage.textContent = "Une erreur est survenue!";
+				errorMessage.hidden = false;
+				return null;
+			}
+
+			return res.json();//On recupere la reponse du serveur 
+		})
+		.then(function (data) {
+			if (data === null)//Si la reponse est null on arrete
+				return;
+
+			if (data.success)//Si la reponse est true et il contient les données 
+			{
+				likeNumber.textContent = data.likeNumber;//On definit le nombre final de likes
+
+				if (data.like)//Si user a liké l'image , on donne la possibilité de retirer
+					button.textContent = 'Retirer le like';
+				else//Si il retire le like on donne la possibilité de liker
+					button.textContent = 'Like';
+
+				errorMessage.textContent = '';
+				errorMessage.hidden = true;
+			}
+			else//Si la reponse du serveur est false, on affiche l'erreur
+			{
+				errorMessage.textContent = data.message;
 				errorMessage.hidden = false;
 			}
-			finally{
-				button.disabled = false;
-			}
+		})
+		.catch(function () {
+			errorMessage.textContent = "Erreur est survenue!";
+			errorMessage.hidden = false;
+		})
+		.then(function () {
+			button.disabled = false;//à la fin on réactive le bouton
+		});
 	});
-});
+}
+
+//On ajoute eventlikeButton à chaque bouton du like
+for (var i = 0; i < likeButton.length; i++)
+{
+	eventlikeButton(likeButton[i]);
+}
 
 //Commentaires
-//On insltale event listener pour chaque form. On lance si bouton submit a cliqué
-commentForm.forEach((form) => {
-	form.addEventListener('submit', async (event) => {
-		event.preventDefault();//On 
+//On instale un  event listener pour chaque form. On lance fetch si le bouton submit est cliqué
+
+function eventCommentForm(form)
+{
+	form.addEventListener('submit', function (event) {
+		event.preventDefault();//On arrete fonctionement par default
 
 		var imageId = form.dataset.imageId;
 		var input = form.querySelector('.comment-input');
 		var message = input.value.trim();
-
 		var erroMessage = form.querySelector('.msg-error-comment');
-
+	
 		if (!message)
 		{
 			erroMessage.textContent = 'Le commentaire ne doit pas etre vide!';
@@ -172,68 +171,70 @@ commentForm.forEach((form) => {
 			return;
 		}
 
-			var formData = new FormData();
-			formData.append('image_id', imageId);
-			formData.append('message', message);
-			formData.append('csrf_token', tokenCsrf);
+		var formData = new FormData();
+		formData.append('image_id', imageId);
+		formData.append('message', message);
+		formData.append('csrf_token', tokenCsrf);
 
 		var submitButton = form.querySelector('button[type="submit"]');
-
 		submitButton.disabled = true;//on a besoin de desactive le bouton de submit de formulare pour n'est pas pouvoir envoier plusieurs
 
-			try {
-				var res = await fetch("/image/comment", {
-					method: "POST",
-					body: formData
-				});
-
-				if (!res.ok)
-				{
-					erroMessage.textContent = "Une erreur est survenue!";
-					erroMessage.hidden = false;
-					return;
-				}
-
-			
-				var data = await res.json();
-				
-
-				if (!data.success)
-				{
-					erroMessage.textContent = data.message;
-					erroMessage.hidden = false;
-					return;
-				}
-
-				var parentComment = form.closest('.comments');
-				var comment = createComment(data.comment);
-				var showButton = form.closest('.comments').querySelector('.button-comment');
-
-				parentComment.insertBefore(comment, showButton);
-
-				input.value = "";
-				erroMessage.textContent = '';
-				erroMessage.hidden = true;
-
-				form.hidden = true;
-
-				
-				showButton.hidden = false;
-
-			} catch 
+		//Avec fetch on va envoer la requete vers serveur avec commentaire
+		fetch("/image/comment", {
+			method: "POST",
+			body: formData
+		})
+		.then(function (res) {
+			if (!res.ok)//Verification de connexion avec serveur avec affichage de l'erreur
 			{
-				erroMessage.textContent = "Probleme de serveur!";
+				erroMessage.textContent = "Une erreur est survenue!";
 				erroMessage.hidden = false;
+				return null;
 			}
-			finally
+
+			return res.json();//On recupere la reponse du serveur 
+		})
+		.then(function (data) {
+			if (data === null)//Si la reponse est null on arrete
+				return;
+
+			if (!data.success)//Si la reponse est false on arrete
 			{
-				submitButton.disabled = false; //reactiver a la fin de request
+				erroMessage.textContent = data.message;
+				erroMessage.hidden = false;
+				return;
 			}
+
+			var parentComment = form.closest('.comments');//On trouve le parent de form
+			var comment = createComment(data.comment);//On crée le element avec commentaire
+			var showButton = parentComment.querySelector('.button-comment');//On trouve element devant la quel il faut inserer element div avec commentaire
+
+			parentComment.insertBefore(comment, showButton);//On inser element div dans html , devant bouton
+
+			input.value = "";//On vide input
+				
+			erroMessage.textContent = '';//On vide message d'erreur
+			erroMessage.hidden = true;//On cache ce message
+
+			form.hidden = true;//On cache le chapm d'input
+			showButton.hidden = false;//Le bouton pour laisser commantaire devien visible
+		})
+		.catch(function () {
+			erroMessage.textContent = "Erreur est survenue!";
+			erroMessage.hidden = false;
+		})
+		.then(function () {
+			submitButton.disabled = false;//à la fin on réactive le bouton de envoie de commentaire
+		});
+
 	});
-});
+}
 
-
-
+//On ajoute event listener avec la logique pour chaque form
+for (var i = 0; i < commentForm.length; i++)
+{
+	eventCommentForm(commentForm[i]);
+}
 
 
 /*
