@@ -2,6 +2,7 @@ services:
 
   nginx:
     image: docker.io/library/nginx:alpine
+
     ports:
       - "8080:80"
 # :ro read only , on peux lire mais on peux pas modifier les fichier
@@ -9,10 +10,9 @@ services:
       - ./public:/var/www/html/public:ro
       - uploads_data:/var/www/html/uploads:ro
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - app_logs:/var/log/camagru
     entrypoint: ["/bin/sh", "-c"]
     command: 
-      - 'exec /docker-entrypoint.sh nginx -g "daemon off;" >> /var/log/camagru/nginx.log 2>&1'
+      - 'exec /docker-entrypoint.sh nginx -g "daemon off;" >/dev/null 2>&1'
     depends_on:
       - server-php
     
@@ -21,17 +21,17 @@ services:
     build:
       context: .
       dockerfile: docker/server-php/Dockerfile
-
+      
     volumes:
       - .:/var/www/html
       - uploads_data:/var/www/html/uploads
       - ./docker/server-php/zzz-camagru.conf:/usr/local/etc/php-fpm.d/zzz-camagru.conf:ro
-      - app_logs:/var/log/camagru
     
     command:
       - sh
       - -c
-      - 'exec php-fpm >> /var/log/camagru/php-fpm.log 2>&1'
+      # - 'exec php-fpm'
+      - 'exec php-fpm >/dev/null 2>&1'
     environment:
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
@@ -63,20 +63,16 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
-      - app_logs:/var/log/camagru
 
     entrypoint: ["/bin/sh", "-c"]
     command: 
-      - 'exec /usr/local/bin/docker-entrypoint.sh mariadbd --innodb-linux-aio=aio >> /var/log/camagru/mariadb.log 2>&1'
+      - 'exec /usr/local/bin/docker-entrypoint.sh mariadbd --innodb-linux-aio=aio >/dev/null 2>&1'
 
 
 volumes:
   db_data:
     driver: local
   uploads_data:
-    driver: local
-  app_logs:
     driver: local
       
     

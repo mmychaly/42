@@ -34,6 +34,9 @@ unset($_SESSION['register_errors']);
 					type="text"
 					id="username"
 					name="username"
+					maxlength="50"
+					minlength="3"
+					pattern="[A-Za-z0-9_]{3,50}"
 					required
 				>
 				<p></p>
@@ -50,6 +53,8 @@ unset($_SESSION['register_errors']);
 					type="password"
 					id="password"
 					name="password"
+					minlength="8"
+					pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}"
 					required
 				>
 				<p></p>

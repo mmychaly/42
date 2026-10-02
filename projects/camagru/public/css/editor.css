@@ -105,5 +105,27 @@
 	text-overflow: ellipsis;
 }
 
+#overlay-list .overlay {
+	width: 100px;
+	height: 100px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	vertical-align: top;
+	padding: 2px;
+}
 
+#overlay-list .overlay img {
+	max-width: 100px;
+	max-height: 100px;
+	object-fit: contain;
+}
 
+.upload-img {
+	margin-top: 12px;
+}
+
+.upload-img label{
+	display: block;
+	margin-bottom: 5px;
+}

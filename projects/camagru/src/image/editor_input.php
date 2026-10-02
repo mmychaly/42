@@ -46,9 +46,10 @@ $userImages = $stmt->fetchAll();
 			</div>
 			<button type="button" id="button-camera">Prendre la photo avec camera</button>
 
-			<label for="image-load">Choisir une image :</label>
-			<input type="file" id="image-load" accept="image/png, image/jpeg">
-
+			<div class="upload-img">
+				<label for="image-load">Choisir une image :</label>
+				<input type="file" id="image-load" accept="image/png, image/jpeg">
+			</div>
 			<!-- overlay -->
 			<div id="overlay-list">
 				<h2>Choisissez un overlay</h2>
@@ -73,8 +74,8 @@ $userImages = $stmt->fetchAll();
 			</div>
 
 			<!-- Capture -->
-			<button type="button" id="capture-button" disabled>
-				Cree l'image
+			<button type="button" id="capture-button" style="margin-top: 12px" disabled>
+				Créer l'image
 			</button>
 			<p id="msg-capture"></p>
 		</section>

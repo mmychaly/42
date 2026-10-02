@@ -86,7 +86,11 @@ if ($path === '/verify-email' && $method === 'GET')
 //Layout of request of email
 if ($path === '/password-forgot' && $method === 'GET')
 {
-	
+	if (isUserSession()) {
+		header('Location: /');
+		exit;
+	}
+
 	require __DIR__  . '/../src/user/password_forgot_input.php';
 	exit;
 }
@@ -102,6 +106,11 @@ if ($path === '/password-forgot' && $method === 'POST')
 //Routes pour modification de mot de passe
 if ($path === '/password-reset' && $method === 'GET')
 {
+	if (isUserSession()) {
+		header('Location: /');
+		exit;
+	}
+
 	require __DIR__  . '/../src/user/password_reset_input.php';
 	exit;
 }
