@@ -14,10 +14,30 @@
 
 #preview {
 	position: relative;
-	width: min(100%, 600px);
-	aspect-ratio: 4 / 3;
+	width: 100%;
+	max-width: 600px;
 	overflow: hidden;
 	outline: 1px solid black;
+}
+
+#preview::before {
+	content: "";
+	display: block;
+	padding-top: 75%;
+}
+
+#preview-text {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	width: 100%;
+	margin: 0;
+
+	text-align: center;
+
+	-webkit-transform: translateY(-50%);
+	transform: translateY(-50%);
+	z-index: 3;
 }
 
 #preview-image,
@@ -29,6 +49,7 @@
 	height: 100%;
 	object-fit: cover;
 }
+
 #preview-image {
 	z-index: 1;
 }
@@ -48,52 +69,34 @@
 }
 
 .editor-layout {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) 280px;
-	gap: 24px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
 }
 
-.editor-layout > section,
+.editor-layout > section {
+	flex: 1 1 0;
+	min-width: 0;
+
+	margin-right: 24px;
+}
+
 .editor-layout > aside {
+	flex: 0 0 280px;
 	min-width: 0;
 }
 
 #user-images{
-	max-height: min(650px, 65vh);
+	max-height: 650px;
 	overflow-y: auto;
 }
 
-@media (max-width: 768px) {
-	.editor-layout {
-		grid-template-columns: 1fr;
-	}
-
-	#user-images {
-		display: flex;
-		gap: 12px;
-		width: 100%;
-		max-width: 100%;
-		box-sizing: border-box;
-		overflow-x: auto;
-		overflow-y: hidden;
-		padding-bottom: 8px;
-	}
-
-	.user-image {
-		flex: 0 0 150px;
-	}
-
-	.user-image img {
-		width: 100%;
-		height: auto;
-	}
-
-}
-
 .editor-layout > h1 {
-	grid-column: 1 / -1;
+	flex: 0 0 100%;
+	width: 100%;
+
 	text-align: center;
-	margin: 0;
+	margin: 0 0 24px 0;
 }
 
 #image-load {
@@ -128,4 +131,51 @@
 .upload-img label{
 	display: block;
 	margin-bottom: 5px;
+}
+
+
+@media (max-width: 768px) {
+	.editor-layout {
+		display:block;
+	}
+
+	.editor-layout > h1 {
+		width: 100%;
+		margin-bottom: 24px;
+	}
+
+	.editor-layout > section {
+		margin-right: 0;
+	}
+	
+	.editor-layout > aside {
+		width: 100%;
+		margin-top: 24px;
+	}
+
+	#user-images {
+		display: flex;
+
+		width: 100%;
+		max-width: 100%;
+		max-height: none;
+		box-sizing: border-box;
+		overflow-x: auto;
+		overflow-y: hidden;
+		padding-bottom: 8px;
+	}
+
+	.user-image {
+		flex: 0 0 150px;
+		margin-right: 12px;
+	}
+
+	.user-image:last-child {
+		margin-right: 0;
+	}
+	.user-image img {
+		width: 100%;
+		height: auto;
+	}
+
 }
