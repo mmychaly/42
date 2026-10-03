@@ -1,27 +1,29 @@
-const overlays = document.querySelectorAll('.overlay[data-overlay]');
-const noStickerButton = document.querySelector('#no-sticker-button');
-const captureButton = document.querySelector('#capture-button');
-const previewOverlays = document.querySelector('#preview-overlays');
-const imageLoaded = document.querySelector('#image-load');//Element with image loaded
-const previewImg = document.querySelector('#preview-image'); //Element where we display image-load
-const previewText = document.querySelector('#preview-text');
-const messageReponse = document.querySelector('#msg-capture');
-const userImages = document.querySelector('#user-images');
-const previewCamera = document.querySelector('#camera');
-const cameraButton = document.querySelector('#button-camera');
-const preview = document.querySelector('#preview');
-const tokenCsrf = document.getElementById('csrf-token').value;
 
-let selectedOverlays = [];
-let noStickerSelect = false;
+var overlays = document.querySelectorAll('.overlay[data-overlay]');
+var noStickerButton = document.querySelector('#no-sticker-button');
+var captureButton = document.querySelector('#capture-button');
+var previewOverlays = document.querySelector('#preview-overlays');
+var imageLoaded = document.querySelector('#image-load');//Element with image loaded
+var previewImg = document.querySelector('#preview-image'); //Element where we display image-load
+var previewText = document.querySelector('#preview-text');
+var messageReponse = document.querySelector('#msg-capture');
+var userImages = document.querySelector('#user-images');
+var previewCamera = document.querySelector('#camera');
+var cameraButton = document.querySelector('#button-camera');
+var preview = document.querySelector('#preview');
+var tokenCsrf = document.getElementById('csrf-token').value;
 
-let imageUrl = null;
-let cameraStream = null;
-let cameraRequest = 0;
-let isSource = null;
+var selectedOverlays = [];
+var noStickerSelect = false;
+
+var imageUrl = null;
+var cameraStream = null;
+var cameraRequest = 0;
+var cameraObjectUrl = null;
+var isSource = null;
 //Positionement de overlay
 
-const overlayParam = {
+var overlayParam = {
 	'cat.png': {
 		x: 150,
 		y: 300,
@@ -54,20 +56,88 @@ const overlayParam = {
 	}
 }
 
+function requestUserMedia(data)
+{
+	//Pour les navigateurs recents
+	if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function')
+		return navigator.mediaDevices.getUserMedia(data);
+
+	//Pour les navigateurs anciens
+	var toolGetUserMedia = 
+		navigator.getUserMedia ||
+		navigator.webkitGetUserMedia ||
+		navigator.mozGetUserMedia;
+
+	if (!toolGetUserMedia)
+		return Promise.reject(new Error('GetUserMedia ne fonctionne pas'));
+
+	return new Promise(function (resolve, reject) {
+		toolGetUserMedia.call(navigator, data, resolve, reject);
+	});
+}
+
+function joinCameraStream(stream)
+{
+	if ('srcObject' in previewCamera)
+	{
+		previewCamera.srcObject = stream;
+		return;
+	}
+
+	var urlObject = window.URL ||window.webkitURL;
+	if (urlObject && typeof urlObject.createObjectURL === 'function')
+	{
+		cameraObjectUrl = urlObject.createObjectURL(stream);
+		previewCamera.src = cameraObjectUrl;
+	}
+}
+
+function cameraSource()
+{
+	if ('srcObject' in previewCamera)
+	{
+		previewCamera.srcObject = null;
+		return;
+	}
+
+	if (cameraObjectUrl)
+	{
+		var urlObject = window.URL || window.webkitURL;
+
+		if (urlObject && typeof urlObject.revokeObjectURL === 'function')
+			urlObject.revokeObjectURL(cameraObjectUrl);
+		
+		cameraObjectUrl = null;
+	}
+
+	previewCamera.removeAttribute('src');
+}
+
+function stopStream(stream)
+{
+	if (!stream)
+		return;
+
+	var tracks = stream.getTracks();
+
+	for (var i = 0; i < tracks.length; i++)
+		tracks[i].stop();
+}
+
 function stopCamera()
 {
 	if (cameraStream)
 	{
-		cameraStream.getTracks().forEach(track => track.stop());
+		stopStream(cameraStream);
 		cameraStream = null;
 	}
 
 	previewCamera.pause();
-	previewCamera.srcObject = null;
+	cameraSource();
 	previewCamera.hidden = true;
 }
 
-window.addEventListener('pagehide', () => {
+window.addEventListener('pagehide', function () {
 	cameraRequest++;
 	stopCamera();
 	isSource = null;
@@ -78,60 +148,80 @@ function updateOverlayDisplay()
 	while (previewOverlays.firstChild)
 		previewOverlays.removeChild(previewOverlays.firstChild);
 
-	const scale = preview.clientWidth / 600;
+	var scale = preview.clientWidth / 600;
 
-	selectedOverlays.forEach((overlayName) => {
-		const params = overlayParam[overlayName];
+	for (var i =0; i < selectedOverlays.length; i++)
+	{
+		var overlayName = selectedOverlays[i];
+		var params = overlayParam[overlayName];
 
-		const img = document.createElement('img');
-		img.src = `/asset/image-def/${overlayName}`;
-		img.alt = "Overlay";
+		var img = document.createElement('img');
+		img.src = '/asset/image-def/' + overlayName;
+		img.alt = 'Overlay';
 		img.classList.add('preview-sticker');
 
-		img.style.left = `${params.x * scale}px`;
-		img.style.top = `${params.y * scale}px`;
-		img.style.width = `${params.width * scale}px`;
-		img.style.height = `${params.height * scale}px`;
+		img.style.left = (params.x * scale) + 'px';
+		img.style.top = (params.y * scale) + 'px';
+		img.style.width = (params.width * scale) + 'px';
+		img.style.height = (params.height * scale) + 'px';
 
 		previewOverlays.appendChild(img);
-	});
+	}
 }
 
 function updateButtonCapture() 
 {
-	const hasSource = isSource !== null;
-	const isOverlayChoice = noStickerSelect || selectedOverlays.length > 0;
+	var hasSource = isSource !== null;
+	var isChoseOverlay = noStickerSelect || selectedOverlays.length > 0;
 
-	captureButton.disabled = !(hasSource && isOverlayChoice)
+	captureButton.disabled = !(hasSource && isChoseOverlay);
 }
 
 function createUserImage(imageId, imageUrl)
 {
-	const container = document.createElement('div');
+	var container = document.createElement('div');
+
 	container.classList.add('user-image');
 	container.dataset.imageId = imageId;
 
 	//creation de image
-	const newImg = document.createElement('img');
+	var newImg = document.createElement('img');
+
 	newImg.src = imageUrl;
 	newImg.alt = 'Image crée';
 	newImg.width = 150;
 
 	//Creation de bouton delete
-	const deleteButton = document.createElement('button');
+	var deleteButton = document.createElement('button');
 	deleteButton.type = 'button';
 	deleteButton.classList.add('delete-image');
 	deleteButton.textContent='Supprimer';
 
-	container.append(newImg, deleteButton);
+	container.appendChild(newImg);
+	container.appendChild(deleteButton);
 
 	return container;
+}
+
+function dataUrlBlob(dataUrl)
+{
+	var part = dataUrl.split(',');
+	var binary = atob(part[1]);
+	var len = binary.length;
+	var bytes = new Uint8Array(len);
+
+	for (var i = 0; i < len; i++)
+		bytes[i] = binary.charCodeAt(i);
+
+	return new Blob(
+		[bytes],
+		{ type: 'image/png'}
+	);
 }
 
 function captureImage()
 {
 	if (!cameraStream || 
-		cameraStream.getVideoTracks().every(track => track.readyState !== 'live') ||
 		previewCamera.readyState < 2 ||
 		previewCamera.videoWidth === 0 ||
 		previewCamera.videoHeight === 0)
@@ -139,34 +229,82 @@ function captureImage()
 		return Promise.resolve(null);
 	}
 
-	const canvas = document.createElement('canvas');
+	var videoTrack = cameraStream.getVideoTracks();
+	var isLiveTrack = false;
+
+	for (var i = 0; i < videoTrack.length; i++)
+	{
+		if (videoTrack[i].readyState === 'live')
+		{
+			isLiveTrack = true;
+			break;
+		}
+	}
+
+	if (!isLiveTrack)
+		return Promise.resolve(null);
+
+	var canvas = document.createElement('canvas');
 
 	canvas.width = 600;
 	canvas.height = 450;
 
-	const context = canvas.getContext('2d');
+	var context = canvas.getContext('2d');
 
-	context.drawImage(previewCamera, 0,0,600,450);
+	if (!context)
+		return Promise.resolve(null);
 
-	return new Promise((resolve) => {
-		canvas.toBlob((blob) => {
-			resolve(blob); 
-		}, 'image/png');
+	try {
+		context.drawImage(previewCamera, 0, 0, 600, 450);
+	} catch (error)
+	{
+		return Promise.resolve(null);
+	}
+
+	return new Promise(function (resolve)  {
+		
+		//Methode pour les navigateurs récents
+		if (typeof canvas.toBlob === 'function')
+		{
+			canvas.toBlob(function (blob) {
+				resolve(blob); 
+			}, 'image/png');
+
+			return;
+		}
+
+		//Pour les navigateurs anciens
+		try {
+			var dataUrl = canvas.toDataURL('image/png');
+			resolve(dataUrlBlob(dataUrl));
+		}
+		catch (error)
+		{
+			resolve(null);
+		}
 	});
 }
 
 window.addEventListener('resize', updateOverlayDisplay);
 
-overlays.forEach((overlay) => {
-	overlay.addEventListener('click', () => {
-
-		const overlayName = overlay.dataset.overlay;
+function eventOverlay(overlay)
+{
+	overlay.addEventListener('click', function () {
+		
+		var overlayName = overlay.dataset.overlay;
 
 		if (overlay.classList.contains('selected')) //Si on click sur le botton deja selected on pourra désélectionné
 		{
 			overlay.classList.remove('selected');//on retire le class
 
-			selectedOverlays = selectedOverlays.filter((item) => item !== overlayName);
+			for (var i = 0; i < selectedOverlays.length; i++)
+			{
+				if (selectedOverlays[i] === overlayName)
+				{
+					selectedOverlays.splice(i, 1);
+					break;
+				}
+			}
 		}
 		else
 		{
@@ -180,9 +318,12 @@ overlays.forEach((overlay) => {
 		updateOverlayDisplay();
 		updateButtonCapture();
 	});
-});
+}
 
-noStickerButton.addEventListener('click', () => {
+for (var i = 0; i < overlays.length; i++)
+	eventOverlay(overlays[i]);
+
+noStickerButton.addEventListener('click', function () {
 	noStickerSelect = !noStickerSelect;
 
 	if (noStickerSelect)
@@ -191,9 +332,8 @@ noStickerButton.addEventListener('click', () => {
 
 		selectedOverlays = [];
 
-		overlays.forEach((overlay) => {
-			overlay.classList.remove('selected');
-		});
+		for (var i = 0; i < overlays.length; i++)
+			overlays[i].classList.remove('selected');
 	}
 	else
 		noStickerButton.classList.remove('selected');
@@ -204,8 +344,9 @@ noStickerButton.addEventListener('click', () => {
 
 
 //Add image from computer in div preview
-imageLoaded.addEventListener('change', () => {
-	const file = imageLoaded.files[0];
+imageLoaded.addEventListener('change', function () {
+	var file = imageLoaded.files[0];
+	var urlObject = window.URL || window.webkitURL;
 
 	if (!file)
 		return;
@@ -217,11 +358,15 @@ imageLoaded.addEventListener('change', () => {
 	isSource = 'upload';
 
 
-	if (imageUrl)
-		URL.revokeObjectURL(imageUrl);
+	if (imageUrl && urlObject && typeof urlObject.revokeObjectURL === 'function')
+		urlObject.revokeObjectURL(imageUrl);
 
-	imageUrl = URL.createObjectURL(file);
-	previewImg.src = imageUrl;
+	if (urlObject && typeof urlObject.createObjectURL === 'function')
+	{
+		imageUrl = urlObject.createObjectURL(file);
+		previewImg.src = imageUrl;
+	}
+
 	previewImg.hidden = false;
 	previewText.hidden = true;
 
@@ -229,42 +374,12 @@ imageLoaded.addEventListener('change', () => {
 
 });
 
-captureButton.addEventListener('click', async () => {
-	let file = null;
-
-	if (!noStickerSelect && selectedOverlays.length === 0)
+function sendImage(file)
+{
+	if (!file)
 		return;
 
-	//const file = imageLoaded.files[0];
-
-	if (isSource === "upload")
-	{
-		file = imageLoaded.files[0];
-
-		if (!file)
-			return;
-	}
-	else if (isSource === "camera")
-	{
-		if (previewCamera.readyState < 2)
-		{
-			messageReponse.textContent = "Caméra se prépare, réessayez plutard!"
-			return;
-		}
-
-		file = await captureImage();
-
-		if (!file)
-		{
-			messageReponse.textContent = "Imposible de prendre la photo."
-			return;
-		}
-	}
-	else 
-		return;
-
-
-	const maxSize = 5 * 1024 * 1024;
+	var maxSize = 5 * 1024 * 1024;
 
 	if (file.size > maxSize)
 	{
@@ -272,101 +387,219 @@ captureButton.addEventListener('click', async () => {
 		return;
 	}
 
-
-	const formData = new FormData();
+	var formData = new FormData();
 	
 	formData.append('image', file);
 	formData.append('no_sticker', noStickerSelect ? '1' : '0');
-	selectedOverlays.forEach((overlayName) => {
-		formData.append('overlays[]', overlayName);
-	});
+
+	for (var i = 0; i < selectedOverlays.length; i++)
+	{
+		formData.append(
+			'overlays[]',
+			selectedOverlays[i]
+		);
+	}
 
 	formData.append('csrf_token', tokenCsrf);
 
-	try {
-		const res = await fetch('/image/create', {
+	fetch('/image/create', {
 			method: 'POST',
 			body: formData
-		});
-
+	})
+	.then(function (res) {
+		
 		if (!res.ok)
 		{
-			messageReponse.textContent = 'Erreur pendant l\'envoi de l\'image';
-			return;
+			messageReponse.textContent = "Erreur pendant l'envoi de l'image";
+			return null;
 		}
 
-		const data = await res.json();
+		return res.json();
+	})
+	.then(function (data) {
+
+		if (data == null)
+			return;
 		
 		messageReponse.textContent = data.message;
 
-		if (data.success)
-		{
-			const noImgMessage = document.querySelector('#no-img-message');
+		if (!data.success)
+			return;
+
+		var noImgMessage = document.querySelector('#no-img-message');
 			
-			if (noImgMessage)
-				noImgMessage.remove();
+		if (noImgMessage && noImgMessage.parentNode)
+				noImgMessage.parentNode.removeChild(noImgMessage);
 
-			const container = createUserImage(data.imageId, data.imageUrl);
-			userImages.prepend(container);
-		}
-	}
-	catch{
+		var container = createUserImage(data.imageId, data.imageUrl);
+
+		if (userImages.firstChild)
+			userImages.insertBefore(container, userImages.firstChild);
+		else
+			userImages.appendChild(container);
+
+		
+	})
+	.catch(function () {
 		messageReponse.textContent = 'Serveur ne reponde pas!';
+	});
+}
+
+captureButton.addEventListener('click', function () {
+
+	if (!noStickerSelect && selectedOverlays.length === 0)
+		return;
+
+	if (isSource === "upload")
+	{
+		var file = imageLoaded.files[0];
+
+		if (!file)
+			return;
+
+		sendImage(file);
+		return;
 	}
 
+	if (isSource === "camera")
+	{
+		if (previewCamera.readyState < 2)
+		{
+			messageReponse.textContent = "Caméra se prépare, réessayez plutard!";
+			return;
+		}
+
+		captureImage()
+		.then(function (file) {
+			if (!file)
+			{
+				messageReponse.textContent = "Imposible de prendre la photo.";
+				return;
+			}
+			sendImage(file);
+		})
+		.catch(function () {
+			messageReponse.textContent = "Imposible de prendre la photo.";
+		});
+	}
 });
 
 //Si user click sur le bouton supprimer
-userImages.addEventListener('click', async (event) => {
+userImages.addEventListener('click', function (event) {
+
 	if (!event.target.classList.contains('delete-image'))
 		return;
 	
-	const parentDiv = event.target.closest('.user-image');//On trouver le parent de bouton, dans ce parent nous avons id de l'image
-	const imageId = parentDiv.dataset.imageId;
+	var parentDiv = event.target.closest('.user-image');//On trouver le parent de bouton, dans ce parent nous avons id de l'image
+	if (!parentDiv)
+		return;
 
-	const formData = new FormData();//On ajout information sur id de l'image 
+	var imageId = parentDiv.dataset.imageId;
+
+	var formData = new FormData();//On ajout information sur id de l'image 
 	formData.append('image_id', imageId);
 	formData.append('csrf_token', tokenCsrf);
 
 	//On fait request pour supprimer l'image 
-	try{
-		const res = await fetch("/image/delete", {
-			method: "POST",
-			body: formData
-		});
-
+	fetch("/image/delete", {
+		method: "POST",
+		body: formData
+	})
+	.then(function (res) {
 		if (!res.ok)
 		{
 			messageReponse.textContent = "Erreur de suppression."
-			return;
+			return null;
 		}
 
-		const data = await res.json();
+		return res.json();
+	})
+	.then(function (data) {
+		if (data === null)
+			return;
+
 		messageReponse.textContent = data.message;//On afficher le message
 
-		if (data.success)
+		if (!data.success)
+			return;
+
+		if (parentDiv.parentNode)
+			parentDiv.parentNode.removeChild(parentDiv);//On retire div avec l'image et bouton
+	
+		if (userImages.querySelectorAll('.user-image').length === 0)//Si on a supprimé tout les images on affiche que il n'a plus de images
 		{
-			parentDiv.remove();//On retire div avec l'image et bouton
-
-			if (userImages.querySelectorAll('.user-image').length === 0)//Si on a supprimé tout les images on affiche que il n'a plus de images
-			{
-				const message = document.createElement('p');
-				message.id = 'no-img-message';
-				message.textContent = 'Aucune image.';
-				userImages.append(message);
-			}
+			var message = document.createElement('p');
+			message.id = 'no-img-message';
+			message.textContent = 'Aucune image.';
+			userImages.appendChild(message);
 		}
-	}catch {
+	})
+	.catch (function () {
 		messageReponse.textContent = 'Serveur ne répond pas!';
-	}
-
+	});
 });
+
+function waitCamera(request)
+{
+	return new Promise(function (resolve, reject) {
+		var startTime = Date.now();
+
+		function checkCamera()
+		{
+			if (request !== cameraRequest)
+			{
+				resolve(false);
+				return;
+			}
+
+			if (previewCamera.readyState >= 2 &&
+				previewCamera.videoWidth > 0 &&
+				previewCamera.videoHeight > 0)
+			{
+				resolve(true);
+				return;
+			}
+
+			if (Date.now() - startTime >= 8000)
+			{
+				reject(new Error('CameraTimeout'));
+				return;
+			}
+
+			setTimeout(checkCamera, 100);
+		}
+
+		checkCamera();
+	});
+}
+
+function addTrackEnded(track, request)
+{
+	track.addEventListener('ended', function () {
+		if (request !== cameraRequest)
+			return;
+
+		cameraRequest++;
+
+		stopCamera();
+
+		isSource = null;
+
+		previewText.textContent = "Caméra déconnectée";
+		previewText.hidden = false;
+
+		updateButtonCapture();
+
+		cameraButton.disabled = false;
+	});
+}
 
 
 //Fonctionement de camera
-cameraButton.addEventListener('click', async () => {
+cameraButton.addEventListener('click', function () {
 	
-	const request = ++cameraRequest;
+	var request = ++cameraRequest;
+
 	cameraButton.disabled = true;
 
 	stopCamera();
@@ -378,52 +611,48 @@ cameraButton.addEventListener('click', async () => {
 	previewText.textContent = 'Demarrage de camera...';
 	previewText.hidden = false;
 
-	let stream = null;
-
-	try{
-
-		stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
-
+	requestUserMedia({
+		video: true,
+		audio: false
+	})
+	.then(function (stream) {
 		if (request !== cameraRequest)
 		{
-			stream.getTracks().forEach(track => track.stop());
-			return;
+			stopStream(stream);
+			return null;
 		}
 
-
-
 		cameraStream = stream;
-		stream.getVideoTracks().forEach(track => {
-			track.addEventListener('ended', () => {
-				if (request !== cameraRequest)
-					return;
+		var tracks = stream.getVideoTracks();
+		for (var i = 0; i < tracks.length; i++)
+			addTrackEnded(tracks[i], request);
 
-				cameraRequest++;
-				stopCamera();
-				isSource = null;
+		joinCameraStream(stream);
 
-				previewText.textContent = 'Camera deconnecte';
-				previewText.hidden = false;
-
-				updateButtonCapture();
-				cameraButton.disabled = false;
-			});
-		});
-		previewCamera.srcObject = stream;
 		previewCamera.hidden = false;
 
-		await Promise.race([
-			previewCamera.play(),
-			new Promise((_, reject) => {
-				setTimeout(() => reject(new Error('CameraTimeout')), 8000);
-			})
-		]);
+		try
+		{
+			var resPlay = previewCamera.play();
+
+			if (resPlay && typeof resPlay.catch === 'function')
+			{
+				resPlay.catch(function () {});
+			}
+		}
+		catch (error)
+		{
+
+		}
+
+		return waitCamera(request);
+	})
+	.then(function (cameraReady) {
+		if (cameraReady === null || cameraReady === false)
+			return;
 
 		if (request !== cameraRequest)
 			return;
-
-		if (previewCamera.videoWidth === 0|| previewCamera.videoHeight === 0)
-			throw new Error('Flux video vide');
 
 		isSource = 'camera';
 		previewImg.hidden = true;
@@ -432,8 +661,8 @@ cameraButton.addEventListener('click', async () => {
 		imageLoaded.value = '';
 
 		updateButtonCapture();
-	}
-	catch (error){
+	})
+	.catch(function (error) {
 		if (request !== cameraRequest)
 			return;
 
@@ -443,18 +672,26 @@ cameraButton.addEventListener('click', async () => {
 		previewText.textContent = "Aucune image disponible";
 		previewText.hidden = false;
 
-		if (error.name === 'NotAllowedError')
-			messageReponse.textContent = 'Autorise la camera dans navigateur et reessaie!';
-		else if (error.name === 'NotReadableError')
-			messageReponse.textContent = 'Camera occupee ou indisponible!';
-		else 
-			messageReponse.textContent = 'Impossible de demarer la camera.Reessaie!';
-
+		if (error && (error.name === 'NotAllowedError' || 
+					error.name === 'PermissionDeniedError' || 
+					error.name === 'SecurityError'))
+		{
+			messageReponse.textContent = 'Autorisez la caméra dans le navigateur et réessayez!';
+		}
+		else if (error && (error.name === 'NotReadableError' || error.name === 'TrackStartError'))
+		{
+			messageReponse.textContent = 'Caméra occupée ou indisponible!';
+		}
+		else
+		{
+			messageReponse.textContent = 'Impossible de démarrer la caméra.Réessayez!';
+		}
+			
 		updateButtonCapture();
-	} finally 
-	{
+	})
+	.then(function () {
 		if (request === cameraRequest)
 			cameraButton.disabled = false;
-	}
-
+	});
 });
+
