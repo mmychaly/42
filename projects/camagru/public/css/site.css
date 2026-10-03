@@ -8,7 +8,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	font-family: Arial, sans-serif;
-	background-image: url('/asset/background.avif');
+	background-image: url('/asset/background_html.jpg');
 	background-position: center;
 	background-size: cover;
 	background-repeat: no-repeat;
@@ -24,19 +24,26 @@ body {
 	justify-content: space-between;
 	align-items: center;
 	flex-wrap: wrap;
-	gap: 20px;
 }
 
 .site-nav{
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	gap: 20px;
+}
+
+.common-header > * + * {
+	margin-left: 20px;
+}
+
+.site-nav > * + * {
+	margin-left: 20px;
 }
 
 .site-main {
 	flex: 1;
-	width: min(1200px, 95%);
+	width: 95%;
+	max-width: 1200px;
 	margin: 24px auto;
 	padding: 24px;
 
@@ -89,11 +96,19 @@ body {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 24px;
+}
+
+.gallery-layout > * {
+	margin-bottom: 24px;
+}
+
+.gallery-layout > *:last-child {
+	margin-bottom: 0;
 }
 
 .gallery-image {
-	width: min(100%, 650px);
+	width: 100%;
+	max-width: 650px;
 	padding: 20px;
 
 	background: rgba(255, 255, 255, 0.7);
@@ -113,9 +128,11 @@ body {
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
-	gap: 12px;
 }
 
+.pagination > * {
+	margin: 0 6px 12px 6px;
+}
 
 @media (max-width: 768px) {
 	body {
@@ -129,7 +146,8 @@ body {
 }
 
 .profile-main{
-	width: min(600px, 95%);
+	width: 95%;
+	max-width: 600px;
 }
 
 .profile-main h1,
@@ -145,7 +163,8 @@ body {
 
 .auth-main {
 	flex: 0 0 auto;
-	width: min(420px, 95%);
+	width: 95%;
+	max-width: 420px;
 	margin: auto;
 }
 
@@ -169,7 +188,8 @@ body {
 }
 
 .comment {
-	overflow-wrap: anywhere;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
 }
 
 .comment-input {
@@ -188,5 +208,6 @@ body {
 	border: 1px solid #d58b9b;
 	border-radius: 6px;
 
-	overflow-wrap: anywhere;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
 }
