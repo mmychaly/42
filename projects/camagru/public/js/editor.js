@@ -78,12 +78,21 @@ function requestUserMedia(data)
 
 function joinCameraStream(stream)
 {
+	//Navigateurs modernes
 	if ('srcObject' in previewCamera)
 	{
 		previewCamera.srcObject = stream;
 		return;
 	}
 
+	//Anciennes versions de firefox
+	if ('mozSrcObject' in previewCamera)
+	{
+		previewCamera.mozSrcObject = stream;
+		return;
+	}
+
+	//Anciennes versions de Chrome
 	var urlObject = window.URL ||window.webkitURL;
 	if (urlObject && typeof urlObject.createObjectURL === 'function')
 	{
@@ -99,6 +108,9 @@ function cameraSource()
 		previewCamera.srcObject = null;
 		return;
 	}
+
+	if ('mozSrcObject' in previewCamera)
+		previewCamera.mozSrcObject = null;
 
 	if (cameraObjectUrl)
 	{
