@@ -1,4 +1,3 @@
-
 var overlays = document.querySelectorAll('.overlay[data-overlay]');
 var noStickerButton = document.querySelector('#no-sticker-button');
 var captureButton = document.querySelector('#capture-button');
@@ -73,6 +72,44 @@ function requestUserMedia(data)
 
 	return new Promise(function (resolve, reject) {
 		toolGetUserMedia.call(navigator, data, resolve, reject);
+	});
+}
+
+function timeoutUserMedia(data, timeout)
+{
+	return new Promise(function (resolve, reject) {
+		var isFinished = false;
+
+		var timer = setTimeout(function () {
+			if (isFinished)
+				return;
+
+			isFinished = true;
+
+			reject(new Error('CameraPermissionTimeout'));
+		}, timeout);
+
+		requestUserMedia(data)
+		.then(function (stream) {
+			if (isFinished)
+			{
+				stopStream(stream);
+				return;
+			}
+
+			isFinished = true;
+			clearTimeout(timer);
+
+			resolve(stream);
+		})
+		.catch(function (error) {
+			if (isFinished)
+				return;
+
+			isFinished = true;
+			clearTimeout(timer);
+			reject                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          (error);
+		});
 	});
 }
 
@@ -623,10 +660,10 @@ cameraButton.addEventListener('click', function () {
 	previewText.textContent = 'Demarrage de camera...';
 	previewText.hidden = false;
 
-	requestUserMedia({
+	timeoutUserMedia({
 		video: true,
 		audio: false
-	})
+	}, 10000)
 	.then(function (stream) {
 		if (request !== cameraRequest)
 		{
@@ -684,7 +721,11 @@ cameraButton.addEventListener('click', function () {
 		previewText.textContent = "Aucune image disponible";
 		previewText.hidden = false;
 
-		if (error && (error.name === 'NotAllowedError' || 
+		if (error && error.message === 'CameraPermissionTimeout')
+		{
+			messageReponse.textContent = "La demande à la caméra a expiré"
+		}
+		else if (error && (error.name === 'NotAllowedError' || 
 					error.name === 'PermissionDeniedError' || 
 					error.name === 'SecurityError'))
 		{
