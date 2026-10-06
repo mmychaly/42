@@ -48,7 +48,7 @@ $userImages = $stmt->fetchAll();
 
 			<div class="upload-img">
 				<label for="image-load">Choisir une image :</label>
-				<input type="file" id="image-load" accept="image/png, image/jpeg">
+				<input type="file" id="image-load" accept=".png,.jpg,.jpeg,image/png,image/jpeg">
 			</div>
 			<!-- overlay -->
 			<div id="overlay-list">

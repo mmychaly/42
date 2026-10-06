@@ -108,7 +108,7 @@ function timeoutUserMedia(data, timeout)
 
 			isFinished = true;
 			clearTimeout(timer);
-			reject                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          (error);
+			reject (error);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         (error);
 		});
 	});
 }
@@ -453,6 +453,7 @@ function sendImage(file)
 
 	fetch('/image/create', {
 			method: 'POST',
+			credentials: 'same-origin',
 			body: formData
 	})
 	.then(function (res) {
@@ -552,6 +553,7 @@ userImages.addEventListener('click', function (event) {
 	//On fait request pour supprimer l'image 
 	fetch("/image/delete", {
 		method: "POST",
+		credentials: 'same-origin',
 		body: formData
 	})
 	.then(function (res) {

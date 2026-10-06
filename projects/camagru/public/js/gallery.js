@@ -101,6 +101,7 @@ function eventlikeButton(button)
 		//requete vers le serveur pour ajouter/retirer un like 
 		fetch("/image/like", {
 			method: "POST",
+			credentials: 'same-origin',
 			body: formData
 		})
 		.then(function (res) {
@@ -182,6 +183,7 @@ function eventCommentForm(form)
 		//Avec fetch on va envoer la requete vers serveur avec commentaire
 		fetch("/image/comment", {
 			method: "POST",
+			credentials: 'same-origin',
 			body: formData
 		})
 		.then(function (res) {
