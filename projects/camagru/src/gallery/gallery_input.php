@@ -2,16 +2,18 @@
 
 require_once __DIR__  . '/../data/database.php';
 
+// Get the requested gallery page and validate it.
 $page = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT);
 
 if ($page === false ||$page === null ||$page < 1)
 	$page = 1;
 
+// Number of images displayed per page.
 $numImgPage = 5;
 
 $galleryError = null;
 
-//Bloc pour conter nombre de pages de galerie
+// Count the total number of gallery pages.
 try {
 	$stmt = $pdo->prepare(
 		'SELECT COUNT(*) AS quantity
@@ -21,17 +23,18 @@ try {
 	$stmt->execute();
 	$res = $stmt->fetch();
 
-	// 1)Request for the db , to count all images in the db
-	$totalImages = (int) $res['quantity'];// 2)Number of images in db, type int
-	$totalPages = (int) ceil($totalImages / $numImgPage);// 3)Total number of pages
+	// Count all images stored in the database.
+	$totalImages = (int) $res['quantity'];// Number of images in the database.
+	$totalPages = (int) ceil($totalImages / $numImgPage);// Total number of pages.
 
-	//Protection against request to  page non-existent
+	// Prevent requests to non-existent pages.
 	if ($totalPages > 0 && $page > $totalPages)
 	$page = $totalPages;
 
-		$calcPage =($page - 1) * $numImgPage; //On calcule sur que contité de image il faut passer à une l'autre
+	$calcPage =($page - 1) * $numImgPage; // Number of images to skip for pagination.
 
-	//4)Request to recive all data for each image, with a limit 5 images and an offset for pagination
+	// Load the images for the current page with the author's username
+	// and the number of likes for each image.
 	$stmt = $pdo->prepare(
 		'SELECT 
 			images.id,
@@ -49,25 +52,27 @@ try {
 		LIMIT ? OFFSET ?'
 	);
 
-	$stmt->bindValue(1, $numImgPage, PDO::PARAM_INT); //On utilise ca pour etre sur d'envoier int
+	$stmt->bindValue(1, $numImgPage, PDO::PARAM_INT); // Bind the value as an integer.
 	$stmt->bindValue(2, $calcPage, PDO::PARAM_INT);
 
-	//INNER JOIN users ON images.user_id = users.id // On va fussioner images et users
+	// INNER JOIN links each image with its author in the users table.
 
 	$stmt->execute();
 	$allImages = $stmt->fetchAll();
 
-	//comments
+	// Comments.
 	$comments = [];
+
 	if (!empty($allImages))
 	{
 		$imageIds = [];
 
 		foreach ($allImages as $image)
-			$imageIds[] = (int) $image['id'];
+			$imageIds[] = (int) $image['id'];// IDs of all images on the current page.
 
 		$preparePlaceholder = implode(',', array_fill(0, count($imageIds), '?'));
-
+		
+		// Load all comments belonging to the images displayed on the current page.
 		$stmt = $pdo->prepare(
 			"SELECT
 				comments.id,
@@ -86,48 +91,49 @@ try {
 		$comments = $stmt->fetchAll();
 	}
 
-	//likes
-	//On va chercher les id de l'images likes par utilisateur
+	// Likes.
 	$likedImages = [];
 
 	if (isset($_SESSION['user_id']) && !empty($allImages))
 	{
 		$imgIds = [];
 
-		foreach ($allImages as $image)//On va prendre tout les images de la page une par une
+		foreach ($allImages as $image)// IDs of all images on the current page.
 		{
-			$imgIds[] = (int) $image['id'];//On recuper les id de images
+			$imgIds[] = (int) $image['id'];
 		}
 
 		$preparePlaceholder = implode(',', array_fill(0, count($imgIds), '?'));
 
+		// Get the IDs of the displayed images already liked by the current user.
 		$stmt = $pdo->prepare(
 			"SELECT image_id
 			FROM likes
 			WHERE user_id = ?
 			AND image_id IN ($preparePlaceholder)"
 		);
-		$args = [$_SESSION['user_id']];
+
+		$args = [$_SESSION['user_id']];// First value: current user's ID.
 
 		foreach ($imgIds as $imgId)
-			$args[] = $imgId;
+			$args[] = $imgId;// Following values: image IDs.
 
-			$stmt->execute($args);
+		$stmt->execute($args);
 
-			$likedImages = $stmt->fetchAll();
-			$likedImages = array_map('intval', array_column($likedImages, 'image_id'));
+		$likedImages = $stmt->fetchAll();
+		$likedImages = array_map('intval', array_column($likedImages, 'image_id'));
 	}
-} catch(PDOException $e)
+}
+catch(PDOException $e)
 {
 	$galleryError = 'Impossible de charger la galerie!';
 	$allImages = [];
 	$totalPages = 0;
 } 
 
-
-
 ?>
 
+<!-- Main page -->
 <!DOCTYPE html>
 <html lang="fr">
 	<head>
@@ -143,41 +149,56 @@ try {
 			require __DIR__  . '/../common/header.php';
 		?>
 
-		
 		<?php if (isUserSession()): ?>
 			<input type="hidden" id="csrf-token" value="<?=htmlspecialchars(tokenCsrf()) ?>">
 		<?php endif; ?>
 
 		<main class="site-main gallery-layout">
 			<h1>Galerie</h1>
+
 			<?php if ($galleryError !== null): ?>
 				<p class='form-error' role='alert'>
 					<?= htmlspecialchars($galleryError) ?>
 				</p>
+
 			<?php elseif (empty($allImages)): ?>
 				<p>Aucune image dans la galerie</p>
+
 			<?php else: ?>
+
 				<?php foreach ($allImages as $image): ?>
 					<article class="gallery-image">
 						<img 
 								src="/uploads/<?=htmlspecialchars($image['filename'])?>" 
 								alt="Image de <?=htmlspecialchars($image['username'])?>" 
 								width="400">
+
 						<p> Crée par <?=htmlspecialchars($image['username'])?> </p>
 						<p> Date: <?=htmlspecialchars($image['created_at'])?> </p>
+
 						<p> Likes: 
 							<span class="like-number"><?= (int) $image['like_number'] ?></span>
 						</p>
+
 						<?php if (isset($_SESSION['user_id'])): ?>
 							<?php $hasLiked = in_array((int) $image['id'], $likedImages, true);?>
-							<button type="button" class='like-button' data-image-id="<?= (int) $image['id'] ?>">
+
+							<button
+								type="button"
+								class='like-button'
+								data-image-id="<?= (int) $image['id'] ?>"
+							>
 								<?= $hasLiked ? 'Retirer le like' : 'Like' ?>
 							</button>
+
 							<span class="error-massage" hidden></span>
 						<?php endif; ?>
-						<div class= "comments">
+
+						<div class="comments">
 							<h3>Commentaires</h3>
+
 							<?php foreach ($comments as $comment): ?>
+
 								<?php if ((int) $comment['image_id'] === (int) $image['id']): ?>
 									<div class="comment">
 										<p>
@@ -191,30 +212,50 @@ try {
 										</small>
 									</div>
 								<?php endif;?>
+
 							<?php endforeach; ?>
+
 							<?php if (isset($_SESSION['user_id'])): ?>
+
 								<button type="button" class="button-comment">
 									Ajouter un commentaire:
 								</button>
 
-								<form class="form-comment" data-image-id="<?= (int) $image['id'] ?>" hidden>
+								<form
+									class="form-comment"
+									data-image-id="<?= (int) $image['id'] ?>"
+									hidden
+								>
 									<label>
 										Commentaire:
-										<input type="text" name="message" class="comment-input" maxlength="400" required>
+										<input
+											type="text"
+											name="message"
+											class="comment-input"
+											maxlength="400"
+											required
+										>
 									</label>
+
 									<button type="submit">
 										Envoyer
 									</button>
+
 									<button type="button" class="cancel-comment">
 										Annuler
 									</button>
+
 									<span class="msg-error-comment" hidden></span>
 								</form>
+
 							<?php endif; ?>
 						</div>
 					</article>
+
 				<?php endforeach; ?>
+
  			<?php endif; ?>
+
 			<?php if ($totalPages > 1): ?>
 				<nav class="pagination">
 
@@ -225,6 +266,7 @@ try {
 					<?php endif; ?>
 
 					<?php for ($i = 1; $i <= $totalPages; $i++): ?>
+
 						<?php if ($i === $page): ?>
 							<span class="current-page">
 								<?= $i ?>
@@ -234,6 +276,7 @@ try {
 								<?= $i ?>
 							</a>
 						<?php endif;?>
+
 					<?php endfor; ?>
 					
 					<?php if ($page < $totalPages): ?>
@@ -241,10 +284,13 @@ try {
 							Suivant
 						</a>
 					<?php endif; ?>
+
 				</nav>
 			<?php endif; ?>
 		</main>
+
 		<?php require __DIR__  . '/../common/footer.php'; ?>
+
 		<script src="/js/gallery.js"></script>
 	</body>
 </html>

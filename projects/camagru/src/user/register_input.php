@@ -4,6 +4,7 @@ $registerErrors = $_SESSION['register_errors'] ?? [];
 unset($_SESSION['register_errors']);
 ?>
 
+<!-- Registration page with a form for username, email, password and CSRF token. -->
 <!DOCTYPE html>
 <html lang="fr">
 	<head>

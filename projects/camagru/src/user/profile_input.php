@@ -9,7 +9,7 @@ unset($_SESSION['profile_errors'], $_SESSION['profile_password_errors']);
 
 require_once __DIR__  . '/../data/database.php';
 
-//Ici on recuper les données d'utilisteur
+// Get the current user's data from the database.
 $stmt = $pdo->prepare(
 	'SELECT username, email, email_notif
 	FROM users
@@ -30,7 +30,7 @@ if (!$user) {
 }
 
 ?>
-
+<!-- Profile page -->
 <!DOCTYPE html>
 <html lang='fr'>
 <head>

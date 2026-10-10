@@ -36,26 +36,26 @@ function smtpWrite($socket, string $message): bool
 function sendEmail(string $email, string $subject, string $body): bool
 {
 
-	//on recuper les variable d'envirenement de SMTP dans les variable
+	// Get the SMTP configuration from environment variables.
 	$smtpUser = getenv('SMTP_USER');
 	$smtpPassword = getenv('SMTP_PASSWORD');
 	$smtpHost = getenv('SMTP_HOST');
 	$smtpPort = getenv('SMTP_PORT');
 	$smtpFrom = getenv('SMTP_FROM');
 
-	////Create connection with SMTP serveur
+	// Create a TCP connection to the SMTP server.
 	$socket = @stream_socket_client("tcp://$smtpHost:$smtpPort", $errorNumber, $errorMessage, 30);
 	if ($socket === false)
 		return false;
 
 	$responseSMTP = readFullResponse($socket);
-	if (substr($responseSMTP, 0, 3) !== '220') //For first message he must send 220
+	if (substr($responseSMTP, 0, 3) !== '220') // The SMTP server must respond with code 220 when the connection is established.
 	{
 		fclose($socket);
 		return false;
 	}
 
-	//Say at server Smpt name of client
+	// Send the client identification to the SMTP server.
 	if (!smtpWrite($socket, "EHLO localhost\r\n"))
 	{
 		fclose($socket);
@@ -63,13 +63,13 @@ function sendEmail(string $email, string $subject, string $body): bool
 	}
 
 	$responseSMTP = readFullResponse($socket);
-	if (substr($responseSMTP, 0, 3) !== '250') //For seconde and next 250 , if smtp dont return 250 we have the problem.
+	if (substr($responseSMTP, 0, 3) !== '250') // The SMTP server must respond with code 250 after EHLO.
 	{
 		fclose($socket);
 		return false;
 	}
 
-	//Launch TLS protocol for transmition name and password
+	// Request a secure TLS connection before sending credentials.
 	if (!smtpWrite($socket, "STARTTLS\r\n"))
 	{
 		fclose($socket);
@@ -83,7 +83,7 @@ function sendEmail(string $email, string $subject, string $body): bool
 		return false;
 	}
 
-	//We need trasform socket of TCP protocol towards TLS protocol 
+	// Upgrade the TCP socket to a TLS-encrypted connection.
 	$tlsEnabled = @stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
 	if ($tlsEnabled !== true)
 	{
@@ -91,7 +91,7 @@ function sendEmail(string $email, string $subject, string $body): bool
 		return false;
 	}
 
-	//After TLS , we need send second time
+	// Send EHLO again after enabling TLS.
 	if (!smtpWrite($socket, "EHLO localhost\r\n"))
 	{
 		fclose($socket);
@@ -104,21 +104,21 @@ function sendEmail(string $email, string $subject, string $body): bool
 		return false;
 	}
 
-	//AUTH LOGIN, send email and pasword
-	if (!smtpWrite($socket, "AUTH LOGIN\r\n"))//We want use autification in SMTP server
+	// Start SMTP authentication with AUTH LOGIN.
+	if (!smtpWrite($socket, "AUTH LOGIN\r\n"))// Request authentication on the SMTP server.
 	{
 		fclose($socket);
 		return false;
 	}
 	
 	$responseSMTP = readFullResponse($socket);
-	if (substr($responseSMTP, 0, 3) !== '334') //334 Server SMTP wait next part
+	if (substr($responseSMTP, 0, 3) !== '334') // Code 334 means the SMTP server is waiting for the next authentication value.
 	{
 		fclose($socket);
 		return false;
 	}
 
-	//Send email en base64
+	// Send the SMTP username encoded in Base64.
 	if (!smtpWrite($socket, base64_encode($smtpUser) . "\r\n"))
 	{
 		fclose($socket);
@@ -132,7 +132,7 @@ function sendEmail(string $email, string $subject, string $body): bool
 		return false;
 	}
 
-	//Send password at server SMTP en base64
+	// Send the SMTP password encoded in Base64.
 	if (!smtpWrite($socket, base64_encode($smtpPassword) . "\r\n"))
 	{
 		fclose($socket);
@@ -140,13 +140,13 @@ function sendEmail(string $email, string $subject, string $body): bool
 	}
 	 
 	$responseSMTP = readFullResponse($socket);
-	if (substr($responseSMTP, 0, 3) !== '235') //235 mean Auth succes
+	if (substr($responseSMTP, 0, 3) !== '235') // Code 235 means authentication was successful.
 	{
 		fclose($socket);
 		return false;
 	}
 
-	//We say who send email
+	// Define the sender email address.
 	if (!smtpWrite($socket, "MAIL FROM:<$smtpFrom>\r\n"))
 	{
 		fclose($socket);
@@ -160,7 +160,7 @@ function sendEmail(string $email, string $subject, string $body): bool
 		return false;
 	}
 
-	//We define who recive the email.
+	// Define the recipient email address.
 	if (!smtpWrite($socket, "RCPT TO:<$email>\r\n"))
 	{
 		fclose($socket);
@@ -174,7 +174,7 @@ function sendEmail(string $email, string $subject, string $body): bool
 		return false;
 	}
 
-	//Send the mail
+	// Tell the SMTP server that the email content will follow.
 	if (!smtpWrite($socket, "DATA\r\n"))
 	{
 		fclose($socket);
@@ -182,7 +182,7 @@ function sendEmail(string $email, string $subject, string $body): bool
 	}
 	
 	$responseSMTP = readFullResponse($socket);
-	if (substr($responseSMTP, 0, 3) !== '354') //Start input
+	if (substr($responseSMTP, 0, 3) !== '354') // Code 354 means the server is ready to receive the message content.
 	{
 		fclose($socket);
 		return false;
@@ -197,7 +197,7 @@ function sendEmail(string $email, string $subject, string $body): bool
 	
 	$message = $headers . "\r\n" . $body;
 
-	// Send message
+	// Send the email headers and body.
 	if (!smtpWrite($socket, $message . "\r\n.\r\n"))
 	{
 		fclose($socket);

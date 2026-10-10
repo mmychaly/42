@@ -1,10 +1,13 @@
 <?php
 
+//Form from profile to change password
+
 require_once __DIR__  . '/../data/database.php';
 
-$currentPassword = $_POST['current_password'] ?? '';
-$newPassword = $_POST['new_password'] ?? '';
-$confirmPassword = $_POST['confirm_password'] ?? '';
+
+$currentPassword = $_POST['current_password'] ?? '';//Extract current password sent by from
+$newPassword = $_POST['new_password'] ?? '';//Extract new password sent by from
+$confirmPassword = $_POST['confirm_password'] ?? '';//Extract confirm password sent by from
 
 $error = [];
 
@@ -21,6 +24,7 @@ if ($currentPassword === '')
 	$error[] = "Le mot de passe actuel est obligatoire!";
 }
 
+//verifying new password
 if ($newPassword === '')
 {
 	$error[] = "Le nouveau mot de passe est obligatoire!";
@@ -68,19 +72,23 @@ if (!$user) {
 	exit;
 }
 
+//verifying if current password is real password
 if (!password_verify($currentPassword, $user['password'])) {
 	$_SESSION['profile_password_errors'] = ['Le mot de passe actuel est incorrect!'];
 	header('Location: /profile', true, 303);
 	exit;
 }
 
+//verifying new password are different to current password
 if (password_verify($newPassword, $user['password'])) {
 	$_SESSION['profile_password_errors'] = ['Le nouveau mot de passe doit etre différent du mot de passe actuel!'];
 	header('Location: /profile', true, 303);
 	exit;
 }
-
+//Hash new password
 $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
+
+//Add new pasword to the database
 $stmt = $pdo->prepare(
 		'UPDATE users
 		SET password = :password

@@ -33,6 +33,7 @@ if(!is_array($overlays))
 	]);
 	exit;
 }
+
 if ($noOverlay && !empty($overlays))
 {
 	echo json_encode([
@@ -60,7 +61,7 @@ if ($file['error'] !== UPLOAD_ERR_OK)
 	exit;
 }
 
-//Interdiction de image trop lourde <5M
+// Reject files larger than 5 MB.
 $maxSize = 5 * 1024 * 1024;
 
 if ($file['size'] > $maxSize)
@@ -72,7 +73,7 @@ if ($file['size'] > $maxSize)
 	exit;	
 }
 
-//On verifie que le fichier est arrivé avec un http request
+// Check that the file was uploaded through an HTTP request.
 if (!is_uploaded_file($file['tmp_name']))
 {
 	echo json_encode([
@@ -83,7 +84,7 @@ if (!is_uploaded_file($file['tmp_name']))
 }
 
 
-//Verification de type d'image
+// Check the image type.
 $infoImg = @getimagesize($file['tmp_name']);
 
 if ($infoImg === false)
@@ -104,7 +105,7 @@ if ($infoImg['mime']  !== 'image/jpeg' && $infoImg['mime']  !== 'image/png')
 	exit;	
 }
 
-//Verification de la taille réelle
+// Check the actual image dimensions.
 $maxPixels = 16000000;
 
 if ($infoImg[0] <= 0 || $infoImg[1] <= 0 || $infoImg[0] * $infoImg[1] > $maxPixels)
@@ -116,8 +117,8 @@ if ($infoImg[0] <= 0 || $infoImg[1] <= 0 || $infoImg[0] * $infoImg[1] > $maxPixe
 	exit;	
 }
 
-//Créer un source pour DG
-//imageSourceDg est Handle interne qui pointe vers les données image chargées en mémoire par l'extension GD , type GDImage
+// Create a GD image source.
+// imageSourceDg is a GDImage object containing the image data loaded into memory by the GD extension.
 if ($infoImg['mime'] === 'image/jpeg')
 {
 	$imageSourceDg = @imagecreatefromjpeg($file['tmp_name']);
@@ -126,7 +127,8 @@ else
 {
 	$imageSourceDg = @imagecreatefrompng($file['tmp_name']);
 }
-//Verification est ce que c'est bien chargé on non
+
+// Check that the image was loaded successfully.
 if ($imageSourceDg === false)
 {
 	echo json_encode([
@@ -170,11 +172,11 @@ $overlayParam = [
 	]
 ];
 
-//Créer une image vide, dans laquelle on va fusionner image transformé avec overlay
+// Create an empty final image where the resized source image and overlays will be merged.
 
 $finalWidth = 600;
 $finalHeight = 450;
-$finalImage = imagecreatetruecolor($finalWidth, $finalHeight);//Image vide sans rien
+$finalImage = imagecreatetruecolor($finalWidth, $finalHeight);// Create an empty image.
 
 if ($finalImage === false)
 {
@@ -185,29 +187,40 @@ if ($finalImage === false)
 	exit;		
 }
 
-$imageSourceWidth = imagesx($imageSourceDg);//largeur de l'image en pixels
-$imageSourceHeight = imagesy($imageSourceDg);//hauteur de l'image en pixels
+$imageSourceWidth = imagesx($imageSourceDg);// Source image width in pixels.
+$imageSourceHeight = imagesy($imageSourceDg);// Source image height in pixels.
 
-$imageSourceRatio = $imageSourceWidth / $imageSourceHeight;//Ratio pour l'image source DG
-$finalImageRatio = $finalWidth / $finalHeight; //Ratio pour l'image final
+$imageSourceRatio = $imageSourceWidth / $imageSourceHeight;// Aspect ratio of the source GD image.
+$finalImageRatio = $finalWidth / $finalHeight; // Aspect ratio of the final image.
 
-if ($imageSourceRatio > $finalImageRatio) //Source trop large : couper gauche/droite
+if ($imageSourceRatio > $finalImageRatio) // Source image is too wide: crop the left and right sides.
 {
-	$cutHeight = $imageSourceHeight;//On garde hauteur
-	$cutWidth = (int) round($imageSourceHeight * $finalImageRatio);//Largeur final a copier
-	$sourceX = (int) round(($imageSourceWidth - $cutWidth) / 2);//Combien il faut decouper de 2 coté
+	$cutHeight = $imageSourceHeight;// Keep the full source height.
+	$cutWidth = (int) round($imageSourceHeight * $finalImageRatio);// Calculate the source width to copy.
+	$sourceX = (int) round(($imageSourceWidth - $cutWidth) / 2);// Calculate how many pixels to crop equally from both sides.
 	$sourceY = 0;	
 }
-else //image de source trop haute : couper haut/bas
+else // Source image is too tall: crop the top and bottom.
 {
-	$cutWidth = $imageSourceWidth;//On garde largeur
-	$cutHeight = (int) round($imageSourceWidth / $finalImageRatio);//Heauteur final a copier
+	$cutWidth = $imageSourceWidth;// Keep the full source width.
+	$cutHeight = (int) round($imageSourceWidth / $finalImageRatio);// Calculate the source height to copy.
 	$sourceX = 0;
-	$sourceY = (int) round(($imageSourceHeight - $cutHeight) / 2); //combien px il faut couper en bas / haut
+	$sourceY = (int) round(($imageSourceHeight - $cutHeight) / 2); // Calculate how many pixels to crop equally from the top and bottom.
 }
 
-//On copie les px de image source vers image final
-if (!imagecopyresampled($finalImage, $imageSourceDg, 0, 0, $sourceX, $sourceY, $finalWidth, $finalHeight, $cutWidth, $cutHeight))
+// Resize and copy the source image into the final image.
+if (!imagecopyresampled(
+	$finalImage,
+	$imageSourceDg,
+	0,
+	0,
+	$sourceX,
+	$sourceY,
+	$finalWidth,
+	$finalHeight,
+	$cutWidth,
+	$cutHeight
+))
 {
 	echo json_encode([
 		'success' => false,
@@ -247,6 +260,7 @@ foreach ($overlays as $overlay)
 	}	
 
 	$overlayFinal = imagecreatetruecolor($width, $height);
+
 	if ($overlayFinal === false)
 	{
 		echo json_encode([
@@ -262,7 +276,18 @@ foreach ($overlays as $overlay)
 	$overlayWidth = imagesx($overlayImage);
 	$overlayHeight = imagesy($overlayImage);
 
-	if (!imagecopyresampled($overlayFinal, $overlayImage, 0, 0, 0, 0, $width, $height, $overlayWidth, $overlayHeight))
+	if (!imagecopyresampled(
+		$overlayFinal,
+		$overlayImage,
+		0,
+		0,
+		0,
+		0,
+		$width,
+		$height,
+		$overlayWidth,
+		$overlayHeight
+	))
 	{
 		echo json_encode([
 			'success' => false,
@@ -273,7 +298,16 @@ foreach ($overlays as $overlay)
 
 	imagealphablending($finalImage, true);
 
-	if (!imagecopy($finalImage, $overlayFinal, $x, $y, 0, 0, $width, $height))
+	if (!imagecopy(
+		$finalImage,
+		$overlayFinal,
+		$x,
+		$y,
+		0,
+		0,
+		$width,
+		$height
+	))
 	{
 		echo json_encode([
 			'success' => false,
@@ -281,13 +315,14 @@ foreach ($overlays as $overlay)
 		]);
 		exit;	
 	}
+
 	imagedestroy($overlayImage);
 	imagedestroy($overlayFinal);
 }
 
-//Créer vraie l'image
-$newFilename = bin2hex(random_bytes(16)) . '.png';//Créer le nom de fichier;
-$uploadPath = __DIR__ . '/../../uploads/' . $newFilename; //Le chemin ou il faut enregistrer
+// Create and save the final image.
+$newFilename = bin2hex(random_bytes(16)) . '.png';// Create a random filename.
+$uploadPath = __DIR__ . '/../../uploads/' . $newFilename; // Path where the image will be saved.
 
 if (!@imagepng($finalImage, $uploadPath))
 {
@@ -308,18 +343,22 @@ try {
 		$_SESSION['user_id'],
 		$newFilename
 	]);
+
 	$imageId = (int) $pdo->lastInsertId();
-} catch (PDOException $e)
+}
+catch (PDOException $e)
 {
 	@unlink($uploadPath);
+
 	echo json_encode([
 		'success' => false,
 		'message' => 'Impossible d\'enregister l\'image!'
 	]);
+
 	exit;	
 }
 
-//liberer le memoire
+// Free the GD image resources.
 imagedestroy($imageSourceDg);
 imagedestroy($finalImage);
 

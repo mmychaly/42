@@ -2,7 +2,7 @@
 $loginError = $_SESSION['login_error'] ?? null;
 unset($_SESSION['login_error']);
 ?>
-
+<!-- Login page with a form for username and password -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -37,11 +37,9 @@ unset($_SESSION['login_error']);
 			<p></p>
 			<button type="submit">Se connecter</button>
 		</form>
-		<!-- add p here? -->
 		<p>
 			<a href="/password-forgot">Mot de passe oublié?</a>
 		</p>
-		<!-- add p here? -->
 		<?php if (isset($_GET['verified'])): ?>
 			<p>L'email a été vérifié. Vous pouvez vous connecter.</p>
 		<?php endif; ?>

@@ -5,6 +5,8 @@ $forgotSuccess = $_SESSION['forgot_success'] ?? null;
 unset($_SESSION['forgot_error'], $_SESSION['forgot_success']);
 ?>
 
+<!-- Reset password page from /login -->
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>

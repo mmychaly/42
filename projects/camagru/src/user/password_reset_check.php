@@ -3,17 +3,18 @@
 require_once __DIR__  . '/../data/database.php';
 
 
-$token = $_POST['token'] ?? ''; //Token de lien de la réinitialisation
+$token = $_POST['token'] ?? ''; //Reset link
 $password = $_POST['password'] ?? '';//New password
 
-//Check token if not compliant request without token == linkError
+// Check that the reset token has the expected format.
 if (!is_string($token) || strlen($token) !== 64 || !ctype_xdigit($token))
 {
 	header('Location: /password-reset', true, 303);
 	exit;
 }
 
-//If password != string , add error to variable and launch new request to display error
+
+// Check that the password has the expected type.
 if (!is_string($password))
 {
 	$_SESSION['reset_errors'] = ['Mot de passe invalide'];
@@ -22,7 +23,7 @@ if (!is_string($password))
 }
 
 $error = [];
-//Check compliant for password
+// Check that the password meets the required format.
 if ($password === '')
 {
 	$error[] = "Le mot de passe est obligatoire!";
@@ -40,7 +41,8 @@ if ($password === '')
 	$error[] = "Le mot de passe doit contenir au moins un chiffre!";
 }
 
-//If password not comlpliant add error to variable and launch new request to display error
+// If the password is not valid, store the errors and redirect
+// to the reset page to display them.
 if (!empty($error))
 {
 	$_SESSION['reset_errors'] = $error;
@@ -48,10 +50,14 @@ if (!empty($error))
 	exit;
 }
 
-$tokenHash = hash('sha256', $token);//On hash pour avoir meme quedans db
-$passwordHash = password_hash($password, PASSWORD_DEFAULT);//We hash new password to stock in db 
+// Hash the reset token to compare it with the stored hash
+$tokenHash = hash('sha256', $token);
 
-//If token exists in db we aset new password in db and put token in NULL
+// Hash the new password before storing it in the database.
+$passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
+// If the token exists and has not expired,
+// update the password and clear the reset token.
 $stmt = $pdo->prepare(
 	'UPDATE users 
 	SET password = :password,
@@ -66,13 +72,13 @@ $stmt->execute([
 	'token_reset' => $tokenHash
 ]);
 
-//If db not  upload add error to variable and launch new request to display error
+// If no row was updated, the reset token is invalid or expired.
 if ($stmt->rowCount() !== 1)
 {
 	header('Location: /password-reset', true, 303);
 	exit;
 }
 
-//If it's ok, display /login
+// If successful, redirect to the login page.
 header('Location: /login?password-reset=1', true, 303);
 exit;

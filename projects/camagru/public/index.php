@@ -4,24 +4,58 @@ session_set_cookie_params([
 	'httponly' => true,
 	'samesite' => 'Lax'
 ]);
+//JS can't read cookis
+//Dont send cookis to other site
 
-session_start();
+session_start();//Start session php or extract existing session
 
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$method = $_SERVER['REQUEST_METHOD'];
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);//Extract URL of request 
+$method = $_SERVER['REQUEST_METHOD'];//Extract method of request 
 
-require_once __DIR__ . '/../src/common/auth.php';
-require_once __DIR__ . '/../src/common/csrf.php';
+require_once __DIR__ . '/../src/common/auth.php';//Add code from auth
+require_once __DIR__ . '/../src/common/csrf.php';//Add code from csrf
 
+//Main page.Accessible for user connected and not. Display html page
 if (($path === '/' || $path === '/image/gallery') && $method === 'GET') {
  
-	require __DIR__  . '/../src/gallery/gallery_input.php';
+	require __DIR__  . '/../src/gallery/gallery_input.php';//Exit after execute this code 
 	exit;
 }
 
+//Page html with form for register user in the server
+if ($path === '/register' && $method === 'GET')
+{
+	if (isUserSession()) {
+		header('Location: /');
+		exit;
+	}
+	require __DIR__  . '/../src/user/register_input.php';
+	exit;
+}
 
+//Request with data of user to register user in server.
+if ($path === '/register' && $method === 'POST')
+{
+	if (isUserSession()) {
+		header('Location: /');
+		exit;
+	}
+	ckeckCsrf('/register');
+
+	require __DIR__  . '/../src/user/register_check.php';
+	exit;
+}
+
+if ($path === '/verify-email' && $method === 'GET')
+{
+	require __DIR__  . '/../src/user/email_verify.php';
+	exit;
+}
+
+//Display login page.Html where user can login 
 if ($path === '/login' && $method === 'GET')
 {
+	//Check user connected or not.If user is connected redirection to main page
 	if (isUserSession()) {
 		header('Location: /');
 		exit;
@@ -31,6 +65,7 @@ if ($path === '/login' && $method === 'GET')
 	exit;
 }
 
+//Request with user data for connect user to server
 if ($path === '/login' && $method === 'POST')
 {
 	if (isUserSession()) {
@@ -44,28 +79,6 @@ if ($path === '/login' && $method === 'POST')
 	exit;
 }
 
-if ($path === '/register' && $method === 'GET')
-{
-	if (isUserSession()) {
-		header('Location: /');
-		exit;
-	}
-	require __DIR__  . '/../src/user/register_input.php';
-	exit;
-}
-
-if ($path === '/register' && $method === 'POST')
-{
-	if (isUserSession()) {
-		header('Location: /');
-		exit;
-	}
-	ckeckCsrf('/register');
-
-	require __DIR__  . '/../src/user/register_check.php';
-	exit;
-}
-
 if ($path === '/logout' && $method === 'POST')
 {
 	checkSession();
@@ -75,11 +88,7 @@ if ($path === '/logout' && $method === 'POST')
 	exit;
 }
 
-if ($path === '/verify-email' && $method === 'GET')
-{
-	require __DIR__  . '/../src/user/email_verify.php';
-	exit;
-}
+
 
 //Bloc for forgot password
 
@@ -128,8 +137,7 @@ if ($path === '/password-reset' && $method === 'POST')
 	exit;
 }
 
-//Changement du profil
-
+//Display profil
 if ($path === '/profile' && $method === 'GET')
 {
 	checkSession();

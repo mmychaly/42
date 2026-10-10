@@ -1,5 +1,6 @@
 <?php
 
+//Page for check email verify link 
 require_once __DIR__  . '/../data/database.php';
 
 $token = $_GET['token'] ?? '';
@@ -22,7 +23,7 @@ if (!is_string($token) || strlen($token) !== 64 || !ctype_xdigit($token))
 
 $tokenHash = hash('sha256', $token);
 
-
+//If email link is real and not expired, change data
 $stmt = $pdo->prepare(
 	'UPDATE users
 	SET email_check = TRUE,

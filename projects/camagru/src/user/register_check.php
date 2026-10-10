@@ -1,15 +1,15 @@
 <?php
 
-require_once __DIR__  . '/../data/database.php'; //recuperer pdo, connection avec db
-require_once __DIR__  . '/../common/mail.php'; //recuper envirenement de SMTP
-//
-$username = trim($_POST['username'] ?? '');
-$email = trim($_POST['email'] ?? '');
-$password = trim($_POST['password'] ?? '');
+require_once __DIR__  . '/../data/database.php'; // Load the PDO database connection.
+require_once __DIR__  . '/../common/mail.php'; // Load the mail/SMTP functions.
+
+$username = trim($_POST['username'] ?? ''); // Extract the username sent by the form.
+$email = trim($_POST['email'] ?? ''); // Extract the email sent by the form.
+$password = trim($_POST['password'] ?? ''); // Extract the password sent by the form.
 
 $error = [];
 
-if ($username === '') //Verification de username 
+if ($username === '') //Check username 
 {
 	$error[] = "Le nom d'utilisateur est obligatoire!";
 } elseif(strlen($username) < 3 || strlen($username) > 50)
@@ -52,6 +52,7 @@ if (!empty($error))
 	exit;
 }
 
+// Delete unconfirmed users whose verification token has expired.
 try {
 	$stmt = $pdo->prepare(
 		'DELETE FROM users
@@ -68,6 +69,7 @@ try {
 	exit;
 }
 
+// Check whether the username or email already exists in the database.
 $res = $pdo->prepare('SELECT id, username, email
 						FROM users
 						WHERE username = :username
@@ -78,6 +80,7 @@ $res->execute(['username' => $username,
 
 $data = $res->fetch();
 
+// If the username or email already exists, add an error.
 if ($data)
 {
 	if($data['username'] === $username)
@@ -93,10 +96,12 @@ if (!empty($error))
 	exit;
 }
 
-$passwordHash = password_hash($password, PASSWORD_DEFAULT); // on transforme le mot de pass vers les symboles aleatoire
-$verifToken = bin2hex(random_bytes(32)); //token pour verifier l'email
-$verifTokenHash = hash('sha256', $verifToken); //on hash le token
+$passwordHash = password_hash($password, PASSWORD_DEFAULT); // Hash the password before storing it in the database.
+$verifToken = bin2hex(random_bytes(32)); // Create an email verification token.
+$verifTokenHash = hash('sha256', $verifToken); // Hash the verification token before storing it in the database.
 
+// Insert the user into the database with the hashed password,
+// hashed verification token and token expiration time.
 $stmt = $pdo->prepare(
 	'INSERT INTO users (
 		username,
@@ -121,11 +126,12 @@ $stmt->execute([
 	'token_verif' => $verifTokenHash
 ]);
 
-$appUrl = rtrim(getenv('APP_URL'), '/');
 
+$appUrl = rtrim(getenv('APP_URL'), '/'); // Get the application base URL.
 
-$verifLink = $appUrl . '/verify-email?token=' . urlencode($verifToken);
+$verifLink = $appUrl . '/verify-email?token=' . urlencode($verifToken); // Build the verification URL with the original token.
 
+// Send the verification email.
 $emailRes = sendVerifEmail($username, $email, $verifLink);
 if (!$emailRes)
 {
@@ -134,5 +140,6 @@ if (!$emailRes)
 	exit;
 }
 
+// Redirect to the login page.
 header('Location: /login?registered=1');
 exit;

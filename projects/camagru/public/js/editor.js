@@ -2,8 +2,8 @@ var overlays = document.querySelectorAll('.overlay[data-overlay]');
 var noStickerButton = document.querySelector('#no-sticker-button');
 var captureButton = document.querySelector('#capture-button');
 var previewOverlays = document.querySelector('#preview-overlays');
-var imageLoaded = document.querySelector('#image-load');//Element with image loaded
-var previewImg = document.querySelector('#preview-image'); //Element where we display image-load
+var imageLoaded = document.querySelector('#image-load');// Input element used to load an image.
+var previewImg = document.querySelector('#preview-image'); // Element used to display the loaded image.
 var previewText = document.querySelector('#preview-text');
 var messageReponse = document.querySelector('#msg-capture');
 var userImages = document.querySelector('#user-images');
@@ -20,8 +20,8 @@ var cameraStream = null;
 var cameraRequest = 0;
 var cameraObjectUrl = null;
 var isSource = null;
-//Positionement de overlay
 
+// Overlay positioning.
 var overlayParam = {
 	'cat.png': {
 		x: 150,
@@ -57,11 +57,11 @@ var overlayParam = {
 
 function requestUserMedia(data)
 {
-	//Pour les navigateurs recents
+	// For modern browsers.
 	if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function')
 		return navigator.mediaDevices.getUserMedia(data);
 
-	//Pour les navigateurs anciens
+	// For older browsers.
 	var toolGetUserMedia = 
 		navigator.getUserMedia ||
 		navigator.webkitGetUserMedia ||
@@ -115,22 +115,23 @@ function timeoutUserMedia(data, timeout)
 
 function joinCameraStream(stream)
 {
-	//Navigateurs modernes
+	// Modern browsers.
 	if ('srcObject' in previewCamera)
 	{
 		previewCamera.srcObject = stream;
 		return;
 	}
 
-	//Anciennes versions de firefox
+	// Older versions of Firefox.
 	if ('mozSrcObject' in previewCamera)
 	{
 		previewCamera.mozSrcObject = stream;
 		return;
 	}
 
-	//Anciennes versions de Chrome
+	// Older versions of Chrome.
 	var urlObject = window.URL ||window.webkitURL;
+
 	if (urlObject && typeof urlObject.createObjectURL === 'function')
 	{
 		cameraObjectUrl = urlObject.createObjectURL(stream);
@@ -233,15 +234,16 @@ function createUserImage(imageId, imageUrl)
 	container.classList.add('user-image');
 	container.dataset.imageId = imageId;
 
-	//creation de image
+	// Create the image element.
 	var newImg = document.createElement('img');
 
 	newImg.src = imageUrl;
 	newImg.alt = 'Image crée';
 	newImg.width = 150;
 
-	//Creation de bouton delete
+	// Create the delete button.
 	var deleteButton = document.createElement('button');
+
 	deleteButton.type = 'button';
 	deleteButton.classList.add('delete-image');
 	deleteButton.textContent='Supprimer';
@@ -305,14 +307,15 @@ function captureImage()
 
 	try {
 		context.drawImage(previewCamera, 0, 0, 600, 450);
-	} catch (error)
+	}
+	catch (error)
 	{
 		return Promise.resolve(null);
 	}
 
 	return new Promise(function (resolve)  {
 		
-		//Methode pour les navigateurs récents
+		// Method for modern browsers.
 		if (typeof canvas.toBlob === 'function')
 		{
 			canvas.toBlob(function (blob) {
@@ -322,7 +325,7 @@ function captureImage()
 			return;
 		}
 
-		//Pour les navigateurs anciens
+		// For older browsers.
 		try {
 			var dataUrl = canvas.toDataURL('image/png');
 			resolve(dataUrlBlob(dataUrl));
@@ -342,9 +345,9 @@ function eventOverlay(overlay)
 		
 		var overlayName = overlay.dataset.overlay;
 
-		if (overlay.classList.contains('selected')) //Si on click sur le botton deja selected on pourra désélectionné
+		if (overlay.classList.contains('selected')) // If the overlay is already selected, clicking it again deselects it.
 		{
-			overlay.classList.remove('selected');//on retire le class
+			overlay.classList.remove('selected');// Remove the selected class.
 
 			for (var i = 0; i < selectedOverlays.length; i++)
 			{
@@ -392,7 +395,7 @@ noStickerButton.addEventListener('click', function () {
 });
 
 
-//Add image from computer in div preview
+// Display an image loaded from the computer in the preview.
 imageLoaded.addEventListener('change', function () {
 	var file = imageLoaded.files[0];
 	var urlObject = window.URL || window.webkitURL;
@@ -479,7 +482,7 @@ function sendImage(file)
 		var noImgMessage = document.querySelector('#no-img-message');
 			
 		if (noImgMessage && noImgMessage.parentNode)
-				noImgMessage.parentNode.removeChild(noImgMessage);
+			noImgMessage.parentNode.removeChild(noImgMessage);
 
 		var container = createUserImage(data.imageId, data.imageUrl);
 
@@ -526,6 +529,7 @@ captureButton.addEventListener('click', function () {
 				messageReponse.textContent = "Imposible de prendre la photo.";
 				return;
 			}
+
 			sendImage(file);
 		})
 		.catch(function () {
@@ -534,29 +538,31 @@ captureButton.addEventListener('click', function () {
 	}
 });
 
-//Si user click sur le bouton supprimer
+// Handle a click on an image delete button.
 userImages.addEventListener('click', function (event) {
 
 	if (!event.target.classList.contains('delete-image'))
 		return;
 	
-	var parentDiv = event.target.closest('.user-image');//On trouver le parent de bouton, dans ce parent nous avons id de l'image
+	var parentDiv = event.target.closest('.user-image');// Find the parent element containing the image ID.
+
 	if (!parentDiv)
 		return;
 
 	var imageId = parentDiv.dataset.imageId;
 
-	var formData = new FormData();//On ajout information sur id de l'image 
+	var formData = new FormData();// Create the form data containing the image ID.
 	formData.append('image_id', imageId);
 	formData.append('csrf_token', tokenCsrf);
 
-	//On fait request pour supprimer l'image 
+	// Send a request to delete the image.
 	fetch("/image/delete", {
 		method: "POST",
 		credentials: 'same-origin',
 		body: formData
 	})
 	.then(function (res) {
+
 		if (!res.ok)
 		{
 			messageReponse.textContent = "Erreur de suppression."
@@ -566,18 +572,19 @@ userImages.addEventListener('click', function (event) {
 		return res.json();
 	})
 	.then(function (data) {
+
 		if (data === null)
 			return;
 
-		messageReponse.textContent = data.message;//On afficher le message
+		messageReponse.textContent = data.message;// Display the server response message.
 
 		if (!data.success)
 			return;
 
 		if (parentDiv.parentNode)
-			parentDiv.parentNode.removeChild(parentDiv);//On retire div avec l'image et bouton
+			parentDiv.parentNode.removeChild(parentDiv);// Remove the image container and its delete button.
 	
-		if (userImages.querySelectorAll('.user-image').length === 0)//Si on a supprimé tout les images on affiche que il n'a plus de images
+		if (userImages.querySelectorAll('.user-image').length === 0)// If all images were deleted, display the empty-gallery message.
 		{
 			var message = document.createElement('p');
 			message.id = 'no-img-message';
@@ -593,6 +600,7 @@ userImages.addEventListener('click', function (event) {
 function waitCamera(request)
 {
 	return new Promise(function (resolve, reject) {
+
 		var startTime = Date.now();
 
 		function checkCamera()
@@ -627,6 +635,7 @@ function waitCamera(request)
 function addTrackEnded(track, request)
 {
 	track.addEventListener('ended', function () {
+
 		if (request !== cameraRequest)
 			return;
 
@@ -646,7 +655,7 @@ function addTrackEnded(track, request)
 }
 
 
-//Fonctionement de camera
+// Camera handling.
 cameraButton.addEventListener('click', function () {
 	
 	var request = ++cameraRequest;
@@ -667,6 +676,7 @@ cameraButton.addEventListener('click', function () {
 		audio: false
 	}, 10000)
 	.then(function (stream) {
+
 		if (request !== cameraRequest)
 		{
 			stopStream(stream);
@@ -674,7 +684,9 @@ cameraButton.addEventListener('click', function () {
 		}
 
 		cameraStream = stream;
+
 		var tracks = stream.getVideoTracks();
+
 		for (var i = 0; i < tracks.length; i++)
 			addTrackEnded(tracks[i], request);
 
@@ -699,6 +711,7 @@ cameraButton.addEventListener('click', function () {
 		return waitCamera(request);
 	})
 	.then(function (cameraReady) {
+
 		if (cameraReady === null || cameraReady === false)
 			return;
 
@@ -714,6 +727,7 @@ cameraButton.addEventListener('click', function () {
 		updateButtonCapture();
 	})
 	.catch(function (error) {
+
 		if (request !== cameraRequest)
 			return;
 
@@ -727,13 +741,18 @@ cameraButton.addEventListener('click', function () {
 		{
 			messageReponse.textContent = "La demande à la caméra a expiré"
 		}
-		else if (error && (error.name === 'NotAllowedError' || 
-					error.name === 'PermissionDeniedError' || 
-					error.name === 'SecurityError'))
+		else if (error && (
+			error.name === 'NotAllowedError' || 
+			error.name === 'PermissionDeniedError' || 
+			error.name === 'SecurityError'
+		))
 		{
 			messageReponse.textContent = 'Autorisez la caméra dans le navigateur et réessayez!';
 		}
-		else if (error && (error.name === 'NotReadableError' || error.name === 'TrackStartError'))
+		else if (
+			error &&
+			(error.name === 'NotReadableError' || error.name === 'TrackStartError')
+		)
 		{
 			messageReponse.textContent = 'Caméra occupée ou indisponible!';
 		}
@@ -745,8 +764,8 @@ cameraButton.addEventListener('click', function () {
 		updateButtonCapture();
 	})
 	.then(function () {
+
 		if (request === cameraRequest)
 			cameraButton.disabled = false;
 	});
 });
-

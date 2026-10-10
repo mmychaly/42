@@ -21,6 +21,7 @@ if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL))
 	exit;
 }
 
+// Search for the user associated with this email address.
 $stmt = $pdo->prepare(
 	'SELECT id, username, email
 	FROM users
@@ -40,11 +41,19 @@ if (!$user)
 	exit;
 }
 
+// Create a random password-reset token.
 $resetToken = bin2hex(random_bytes(32));
+
+// Hash the token before storing it in the database.
 $resetTokenHash = hash('sha256', $resetToken);
+
+// Build the reset link using the original token.
 $appUrl = rtrim(getenv('APP_URL'), '/');
 $resetLink = $appUrl . '/password-reset?token=' . urlencode($resetToken);
 
+
+// Store the reset token with a one-hour expiration.
+// Use a transaction so the token is kept only if the email is sent successfully.
 try {
 	$pdo->beginTransaction();
 	$stmt = $pdo->prepare(

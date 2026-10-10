@@ -1,5 +1,7 @@
 <?php
 
+//Form from profile , to change username, email and email notif
+
 require_once __DIR__  . '/../data/database.php';
 require_once __DIR__  . '/../common/mail.php';
 
@@ -32,6 +34,7 @@ $usernameChanged = $username !== $currentUser['username'];
 $emailChanged = $email !== $currentUser['email'];
 $emailNotifChanged = $emailNotif !== (int) $currentUser['email_notif'];
 
+// Check which profile fields were modified.
 if (!$usernameChanged && !$emailChanged && !$emailNotifChanged)
 {
 	header('Location: /profile');
@@ -39,7 +42,7 @@ if (!$usernameChanged && !$emailChanged && !$emailNotifChanged)
 }
 
 if ($usernameChanged) {
-	if ($username === '') //Verification de username 
+	if ($username === '')
 	{
 		$error[] = "Le nom d'utilisateur est obligatoire!";
 	} elseif(strlen($username) < 3 || strlen($username) > 50)
@@ -60,6 +63,8 @@ if ($emailChanged) {
 	}
 }
 
+
+//Verify username in db
 if($usernameChanged && empty($error)) {
 	$stmt = $pdo->prepare(
 		'SELECT id
@@ -78,6 +83,7 @@ if($usernameChanged && empty($error)) {
 	}
 }
 
+//Check email in db
 if($emailChanged && empty($error)) {
 	$stmt = $pdo->prepare(
 		'SELECT id
@@ -123,12 +129,13 @@ if (!$emailChanged) {
 	exit;
 }
 
-//Changment d'email.
-$verifToken = bin2hex(random_bytes(32)); //token pour verifier l'email
-$verifTokenHash = hash('sha256', $verifToken); //on hash le token
+// Handle an email address change.
+$verifToken = bin2hex(random_bytes(32));
+$verifTokenHash = hash('sha256', $verifToken);
 $appUrl = rtrim(getenv('APP_URL'), '/');
 $verifLink = $appUrl . '/verify-email?token=' . urlencode($verifToken);
 
+//If email change, update all
 try{
 	$pdo->beginTransaction();
 	$stmt = $pdo->prepare(

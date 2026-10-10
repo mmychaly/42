@@ -2,15 +2,16 @@
 
 require_once __DIR__  . '/../data/database.php';
 
-$token = $_GET['token'] ?? '';//Token de lien de la réinitialisation
-$linkError=null;//Variable dans laquelle on stock les erreur de lien transmit
+$token = $_GET['token'] ?? '';//Extract reset link
+$linkError=null;
 
 
 $resetErrors = $_SESSION['reset_errors'] ?? [];//We receive errors from reset_check 
 unset($_SESSION['reset_errors']);//Unset let clear variable $_SESSION['reset_errors']
 
 
-//Ici on va verifier si le token de lien est conform  et nous avons ce token dans la db et est ce que il est toujour valide
+// Check that the token has a valid format,
+// exists in the database and has not expired.
 if (!is_string($token) || strlen($token) !== 64 || !ctype_xdigit($token))//
 {
 	$linkError='Lien de réinitialisation invalide';
@@ -38,7 +39,7 @@ else
 }
 
 ?>
-
+<!-- Reset password page -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>

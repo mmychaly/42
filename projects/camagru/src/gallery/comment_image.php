@@ -5,10 +5,10 @@ require_once __DIR__  . '/../common/mail.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-$imageId = filter_input(INPUT_POST, 'image_id', FILTER_VALIDATE_INT);//Recuperer le id de image depuis body de post
+$imageId = filter_input(INPUT_POST, 'image_id', FILTER_VALIDATE_INT);// Get the image ID from the POST request body.
 
 
-if ($imageId === false || $imageId === null || $imageId < 1)//verification
+if ($imageId === false || $imageId === null || $imageId < 1)// Validate the image ID.
 {
 		echo json_encode([
 			'success' => false,
@@ -109,7 +109,7 @@ if ((int) $image['email_notif'] === 1)
 
 
 
-//On fait request pour recuperer information complete de commentaire
+// Get the complete information for the newly created comment.
 try{
  	$stmt = $pdo->prepare(
 		'SELECT
@@ -144,7 +144,7 @@ try{
 }
 
 
-//on va retourner le data vers js pour afficher les données
+// Return the comment data to JavaScript for display.
 echo json_encode([
 	'success' => true,
 	'message' => "Commentaire ajouté",

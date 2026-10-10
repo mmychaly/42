@@ -42,7 +42,6 @@ $userImages = $stmt->fetchAll();
 
 				<img id = "preview-image" src="" alt="Image chargée" hidden>
 				<div id="preview-overlays"></div>
-				<!-- <img id = "preview-overlay" src="" alt="Overlay ajouté" hidden> -->
 			</div>
 			<button type="button" id="button-camera">Prendre la photo avec camera</button>
 
